@@ -32,5 +32,5 @@ package com.easyinnova.main;
 
 
 public class Main {
-
+  int a = 0;
 }
