@@ -32,6 +32,12 @@ package com.easyinnova.main;
 
 
 public class Main {
-  int a = 0;
-  //comment
+  int a = 1;
+
+  // commentari
+
+  int FuncioXula() {
+    return 0;
+  }
 }
+
