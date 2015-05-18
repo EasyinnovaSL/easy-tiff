@@ -1,5 +1,5 @@
 /**
- * <h1>TiffReader.java</h1> 
+ * <h1>TiffReaderWriter.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,7 +25,7 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 14/5/2015
+ * @since 18/5/2015
  *
  */
 package com.easyinnova.main;
@@ -34,9 +34,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * The Class TiffReader.
+ * The Class EasyTiff.
  */
-public class TiffReader {
+public class TiffReaderWriter {
 
   /**
    * The main method.

@@ -56,6 +56,9 @@ public class TiffFile {
   /** The first IFD. */
   IFD IFD0;
 
+  /** The Ifd structure. */
+  TiffStructure IfdStructure;
+
   /** The result of the validation. */
   ValidationResult validation_result;
 
@@ -70,6 +73,7 @@ public class TiffFile {
   public TiffFile(String filename) {
     this.filename = filename;
     validation_result = new ValidationResult();
+    IfdStructure = new TiffStructure();
   }
 
   /**
@@ -85,10 +89,9 @@ public class TiffFile {
       if (Files.exists(path)) {
         RandomAccessFile memoryMappedFile = new RandomAccessFile(filename, "rw");
         data = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, PageSize);
-        int result = ReadHeader();
-        if (result == 0) {
+        boolean result = ReadHeader();
+        if (result)
           ReadIFDs();
-        }
         memoryMappedFile.close();
       } else {
         // File not found
@@ -109,6 +112,7 @@ public class TiffFile {
     int n = 0;
     IFD ifd0 = ReadIFD(4);
     ifd0.Validate(validation_result);
+    IfdStructure.AddIfd(ifd0);
     n++;
     IFD current_ifd = ifd0;
     while (current_ifd.hasNextIFD()) {
@@ -119,6 +123,7 @@ public class TiffFile {
         break;
       } else {
         current_ifd.Validate(validation_result);
+        IfdStructure.AddIfd(current_ifd);
       }
       n++;
     }
@@ -160,8 +165,8 @@ public class TiffFile {
    *
    * @return true, if successful
    */
-  public int ReadHeader() {
-    int result = 0;
+  public boolean ReadHeader() {
+    boolean ok = true;
     ByteOrder order = ByteOrder.BIG_ENDIAN;
 
     // read the first two bytes to know the byte ordering
@@ -171,25 +176,25 @@ public class TiffFile {
       order = ByteOrder.BIG_ENDIAN;
     else {
       validation_result.addError("Invalid Byte Order", "" + data.get(0) + data.get(1));
-      result = -11;
+      ok = false;
     }
 
     data.order(order);
 
-    if (result == 0) {
+    if (ok) {
       try{
         int magic = data.getShort(2);
         if (magic != 42) {
-          result = -12;
+          ok = false;
           validation_result.addError("Magic number != 42", magic);
         }
       } catch (IndexOutOfBoundsException ex) {
         validation_result.addError("Magic number format");
-        result = -13;
+        ok = false;
       }
     }
 
-    return result;
+    return ok;
   }
 
   /**
