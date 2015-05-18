@@ -17,13 +17,13 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the ï¿½ statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * ï¿½ 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author Vï¿½ctor Muï¿½oz Solï¿½
  * @version 1.0
  * @since 14/5/2015
  *
@@ -39,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class TiffFile.
  */
@@ -142,7 +143,7 @@ public class TiffFile {
         long tagN = data.getLong(index + 4);
         long tagValue = data.getLong(index + 8);
 
-        IfdEntry tag = new IfdEntry(tagid, tagType, tagN, tagValue);
+        Tag tag = new Tag(tagid, tagType, tagN, tagValue);
         ifd.AddTag(tag);
 
         index += 12;
@@ -193,8 +194,9 @@ public class TiffFile {
 
   /**
    * Reads a short. (deprecated)
-   * 
+   *
    * @param index Offset
+   * @param order the order
    * @return the short
    * @throws IOException Signals that an I/O exception has occurred.
    */
@@ -219,8 +221,9 @@ public class TiffFile {
 
   /**
    * Reads a long. (deprecated)
-   * 
+   *
    * @param index Offset
+   * @param order the order
    * @return the long
    * @throws IOException Signals that an I/O exception has occurred.
    */
@@ -251,9 +254,12 @@ public class TiffFile {
     return result;
   }
 
+ 
   /**
-   * @param output_file
-   * @return
+   * Gets the validation.
+   *
+   * @param output_file the output_file
+   * @return true, if successful
    */
   public boolean GetValidation(String output_file) {
     return validation_result.Errors.size() == 0;
