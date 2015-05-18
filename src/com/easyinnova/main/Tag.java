@@ -1,4 +1,3 @@
-package com.easyinnova.main;
 /**
  * <h1>Tag.java</h1> 
  * <p>
@@ -29,6 +28,8 @@ package com.easyinnova.main;
  * @since 14/5/2015
  *
  */
+package com.easyinnova.main;
+
 public class Tag {
   int id;
   int type;

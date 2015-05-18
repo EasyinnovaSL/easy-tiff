@@ -1,7 +1,3 @@
-package com.easyinnova.main;
-
-import java.nio.ByteOrder;
-
 /**
  * <h1>TiffHeader.java</h1> 
  * <p>
@@ -32,6 +28,10 @@ import java.nio.ByteOrder;
  * @since 14/5/2015
  *
  */
+package com.easyinnova.main;
+
+import java.nio.ByteOrder;
+
 public class TiffHeader {
   ByteOrder Order;
   int Number;

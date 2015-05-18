@@ -1,6 +1,3 @@
-package com.easyinnova.main;
-
-import java.io.IOException;
 /**
  * <h1>TiffReader.java</h1> 
  * <p>
@@ -31,6 +28,9 @@ import java.io.IOException;
  * @since 14/5/2015
  *
  */
+package com.easyinnova.main;
+
+import java.io.IOException;
 
 public class TiffReader {
   public static void main(final String[] args) throws IOException {

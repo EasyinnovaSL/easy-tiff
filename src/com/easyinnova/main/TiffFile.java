@@ -1,11 +1,3 @@
-package com.easyinnova.main;
-
-import java.io.IOException;
-import java.nio.ByteOrder;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 /**
  * <h1>TiffFile.java</h1> 
  * <p>
@@ -36,6 +28,14 @@ import java.nio.file.Paths;
  * @since 14/5/2015
  *
  */
+package com.easyinnova.main;
+
+import java.io.IOException;
+import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class TiffFile {
   String filename;
   TiffHeader header;
