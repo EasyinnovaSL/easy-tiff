@@ -33,7 +33,7 @@ package com.easyinnova.main;
 /**
  * The Class Tag.
  */
-public class Tag {
+public class IfdEntry {
 
   /** The id. */
   int id;
@@ -55,7 +55,7 @@ public class Tag {
    * @param n Number of values
    * @param val Tag value
    */
-  public Tag(int id, int type, long n, long val) {
+  public IfdEntry(int id, int type, long n, long val) {
     this.id = id;
     this.type = type;
     this.n = n;

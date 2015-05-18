@@ -142,7 +142,7 @@ public class TiffFile {
         long tagN = data.getLong(index + 4);
         long tagValue = data.getLong(index + 8);
 
-        Tag tag = new Tag(tagid, tagType, tagN, tagValue);
+        IfdEntry tag = new IfdEntry(tagid, tagType, tagN, tagValue);
         ifd.AddTag(tag);
 
         index += 12;

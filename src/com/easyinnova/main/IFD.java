@@ -39,7 +39,7 @@ import java.util.ArrayList;
 public class IFD {
 
   /** Tag list. */
-  public ArrayList<Tag> Tags;
+  public ArrayList<IfdEntry> Tags;
 
   /** The Next ifd. */
   public long NextIFD = 0;
@@ -48,7 +48,7 @@ public class IFD {
    * Instantiates a new ifd.
    */
   public IFD() {
-    Tags = new ArrayList<Tag>();
+    Tags = new ArrayList<IfdEntry>();
   }
 
   /**
@@ -56,7 +56,7 @@ public class IFD {
    *
    * @param tag the tag
    */
-  public void AddTag(Tag tag) {
+  public void AddTag(IfdEntry tag) {
     Tags.add(tag);
   }
 
