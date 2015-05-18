@@ -1,11 +1,12 @@
 {
-  "id": 254,
-  "name": "NewSubfileType",
+  "id": 50968,
+  "name": "PreviewSettingsName",
   "type": [
-    "LONG"
+    "ASCII",
+    "BYTE"
   ],
-  "cardinality": "1",
-  "defaultValue": "0",
+  "cardinality": "N",
+  "defaultValue": "",
   "ifd": "",
   "description": "",
   "source": "",

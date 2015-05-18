@@ -1,13 +1,14 @@
 {
-"id":255, 
-"name":"SubfileType",
-"type": ["SHORT"],
-"cardinality": "1",
-"validValues": [0,1,2,4],
-"defaultValue": "0",
-"ifd": "IMAGE",
-"description": "",
-"source": "BASELINE",
-"created": "14/05/2015",
-"modified": "14/05/2015"
+  "id": 255,
+  "name": "SubfileType",
+  "type": [
+    "SHORT"
+  ],
+  "cardinality": "1",
+  "defaultValue": "",
+  "ifd": "",
+  "description": "",
+  "source": "",
+  "created": "18/05/2015",
+  "modified": "18/05/2015"
 }

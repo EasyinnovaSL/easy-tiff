@@ -1,11 +1,11 @@
 {
-  "id": 254,
-  "name": "NewSubfileType",
+  "id": 41493,
+  "name": "ExposureIndex",
   "type": [
-    "LONG"
+    "RATIONAL"
   ],
   "cardinality": "1",
-  "defaultValue": "0",
+  "defaultValue": "",
   "ifd": "",
   "description": "",
   "source": "",
