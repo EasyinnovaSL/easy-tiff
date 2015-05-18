@@ -45,25 +45,19 @@ import java.nio.file.Paths;
 public class TiffFile {
 
   /** The filename. */
-  String filename;
+  String Filename;
 
-  /** The First ifd. */
-  int FirstIFD;
-
-  /** The data. */
+  /** The file data (buffered). */
   MappedByteBuffer data;
 
-  /** The first IFD. */
-  IFD IFD0;
+  /** The buffer size (in memory) of the file. */
+  private static int PageSize = 10 * 1024 * 1024; // 10 MB
 
-  /** The Ifd structure. */
+  /** Structure of the Tiff file. */
   TiffStructure IfdStructure;
 
   /** The result of the validation. */
   ValidationResult validation_result;
-
-  /** The Page size. */
-  private static int PageSize = 10 * 1024 * 1024; // 10 MB
 
   /**
    * Instantiates a new tiff file.
@@ -71,7 +65,7 @@ public class TiffFile {
    * @param filename File name
    */
   public TiffFile(String filename) {
-    this.filename = filename;
+    this.Filename = filename;
     validation_result = new ValidationResult();
     IfdStructure = new TiffStructure();
   }
@@ -82,12 +76,12 @@ public class TiffFile {
    * @return Error code (0 if successful)
    */
   public int Read() {
-    Path path = Paths.get(filename);
+    Path path = Paths.get(Filename);
     int error = 0;
 
     try {
       if (Files.exists(path)) {
-        RandomAccessFile memoryMappedFile = new RandomAccessFile(filename, "rw");
+        RandomAccessFile memoryMappedFile = new RandomAccessFile(Filename, "rw");
         data = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, PageSize);
         boolean result = ReadHeader();
         if (result)
@@ -106,7 +100,7 @@ public class TiffFile {
   }
 
   /**
-   * Read Image Directory Files.
+   * Read Image Directories.
    */
   void ReadIFDs() {
     int n = 0;
@@ -162,7 +156,7 @@ public class TiffFile {
 
   /**
    * Reads the header.
-   *
+   * 
    * @return true, if successful
    */
   public boolean ReadHeader() {
@@ -198,8 +192,8 @@ public class TiffFile {
   }
 
   /**
-   * Reads a short.
-   *
+   * Reads a short. (deprecated)
+   * 
    * @param index Offset
    * @return the short
    * @throws IOException Signals that an I/O exception has occurred.
@@ -210,11 +204,11 @@ public class TiffFile {
     try {
       if (order == ByteOrder.BIG_ENDIAN) {
         result = data.get(index) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result += data.get(index + 1) & 0xff;
-    } else {
+      } else {
         result = data.get(index + 1) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result += data.get(index) & 0xff;
       }
     } catch (Exception ex) {
@@ -224,8 +218,8 @@ public class TiffFile {
   }
 
   /**
-   * Reads a long.
-   *
+   * Reads a long. (deprecated)
+   * 
    * @param index Offset
    * @return the long
    * @throws IOException Signals that an I/O exception has occurred.
@@ -236,19 +230,19 @@ public class TiffFile {
     try {
       if (order == ByteOrder.BIG_ENDIAN) {
         result = data.get(index) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result += data.get(index + 1) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result += data.get(index + 2) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result += data.get(index + 3) & 0xff;
-    } else {
+      } else {
         result = data.get(index + 3) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result = data.get(index + 2) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result = data.get(index + 1) & 0xff;
-      result <<= 8;
+        result <<= 8;
         result += data.get(index) & 0xff;
       }
     } catch (Exception ex) {

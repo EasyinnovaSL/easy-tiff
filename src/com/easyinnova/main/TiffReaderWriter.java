@@ -82,7 +82,7 @@ public class TiffReaderWriter {
    * @param result
    */
   private static void ReportResults(TiffFile tiffFile, int result, String output_file) {
-    String filename = tiffFile.filename;
+    String filename = tiffFile.Filename;
     if (output_file != null) {
       // TODO: Create xml file with report
     } else {
