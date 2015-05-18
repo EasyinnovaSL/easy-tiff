@@ -1,5 +1,5 @@
 /**
- * <h1>IFD.java</h1>
+ * <h1>ValidationError.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,9 +13,8 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a
- * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
- * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
+ * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
  * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
@@ -26,64 +25,38 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 14/5/2015
+ * @since 18/5/2015
  *
  */
 package com.easyinnova.main;
 
-import java.util.ArrayList;
-
 /**
- * The Class IFD.
+ * The Class ValidationError.
  */
-public class IFD {
+public class ValidationError {
 
-  /** Tag list. */
-  public ArrayList<Tag> Tags;
+  /** The Description. */
+  public String Description;
 
-  /** The Next ifd. */
-  public long NextIFD = 0;
+  /** The Value. */
+  public String Value;
 
   /**
-   * Instantiates a new ifd.
+   * Instantiates a new validation error.
    */
-  public IFD() {
-    Tags = new ArrayList<Tag>();
+  public ValidationError() {
+    Description = "";
+    Value = null;
   }
 
   /**
-   * Adds a tag.
-   *
-   * @param tag the tag
+   * Prints the error in the console.
    */
-  public void AddTag(Tag tag) {
-    Tags.add(tag);
-  }
-
-  /**
-   * Checks for next ifd.
-   *
-   * @return true, if next IFD exists
-   */
-  public boolean hasNextIFD() {
-    return NextIFD > 0;
-  }
-
-  /**
-   * Get Next IFD.
-   *
-   * @return the next ifd
-   */
-  public long nextIFDOffset() {
-    return NextIFD;
-  }
-
-  /**
-   * Validates the IFD.
-   *
-   * @param validation_result the validation_result
-   */
-  public void Validate(ValidationResult validation_result) {
-
+  public void Print() {
+    System.out.print(Description);
+    if (Value != null)
+      System.out.print(" (" + Value + ")");
+    System.out.println();
   }
 }
+

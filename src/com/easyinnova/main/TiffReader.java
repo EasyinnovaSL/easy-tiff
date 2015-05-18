@@ -31,13 +31,93 @@
 package com.easyinnova.main;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+/**
+ * The Class TiffReader.
+ */
 public class TiffReader {
+
+  /**
+   * The main method.
+   *
+   * @param args the arguments
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   public static void main(final String[] args) throws IOException {
-    for (final String arg : args) {
-      TiffFile tiffFile = new TiffFile(arg);
-      int result = tiffFile.Read();
-      System.out.println("Result:" + result);
+    ArrayList<String> files = new ArrayList<String>();
+    String output_file = null;
+    boolean args_error = false;
+    for (int i = 0; i < args.length; i++) {
+      String arg = args[i];
+      if (arg == "-o") {
+        if (i + 1 < args.length)
+          output_file = args[++i];
+        else {
+          args_error = true;
+          break;
+        }
+      } else if (arg == "-help") {
+        DisplayHelp();
+      } else if (arg.startsWith("-")) {
+        args_error = true;
+        break;
+      } else {
+        files.add(arg);
+      }
     }
+    if (args_error) {
+      DisplayHelp();
+    } else {
+      for (final String filename : files) {
+        TiffFile tiffFile = new TiffFile(filename);
+        int result = tiffFile.Read();
+        ReportResults(tiffFile, result, output_file);
+      }
+    }
+  }
+
+  /**
+   * @param tiffFile
+   * @param result
+   */
+  private static void ReportResults(TiffFile tiffFile, int result, String output_file) {
+    String filename = tiffFile.filename;
+    if (output_file != null) {
+      // TODO: Create xml file with report
+    } else {
+      // Display results human readable
+      switch (result) {
+        case -1:
+          System.out.println("File '" + filename + "' does not exist");
+          break;
+        case -2:
+          System.out.println("IO Exception in file '" + filename + "'");
+          break;
+        case -3:
+          System.out.println("Internal exception in file '" + filename + "'");
+          break;
+        case 0:
+          if (tiffFile.GetValidation(output_file)) {
+            System.out.println("Everything ok in file '" + filename + "'");
+            System.out.println("IFDs: " + tiffFile.validation_result.nifds);
+          } else {
+            System.out.println("Errors in file '" + filename + "'");
+            tiffFile.PrintErrors();
+          }
+          break;
+        default:
+          System.out.println("Unknown result (" + result + ") in file '" + filename + "'");
+          break;
+      }
+    }
+  }
+
+  /**
+   * Shows program usage.
+   */
+  static void DisplayHelp() {
+    System.out.println("Usage: TiffReader [options] <file1> <file2> ... <fileN>");
+    System.out.println("Options: -help displays help");
   }
 }

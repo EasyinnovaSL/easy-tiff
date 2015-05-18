@@ -1,5 +1,5 @@
 /**
- * <h1>TiffHeader.java</h1> 
+ * <h1>ValidationResult.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,15 +25,67 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 14/5/2015
+ * @since 18/5/2015
  *
  */
 package com.easyinnova.main;
 
-import java.nio.ByteOrder;
+import java.util.ArrayList;
 
-public class TiffHeader {
-  ByteOrder Order;
-  int Number;
-  int FirstIFD;
+/**
+ * The Class ValidationResult.
+ */
+public class ValidationResult {
+
+  /** The nifds. */
+  public int nifds = 0;
+
+  /** Errors List. */
+  public ArrayList<ValidationError> Errors;
+
+  /**
+   * Instantiates a new validation result object.
+   */
+  public ValidationResult() {
+    Errors = new ArrayList<ValidationError>();
+  }
+
+  /**
+   * Adds an error.
+   *
+   * @param desc Error description
+   * @param value Value
+   */
+  public void addError(String desc, int value) {
+    ValidationError ve = new ValidationError();
+    ve.Description = desc;
+    ve.Value = "" + value;
+    Errors.add(ve);
+  }
+
+  /**
+   * Adds an error.
+   *
+   * @param desc Error description
+   * @param value Value
+   */
+  public void addError(String desc, String value) {
+    ValidationError ve = new ValidationError();
+    ve.Description = desc;
+    ve.Value = value;
+    Errors.add(ve);
+  }
+
+  /**
+   * Adds an error.
+   *
+   * @param desc Error description
+   */
+  public void addError(String desc) {
+    ValidationError ve = new ValidationError();
+    ve.Description = desc;
+    ve.Value = null;
+    Errors.add(ve);
+  }
 }
+

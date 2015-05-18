@@ -30,12 +30,31 @@
  */
 package com.easyinnova.main;
 
+/**
+ * The Class Tag.
+ */
 public class Tag {
+
+  /** The id. */
   int id;
+
+  /** The type. */
   int type;
+
+  /** Number of values. */
   long n;
+
+  /** The value. */
   long value;
 
+  /**
+   * Instantiates a new tag.
+   *
+   * @param id Tag identifier
+   * @param type Tag type
+   * @param n Number of values
+   * @param val Tag value
+   */
   public Tag(int id, int type, long n, long val) {
     this.id = id;
     this.type = type;
@@ -43,6 +62,11 @@ public class Tag {
     this.value = val;
   }
 
+  /**
+   * Validate.
+   *
+   * @return true, if successful
+   */
   public boolean Validate() {
     // TODO: Verify the tag values as defined in the json tag file
     return true;

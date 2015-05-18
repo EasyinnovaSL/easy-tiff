@@ -31,143 +31,241 @@
 package com.easyinnova.main;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * The Class TiffFile.
+ */
 public class TiffFile {
+
+  /** The filename. */
   String filename;
-  TiffHeader header;
-  byte[] data;
+
+  /** The First ifd. */
+  int FirstIFD;
+
+  /** The data. */
+  MappedByteBuffer data;
+
+  /** The first IFD. */
   IFD IFD0;
 
+  /** The result of the validation. */
+  ValidationResult validation_result;
+
+  /** The Page size. */
+  private static int PageSize = 10 * 1024 * 1024; // 10 MB
+
+  /**
+   * Instantiates a new tiff file.
+   *
+   * @param filename File name
+   */
   public TiffFile(String filename) {
     this.filename = filename;
+    validation_result = new ValidationResult();
   }
 
+  /**
+   * Reads a Tiff File.
+   *
+   * @return Error code (0 if successful)
+   */
   public int Read() {
     Path path = Paths.get(filename);
     int error = 0;
 
     try {
       if (Files.exists(path)) {
-        this.data = Files.readAllBytes(path);
-        boolean result = ReadHeader();
-        if (!result)
-          error = -3;
-        else {
-          ReadIFD0();
+        RandomAccessFile memoryMappedFile = new RandomAccessFile(filename, "rw");
+        data = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, PageSize);
+        int result = ReadHeader();
+        if (result == 0) {
+          ReadIFDs();
         }
+        memoryMappedFile.close();
       } else {
+        // File not found
         error = -1;
       }
     } catch (IOException ex) {
+      // Exception
       error = -2;
     }
 
     return error;
   }
 
-  void ReadIFD0() {
-    try {
-      long IFD0_idx = ReadLong(4);
-      IFD0 = ReadIFD(IFD0_idx);
-    } catch (IOException ex) {
-      IFD0 = null;
+  /**
+   * Read Image Directory Files.
+   */
+  void ReadIFDs() {
+    int n = 0;
+    IFD ifd0 = ReadIFD(4);
+    ifd0.Validate(validation_result);
+    n++;
+    IFD current_ifd = ifd0;
+    while (current_ifd.hasNextIFD()) {
+      long offset = current_ifd.nextIFDOffset();
+      current_ifd = ReadIFD(offset);
+      if (current_ifd == null) {
+        validation_result.addError("Next IFD does not exist", "" + offset);
+        break;
+      } else {
+        current_ifd.Validate(validation_result);
+      }
+      n++;
     }
+    validation_result.nifds = n;
   }
 
+  /**
+   * Reads a ifd.
+   *
+   * @param IFD_idx Offset
+   * @return the ifd
+   */
   IFD ReadIFD(long IFD_idx) {
     IFD ifd = new IFD();
-    int index = (int) IFD_idx;
     try {
-      int directoryEntries = ReadShort(index);
+      int index = (int) data.getShort((int) IFD_idx);
+      int directoryEntries = data.getShort(index);
       index += 2;
       for (int i = 0; i < directoryEntries; i++) {
-        int tagid = ReadShort(index);
-        int tagType = ReadShort(index + 2);
-        long tagN = ReadLong(index + 4);
-        long tagValue = ReadLong(index + 8);
+        int tagid = data.getShort(index);
+        int tagType = data.getShort(index + 2);
+        long tagN = data.getLong(index + 4);
+        long tagValue = data.getLong(index + 8);
 
         Tag tag = new Tag(tagid, tagType, tagN, tagValue);
         ifd.AddTag(tag);
+
+        index += 12;
       }
-    } catch (IOException ex) {
+      ifd.NextIFD = data.getShort(index);
+    } catch (IndexOutOfBoundsException ex) {
       ifd = null;
     }
     return ifd;
   }
 
-  public boolean ReadHeader() {
-    boolean ok = true;
-    header = new TiffHeader();
+  /**
+   * Reads the header.
+   *
+   * @return true, if successful
+   */
+  public int ReadHeader() {
+    int result = 0;
+    ByteOrder order = ByteOrder.BIG_ENDIAN;
 
     // read the first two bytes to know the byte ordering
-    if (data[0] == 'I' && data[1] == 'I')
-      header.Order = ByteOrder.LITTLE_ENDIAN;
-    else if (data[0] == 'M' && data[1] == 'M')
-      header.Order = ByteOrder.BIG_ENDIAN;
-    else
-      ok = false;
+    if (data.get(0) == 'I' && data.get(1) == 'I')
+      order = ByteOrder.LITTLE_ENDIAN;
+    else if (data.get(0) == 'M' && data.get(1) == 'M')
+      order = ByteOrder.BIG_ENDIAN;
+    else {
+      validation_result.addError("Invalid Byte Order", "" + data.get(0) + data.get(1));
+      result = -11;
+    }
 
-    if (ok) {
+    data.order(order);
+
+    if (result == 0) {
       try{
-        int magic = ReadShort(2);
-        if (magic != 42)
-          ok = false;
-      }
- catch (IOException ex) {
-        ok = false;
+        int magic = data.getShort(2);
+        if (magic != 42) {
+          result = -12;
+          validation_result.addError("Magic number != 42", magic);
+        }
+      } catch (IndexOutOfBoundsException ex) {
+        validation_result.addError("Magic number format");
+        result = -13;
       }
     }
 
-    return ok;
+    return result;
   }
 
-  int ReadShort(int index) throws IOException {
+  /**
+   * Reads a short.
+   *
+   * @param index Offset
+   * @return the short
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  int ReadShort(int index, ByteOrder order) throws IOException {
     int result = 0;
 
-    if (index + 1 >= data.length) {
-      throw new IOException();
-    }
-
-    if (header.Order == ByteOrder.BIG_ENDIAN) {
-      result = data[index] & 0xff;
+    try {
+      if (order == ByteOrder.BIG_ENDIAN) {
+        result = data.get(index) & 0xff;
       result <<= 8;
-      result += data[index + 1] & 0xff;
+        result += data.get(index + 1) & 0xff;
     } else {
-      result = data[index + 1] & 0xff;
+        result = data.get(index + 1) & 0xff;
       result <<= 8;
-      result += data[index] & 0xff;
+        result += data.get(index) & 0xff;
+      }
+    } catch (Exception ex) {
+      throw new IOException();
     }
     return result;
   }
 
-  long ReadLong(int index) throws IOException {
+  /**
+   * Reads a long.
+   *
+   * @param index Offset
+   * @return the long
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  long ReadLong(int index, ByteOrder order) throws IOException {
     long result = 0;
 
-    if (index + 3 >= data.length) {
+    try {
+      if (order == ByteOrder.BIG_ENDIAN) {
+        result = data.get(index) & 0xff;
+      result <<= 8;
+        result += data.get(index + 1) & 0xff;
+      result <<= 8;
+        result += data.get(index + 2) & 0xff;
+      result <<= 8;
+        result += data.get(index + 3) & 0xff;
+    } else {
+        result = data.get(index + 3) & 0xff;
+      result <<= 8;
+        result = data.get(index + 2) & 0xff;
+      result <<= 8;
+        result = data.get(index + 1) & 0xff;
+      result <<= 8;
+        result += data.get(index) & 0xff;
+      }
+    } catch (Exception ex) {
       throw new IOException();
     }
-
-    if (header.Order == ByteOrder.BIG_ENDIAN) {
-      result = data[index] & 0xff;
-      result <<= 8;
-      result += data[index + 1] & 0xff;
-      result <<= 8;
-      result += data[index + 2] & 0xff;
-      result <<= 8;
-      result += data[index + 3] & 0xff;
-    } else {
-      result = data[index + 3] & 0xff;
-      result <<= 8;
-      result = data[index + 2] & 0xff;
-      result <<= 8;
-      result = data[index + 1] & 0xff;
-      result <<= 8;
-      result += data[index] & 0xff;
-    }
     return result;
+  }
+
+  /**
+   * @param output_file
+   * @return
+   */
+  public boolean GetValidation(String output_file) {
+    return validation_result.Errors.size() == 0;
+  }
+
+  /**
+   * Prints the errors.
+   */
+  public void PrintErrors() {
+    for (ValidationError ve : validation_result.Errors) {
+      ve.Print();
+    }
   }
 }
