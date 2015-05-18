@@ -1,6 +1,5 @@
-package com.easyinnova.main;
 /**
- * <h1>Main.java</h1>
+ * <h1>TiffTags.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -14,40 +13,52 @@ package com.easyinnova.main;
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Xavier Tarrés Bonet
+ * @author Xavier TarrÃ©s Bonet
  * @version 1.0
- * @since 13/5/2015
+ * @since 18/5/2015
  *
  */
 
+package com.easyinnova.main;
 
+import java.io.File;
+
+import javafx.stage.Stage;
+
+
+/**
+ * The Class Main.
+ */
 public class Main {
 
   /**
-   * 
+   * The main method.
+   *
+   * @param args asdf
+   * @throws Exception asd
    */
-  public void function() {
-    for (int i = 0; i < 100; i++) {
-
+  public static void main(final String[] args) throws Exception {
+    
+    //System.out.println(new java.io.File("").getAbsolutePath());
+    //System.out.println(Main.class.getClassLoader().getResource("").getPath());
+   
+   
+    TiffTags a= TiffTags.getTiffTags();
+    
+   
     }
-  }
-  //comment
-  int a = 0;
-
-  // commentari
-
-  int FuncioXula() {
-    return 0;
-  }
+  
+ 
 }
 

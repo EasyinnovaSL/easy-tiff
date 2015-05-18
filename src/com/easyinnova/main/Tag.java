@@ -32,6 +32,8 @@
 
 package com.easyinnova.main;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -44,25 +46,25 @@ public class Tag {
   protected Integer id;
 
   /** The name. */
-  protected String name;
+  protected String name = "";
 
   /** The type. */
   protected List<String> type;
 
   /** The cardinality. */
-  protected String cardinality;
+  protected String cardinality = "";
 
   /** The default value. */
-  protected String defaultValue;
+  protected String defaultValue = "";
   
   /** The ifd. */
-  protected String ifd;
+  protected String ifd = ""; 
   
   /** The description. */
-  protected String description;
+  protected String description = "";
   
   /** The source. */
-  protected String source;
+  protected String source = "";
   
   /** The created. */
   protected Date created;
@@ -259,16 +261,23 @@ public class Tag {
    * @param type the type
    * @param cardinality the cardinality
    * @param defaultValue the default value
-   * @param version the version
+
    */
-  public Tag(int id, String name, List<String>  type, String cardinality, String defaultValue, int version) {
+  public Tag(int id, String name, List<String>  type, String cardinality, String defaultValue) {
     
     this.id = id;
     this.name = name;
     this.type = type;
     this.cardinality = cardinality;
     this.defaultValue = defaultValue;
-
+    this.ifd = ""; 
+    this.description = "";
+    this.source = "";
+    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");    
+    Date date = new Date();
+    this.created = date;
+    this.modified= date;
+  
 }
 
 }
