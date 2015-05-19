@@ -1,2 +1,1 @@
-# easy-tiff
-#
+# Tiff Reader and Writer

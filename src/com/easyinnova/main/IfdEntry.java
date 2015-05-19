@@ -30,6 +30,8 @@
  */
 package com.easyinnova.main;
 
+import java.nio.MappedByteBuffer;
+
 /**
  * The Class Tag.
  */
@@ -45,7 +47,7 @@ public class IfdEntry {
   int n;
 
   /** The value. */
-  int value;
+  TagValue value;
 
   /**
    * Instantiates a new tag.
@@ -53,13 +55,56 @@ public class IfdEntry {
    * @param id Tag identifier
    * @param type Tag type
    * @param n Number of values
-   * @param val Tag value
    */
-  public IfdEntry(int id, int type, int n, int val) {
+  public IfdEntry(int id, int type, int n) {
     this.id = id;
     this.type = type;
     this.n = n;
-    this.value = val;
+  }
+
+  /**
+   * Gets the value.
+   *
+   * @param data Tiff File
+   * @param offset the position of the tag
+   * @param tagType the tag type
+   */
+  public void getValue(MappedByteBuffer data, int offset, int tagType) {
+    int size = 0;
+    switch (tagType) {
+      case 1:
+      case 2:
+      case 6:
+      case 7:
+        size = n;
+        break;
+      case 3:
+      case 8:
+        size = 2 * n;
+        break;
+      case 4:
+      case 9:
+        size = 4 * n;
+        break;
+      case 5:
+      case 10:
+        size = 8 * n;
+        break;
+      case 11:
+        size = 4 * n;
+        break;
+      case 12:
+        size = 8 * n;
+        break;
+    }
+    if (size == 1)
+      value = new TagValue(data.get(offset), false);
+    else if (size == 2)
+      value = new TagValue(data.getShort(offset), false);
+    else if (size == 4)
+      value = new TagValue(data.getInt(offset), false);
+    else if (size > 4)
+      value = new TagValue(data.getInt(offset), true);
   }
 
   /**
@@ -71,7 +116,7 @@ public class IfdEntry {
     if (!TiffTags.tagMap.containsKey(id))
       validation_result.addError("Undefined tag id " + id);
     else if (!TiffTags.tagTypes.containsKey(type))
-      validation_result.addError("Unknown tag type " + type);
+      validation_result.addWarning("Unknown tag type " + type);
     else {
       Tag t = TiffTags.getTag(id);
       String stype = TiffTags.tagTypes.get(type);

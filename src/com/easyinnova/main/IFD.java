@@ -31,6 +31,7 @@
  */
 package com.easyinnova.main;
 
+import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,6 +39,23 @@ import java.util.HashMap;
  * The Class IFD.
  */
 public class IFD {
+  
+  /**
+   * The Enum ImageType.
+   */
+  public enum ImageType {
+
+    /** The bilevel. */
+    BILEVEL,
+    /** The grayscale. */
+    GRAYSCALE,
+    /** The palette. */
+    PALETTE,
+    /** The rgb. */
+    RGB,
+    /** The undefined. */
+    UNDEFINED
+  };
 
   /** Tag list. */
   public ArrayList<IfdEntry> Tags;
@@ -51,13 +69,25 @@ public class IFD {
   /** The Next ifd. */
   public int NextIFD = 0;
 
+  /** The Offset. */
+  public int Offset = 0;
+
+  /** The Correct. */
+  public boolean Correct;
+  
+  /** The Type. */
+  public ImageType Type;
+
   /**
    * Instantiates a new ifd.
    */
-  public IFD() {
+  public IFD(int offset) {
+    Offset = offset;
     Tags = new ArrayList<IfdEntry>();
     HashTagsId = new HashMap<Integer, IfdEntry>();
     HashTagsName = new HashMap<String, IfdEntry>();
+    Correct = true;
+    Type = ImageType.UNDEFINED;
   }
 
   /**
@@ -96,10 +126,87 @@ public class IFD {
    *
    * @param validation_result the validation_result
    */
-  public void Validate(ValidationResult validation_result) {
-    for (IfdEntry ie : Tags) {
-      ie.Validate(validation_result);
+  public void Validate(ValidationResult validation_result, MappedByteBuffer data) {
+    if (Correct) {
+      // Validate tags
+      for (IfdEntry ie : Tags) {
+        ie.Validate(validation_result);
+      }
+
+      // Validate image
+      CheckImage(validation_result, data);
     }
+  }
+
+  /**
+   * Check image.
+   */
+  public boolean CheckImage(ValidationResult validation_result, MappedByteBuffer data) {
+    boolean ok = true;
+    if (!HashTagsId.containsKey(256)) {
+      ok = false;
+      validation_result.addError("Missing image width tag");
+    } else if (HashTagsId.get(256).value.isOffset) {
+      ok = false;
+      validation_result.addError("Incorrect image width tag");
+    }
+
+    if (!HashTagsId.containsKey(257)) {
+      ok = false;
+      validation_result.addError("Missing image height tag");
+    } else if (HashTagsId.get(257).value.isOffset) {
+      ok = false;
+      validation_result.addError("Incorrect image height tag");
+    }
+
+    if (!HashTagsId.containsKey(262)) {
+      ok = false;
+      validation_result.addError("Missing Photometric Interpretation tag");
+    } else if (HashTagsId.get(262).value.isOffset) {
+      long val = HashTagsId.get(262).value.Value;
+      ok = val == 0 || val == 1;
+      if (!ok)
+        validation_result.addError("Incorrect Photometric Interpretation tag");
+    }
+    
+    if (!HashTagsId.containsKey(258)) {
+      Type = ImageType.BILEVEL;
+    } else {
+      if (HashTagsId.containsKey(320)) {
+        Type = ImageType.PALETTE;
+        if (HashTagsId.get(258).value.isOffset)
+          validation_result.addError("Incorrect Bits Per Sample tag type");
+        else if (HashTagsId.get(258).value.getLongValue() != 4
+            && HashTagsId.get(258).value.getLongValue() != 8)
+          validation_result.addError("Bits Per Sample tag != 8",
+              (int) HashTagsId.get(258).value.getLongValue());
+      } else if (HashTagsId.containsKey(277)) {
+        Type = ImageType.RGB;
+        if (HashTagsId.get(257).value.getLongValue() < 3) {
+          validation_result.addError("Samples per Pixel < 3",
+              (int) HashTagsId.get(257).value.getLongValue());
+        }
+        if (!HashTagsId.get(258).value.isOffset)
+          validation_result.addError("Incorrect Bits Per Sample tag type");
+        else {
+          int short1 = data.getShort((int) HashTagsId.get(258).value.Value);
+          int short2 = data.getShort((int) HashTagsId.get(258).value.Value + 2);
+          int short3 = data.getShort((int) HashTagsId.get(258).value.Value + 4);
+          if (short1 < 8 || short2 < 8 || short3 < 8) {
+            validation_result.addError("Bits Per Sample != 8", short3);
+          }
+        }
+      } else {
+        Type = ImageType.GRAYSCALE;
+        if (HashTagsId.get(258).value.isOffset)
+          validation_result.addError("Incorrect Bits Per Sample tag type");
+        else if (HashTagsId.get(258).value.getLongValue() != 4
+            && HashTagsId.get(258).value.getLongValue() != 8)
+          validation_result.addError("Incorrect Bits Per Sample tag");
+      }
+    }
+
+    return ok;
   }
 
   /**
@@ -108,10 +215,10 @@ public class IFD {
    * @param string the string
    * @return the tag value
    */
-  public int getTagValue(String tagname) {
-    int val = 0;
+  public String getTagValue(String tagname) {
+    String val = "";
     if (HashTagsName.containsKey(tagname))
-      val = HashTagsName.get(tagname).value;
+      val = HashTagsName.get(tagname).value.getValue();
     return val;
   }
 }

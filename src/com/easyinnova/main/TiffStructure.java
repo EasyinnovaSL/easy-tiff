@@ -55,5 +55,22 @@ public class TiffStructure {
   public void AddIfd(IFD ifd) {
     IFDs.add(ifd);
   }
+
+  /**
+   * Circular offset.
+   *
+   * @param offset the offset
+   * @return true, if successful
+   */
+  public boolean UsedOffset(int offset) {
+    boolean used = false;
+    for (IFD ifd : IFDs) {
+      if (ifd.Offset == offset) {
+        used = true;
+        break;
+      }
+    }
+    return used;
+  }
 }
 

@@ -43,11 +43,15 @@ public class ValidationResult {
   /** Errors List. */
   public ArrayList<ValidationError> Errors;
 
+  /** Warnings List. */
+  public ArrayList<ValidationError> Warnings;
+
   /**
    * Instantiates a new validation result object.
    */
   public ValidationResult() {
     Errors = new ArrayList<ValidationError>();
+    Warnings = new ArrayList<ValidationError>();
   }
 
   /**
@@ -87,5 +91,16 @@ public class ValidationResult {
     ve.Value = null;
     Errors.add(ve);
   }
-}
 
+  /**
+   * Adds an warning.
+   *
+   * @param desc Warning description
+   */
+  public void addWarning(String desc) {
+    ValidationError ve = new ValidationError();
+    ve.Description = desc;
+    ve.Value = null;
+    Warnings.add(ve);
+  }
+}

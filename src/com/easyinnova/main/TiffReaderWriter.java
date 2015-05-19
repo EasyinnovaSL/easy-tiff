@@ -30,6 +30,7 @@
  */
 package com.easyinnova.main;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -48,6 +49,8 @@ public class TiffReaderWriter {
     ArrayList<String> files = new ArrayList<String>();
     String output_file = null;
     boolean args_error = false;
+
+    // Creates an array of files to process
     for (int i = 0; i < args.length; i++) {
       String arg = args[i];
       if (arg == "-o") {
@@ -63,12 +66,24 @@ public class TiffReaderWriter {
         args_error = true;
         break;
       } else {
-        files.add(arg);
+        File f = new File(arg);
+        if (f.isFile())
+          files.add(arg);
+        else if (f.isDirectory()) {
+          File[] listOfFiles = f.listFiles();
+          for (int j = 0; j < listOfFiles.length; j++) {
+            if (listOfFiles[j].isFile()) {
+              files.add(listOfFiles[j].getPath());
+            }
+          }
+        }
       }
     }
     if (args_error) {
+      // Shows the program usage
       DisplayHelp();
     } else {
+      // Process files
       for (final String filename : files) {
         TiffFile tiffFile = new TiffFile(filename);
         int result = tiffFile.Read();
@@ -99,17 +114,21 @@ public class TiffReaderWriter {
           break;
         case 0:
           if (tiffFile.GetValidation(output_file)) {
+            // The file is correct
             System.out.println("Everything ok in file '" + filename + "'");
             System.out.println("IFDs: " + tiffFile.validation_result.nifds);
             int index = 0;
             for (IFD ifd : tiffFile.IfdStructure.IFDs) {
-              System.out.println("IFD " + index++ + " Size: " + ifd.getTagValue("ImageWidth") + "x"
+              System.out.println("IFD " + index++ + ", " + ifd.Type.toString() + ", Size: "
+                  + ifd.getTagValue("ImageWidth") + "x"
                   + ifd.getTagValue("ImageLength"));
             }
           } else {
+            // The file is not correct
             System.out.println("Errors in file '" + filename + "'");
             tiffFile.PrintErrors();
           }
+          tiffFile.PrintWarnings();
           break;
         default:
           System.out.println("Unknown result (" + result + ") in file '" + filename + "'");

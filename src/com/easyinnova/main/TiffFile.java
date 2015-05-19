@@ -56,6 +56,9 @@ public class TiffFile {
   /** The result of the validation. */
   ValidationResult validation_result;
 
+  /** Indicate if the Tiff file is readable. */
+  public boolean Correct;
+
   /**
    * Instantiates a new tiff file.
    *
@@ -65,6 +68,7 @@ public class TiffFile {
     this.Filename = filename;
     validation_result = new ValidationResult();
     IfdStructure = new TiffStructure();
+    Correct = true;
   }
 
   /**
@@ -82,9 +86,14 @@ public class TiffFile {
         FileChannel channel = aFile.getChannel();
         data = channel.map(FileChannel.MapMode.READ_WRITE, 0, channel.size());
         data.load();
-        boolean result = ReadHeader();
-        if (result)
+
+        // Read the Tiff Head
+        Correct = ReadHeader();
+
+        // Read Tiff IFDs
+        if (Correct)
           ReadIFDs();
+
         channel.close();
         aFile.close();
       } else {
@@ -104,25 +113,36 @@ public class TiffFile {
    */
   void ReadIFDs() {
     int n = 0;
-    IFD ifd0 = ReadIFD(4);
-    if (ifd0 == null)
+
+    // Read first IFD
+    int offset0 = (int) data.getInt(4);
+    IFD ifd0 = ReadIFD(offset0);
+    if (ifd0 == null) {
+      Correct = false;
       validation_result.addError("IFD 0 does not exist");
+    }
     else {
-      ifd0.Validate(validation_result);
+      ifd0.Validate(validation_result, data);
       IfdStructure.AddIfd(ifd0);
       n++;
       IFD current_ifd = ifd0;
+      // Read next IFDs
       while (current_ifd.hasNextIFD()) {
         int offset = current_ifd.nextIFDOffset();
+        if (!IfdStructure.UsedOffset(offset)) {
         current_ifd = ReadIFD(offset);
         if (current_ifd == null) {
           validation_result.addError("Next IFD does not exist", "" + offset);
           break;
         } else {
-          current_ifd.Validate(validation_result);
+            current_ifd.Validate(validation_result, data);
           IfdStructure.AddIfd(current_ifd);
         }
         n++;
+        } else {
+          validation_result.addError("IFD offset already used");
+          break;
+        }
       }
     }
     validation_result.nifds = n;
@@ -134,24 +154,30 @@ public class TiffFile {
    * @param IFD_idx Offset
    * @return the ifd
    */
-  IFD ReadIFD(int IFD_idx) {
-    IFD ifd = new IFD();
+  IFD ReadIFD(int offset) {
+    IFD ifd = new IFD(offset);
     try {
-      int index = (int) data.getInt(IFD_idx);
-      int directoryEntries = data.getShort(index);
-      index += 2;
-      for (int i = 0; i < directoryEntries; i++) {
-        int tagid = data.getShort(index);
-        int tagType = data.getShort(index + 2);
-        int tagN = data.getInt(index + 4);
-        int tagValue = data.getInt(index + 8);
+      int index = offset;
+      int directoryEntries = data.getShort(offset);
+      if (directoryEntries < 0) {
+        validation_result.addError("Incorrect number of IFD entries", directoryEntries);
+        ifd.Correct = false;
+      } else {
+        index += 2;
+        for (int i = 0; i < directoryEntries; i++) {
+          // Read a tag
+          int tagid = data.getShort(index);
+          int tagType = data.getShort(index + 2);
+          int tagN = data.getInt(index + 4);
+          IfdEntry tag = new IfdEntry(tagid, tagType, tagN);
+          tag.getValue(data, index + 8, tagType);
+          ifd.AddTag(tag);
 
-        IfdEntry tag = new IfdEntry(tagid, tagType, tagN, tagValue);
-        ifd.AddTag(tag);
-
-        index += 12;
+          index += 12;
+        }
+        // Reads the position of the next IFD
+        ifd.NextIFD = (int) data.getInt(index);
       }
-      ifd.NextIFD = (int) data.getInt(index);
     } catch (IndexOutOfBoundsException ex) {
       ifd = null;
     }
@@ -177,6 +203,7 @@ public class TiffFile {
       ok = false;
     }
 
+    // set byte ordering
     data.order(order);
 
     if (ok) {
@@ -187,7 +214,7 @@ public class TiffFile {
           validation_result.addError("Magic number != 42", magic);
         }
       } catch (IndexOutOfBoundsException ex) {
-        validation_result.addError("Magic number format");
+        validation_result.addError("Magic number format error");
         ok = false;
       }
     }
@@ -274,6 +301,15 @@ public class TiffFile {
   public void PrintErrors() {
     for (ValidationError ve : validation_result.Errors) {
       ve.Print();
+    }
+  }
+
+  /**
+   * Prints the warnings.
+   */
+  public void PrintWarnings() {
+    for (ValidationError ve : validation_result.Warnings) {
+      ve.PrintWarning();
     }
   }
 }

@@ -1,5 +1,5 @@
 /**
- * <h1>ValidationError.java</h1> 
+ * <h1>TagValue.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,49 +25,52 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 18/5/2015
+ * @since 19/5/2015
  *
  */
 package com.easyinnova.main;
 
 /**
- * The Class ValidationError.
+ * The Class TagValue.
  */
-public class ValidationError {
-
-  /** The Description. */
-  public String Description;
+public class TagValue {
 
   /** The Value. */
-  public String Value;
+  long Value;
+
+  /** The is offset. */
+  boolean isOffset;
 
   /**
-   * Instantiates a new validation error.
+   * Instantiates a new tag value.
+   *
+   * @param value the value
+   * @param isOffset the is offset
    */
-  public ValidationError() {
-    Description = "";
-    Value = null;
+  public TagValue(long value, boolean isOffset) {
+    this.Value = value;
+    this.isOffset = isOffset;
   }
 
   /**
-   * Prints the error in the console.
+   * Gets the value.
+   *
+   * @return the value
    */
-  public void Print() {
-    System.out.print(Description);
-    if (Value != null)
-      System.out.print(" (" + Value + ")");
-    System.out.println();
+  public String getValue() {
+    if (!isOffset)
+      return "" + Value;
+    else
+      return "Offset to " + Value;
   }
 
   /**
-   * Prints the warning.
+   * Gets the long value.
+   *
+   * @return the long value
    */
-  public void PrintWarning() {
-    System.out.print("Warning: ");
-    System.out.print(Description);
-    if (Value != null)
-      System.out.print(" (" + Value + ")");
-    System.out.println();
+  public long getLongValue() {
+    return Value;
   }
 }
 
