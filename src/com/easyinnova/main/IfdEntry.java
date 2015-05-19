@@ -42,10 +42,10 @@ public class IfdEntry {
   int type;
 
   /** Number of values. */
-  long n;
+  int n;
 
   /** The value. */
-  long value;
+  int value;
 
   /**
    * Instantiates a new tag.
@@ -55,7 +55,7 @@ public class IfdEntry {
    * @param n Number of values
    * @param val Tag value
    */
-  public IfdEntry(int id, int type, long n, long val) {
+  public IfdEntry(int id, int type, int n, int val) {
     this.id = id;
     this.type = type;
     this.n = n;
@@ -63,12 +63,27 @@ public class IfdEntry {
   }
 
   /**
-   * Validate.
+   * Validates the tag.
    *
-   * @return true, if successful
    */
-  public boolean Validate() {
-    // TODO: Verify the tag values as defined in the json tag file
-    return true;
+  public void Validate(ValidationResult validation_result) {
+    TiffTags.getTiffTags();
+    if (!TiffTags.tagMap.containsKey(id))
+      validation_result.addError("Undefined tag id " + id);
+    else if (!TiffTags.tagTypes.containsKey(type))
+      validation_result.addError("Unknown tag type " + type);
+    else {
+      Tag t = TiffTags.getTag(id);
+      String stype = TiffTags.tagTypes.get(type);
+      if (!t.type.contains(stype))
+        validation_result.addError("Invalid type for tag " + id, stype);
+      try {
+        int card = Integer.parseInt(t.cardinality);
+        if (card != n)
+          validation_result.addError("Cardinality for tag " + id + " must be " + card, n);
+      } catch (Exception e) {
+        e.toString();
+      }
+    }
   }
 }

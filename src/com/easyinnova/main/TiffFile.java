@@ -39,7 +39,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TiffFile.
  */
@@ -50,9 +49,6 @@ public class TiffFile {
 
   /** The file data (buffered). */
   MappedByteBuffer data;
-
-  /** The buffer size (in memory) of the file. */
-  private static int PageSize = 10 * 1024 * 1024; // 10 MB
 
   /** Structure of the Tiff file. */
   TiffStructure IfdStructure;
@@ -82,12 +78,15 @@ public class TiffFile {
 
     try {
       if (Files.exists(path)) {
-        RandomAccessFile memoryMappedFile = new RandomAccessFile(Filename, "rw");
-        data = memoryMappedFile.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, PageSize);
+        RandomAccessFile aFile = new RandomAccessFile(Filename, "rw");
+        FileChannel channel = aFile.getChannel();
+        data = channel.map(FileChannel.MapMode.READ_WRITE, 0, channel.size());
+        data.load();
         boolean result = ReadHeader();
         if (result)
           ReadIFDs();
-        memoryMappedFile.close();
+        channel.close();
+        aFile.close();
       } else {
         // File not found
         error = -1;
@@ -106,21 +105,25 @@ public class TiffFile {
   void ReadIFDs() {
     int n = 0;
     IFD ifd0 = ReadIFD(4);
-    ifd0.Validate(validation_result);
-    IfdStructure.AddIfd(ifd0);
-    n++;
-    IFD current_ifd = ifd0;
-    while (current_ifd.hasNextIFD()) {
-      long offset = current_ifd.nextIFDOffset();
-      current_ifd = ReadIFD(offset);
-      if (current_ifd == null) {
-        validation_result.addError("Next IFD does not exist", "" + offset);
-        break;
-      } else {
-        current_ifd.Validate(validation_result);
-        IfdStructure.AddIfd(current_ifd);
-      }
+    if (ifd0 == null)
+      validation_result.addError("IFD 0 does not exist");
+    else {
+      ifd0.Validate(validation_result);
+      IfdStructure.AddIfd(ifd0);
       n++;
+      IFD current_ifd = ifd0;
+      while (current_ifd.hasNextIFD()) {
+        int offset = current_ifd.nextIFDOffset();
+        current_ifd = ReadIFD(offset);
+        if (current_ifd == null) {
+          validation_result.addError("Next IFD does not exist", "" + offset);
+          break;
+        } else {
+          current_ifd.Validate(validation_result);
+          IfdStructure.AddIfd(current_ifd);
+        }
+        n++;
+      }
     }
     validation_result.nifds = n;
   }
@@ -131,24 +134,24 @@ public class TiffFile {
    * @param IFD_idx Offset
    * @return the ifd
    */
-  IFD ReadIFD(long IFD_idx) {
+  IFD ReadIFD(int IFD_idx) {
     IFD ifd = new IFD();
     try {
-      int index = (int) data.getShort((int) IFD_idx);
+      int index = (int) data.getInt(IFD_idx);
       int directoryEntries = data.getShort(index);
       index += 2;
       for (int i = 0; i < directoryEntries; i++) {
         int tagid = data.getShort(index);
         int tagType = data.getShort(index + 2);
-        long tagN = data.getLong(index + 4);
-        long tagValue = data.getLong(index + 8);
+        int tagN = data.getInt(index + 4);
+        int tagValue = data.getInt(index + 8);
 
         IfdEntry tag = new IfdEntry(tagid, tagType, tagN, tagValue);
         ifd.AddTag(tag);
 
         index += 12;
       }
-      ifd.NextIFD = data.getShort(index);
+      ifd.NextIFD = (int) data.getInt(index);
     } catch (IndexOutOfBoundsException ex) {
       ifd = null;
     }

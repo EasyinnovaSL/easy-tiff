@@ -101,6 +101,11 @@ public class TiffReaderWriter {
           if (tiffFile.GetValidation(output_file)) {
             System.out.println("Everything ok in file '" + filename + "'");
             System.out.println("IFDs: " + tiffFile.validation_result.nifds);
+            int index = 0;
+            for (IFD ifd : tiffFile.IfdStructure.IFDs) {
+              System.out.println("IFD " + index++ + " Size: " + ifd.getTagValue("ImageWidth") + "x"
+                  + ifd.getTagValue("ImageLength"));
+            }
           } else {
             System.out.println("Errors in file '" + filename + "'");
             tiffFile.PrintErrors();

@@ -32,15 +32,14 @@
 
 package com.easyinnova.main;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.HashMap;
-import java.util.Map.Entry;
-
-import com.google.gson.Gson; 
-import com.google.gson.GsonBuilder;
 
 
 /**
@@ -53,6 +52,9 @@ public class TiffTags {
 
   /** The tag map. */
   protected static HashMap<Integer, Tag> tagMap = new HashMap<Integer, Tag>();
+
+  /** The tag types. */
+  protected static HashMap<Integer, String> tagTypes = new HashMap<Integer, String>();
 
   /**
    * Instantiates a new tiff tags.
@@ -76,6 +78,18 @@ public class TiffTags {
       }  
    } 
     
+    tagTypes.put(1, "BYTE");
+    tagTypes.put(2, "ASCII");
+    tagTypes.put(3, "SHORT");
+    tagTypes.put(4, "LONG");
+    tagTypes.put(5, "RATIONAL");
+    tagTypes.put(6, "SBYTE");
+    tagTypes.put(7, "UNDEFINED");
+    tagTypes.put(8, "SSHORT");
+    tagTypes.put(9, "SSHORT");
+    tagTypes.put(10, "SRATIONAL");
+    tagTypes.put(11, "FLOAT");
+    tagTypes.put(12, "DOUBLE");
   }
   
   /**
@@ -91,4 +105,18 @@ public class TiffTags {
     return instance;
   }
 
+  /**
+   * Gets tag information.
+   *
+   * @param identifier Tag id
+   * @return the tag or null if the identifier does not exist
+   */
+  public static Tag getTag(int identifier) {
+    if (instance == null)
+      getTiffTags();
+    if (tagMap.containsKey(identifier))
+      return tagMap.get(identifier);
+    else
+      return null;
+  }
 }

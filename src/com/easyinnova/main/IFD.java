@@ -32,6 +32,7 @@
 package com.easyinnova.main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The Class IFD.
@@ -41,14 +42,22 @@ public class IFD {
   /** Tag list. */
   public ArrayList<IfdEntry> Tags;
 
+  /** The Hash tags id. */
+  public HashMap<Integer, IfdEntry> HashTagsId;
+
+  /** The Hash tags name. */
+  public HashMap<String, IfdEntry> HashTagsName;
+
   /** The Next ifd. */
-  public long NextIFD = 0;
+  public int NextIFD = 0;
 
   /**
    * Instantiates a new ifd.
    */
   public IFD() {
     Tags = new ArrayList<IfdEntry>();
+    HashTagsId = new HashMap<Integer, IfdEntry>();
+    HashTagsName = new HashMap<String, IfdEntry>();
   }
 
   /**
@@ -58,6 +67,10 @@ public class IFD {
    */
   public void AddTag(IfdEntry tag) {
     Tags.add(tag);
+    HashTagsId.put(tag.id, tag);
+    Tag t = TiffTags.getTag(tag.id);
+    if (t != null)
+      HashTagsName.put(t.name, tag);
   }
 
   /**
@@ -74,7 +87,7 @@ public class IFD {
    *
    * @return the next ifd
    */
-  public long nextIFDOffset() {
+  public int nextIFDOffset() {
     return NextIFD;
   }
 
@@ -84,6 +97,21 @@ public class IFD {
    * @param validation_result the validation_result
    */
   public void Validate(ValidationResult validation_result) {
+    for (IfdEntry ie : Tags) {
+      ie.Validate(validation_result);
+    }
+  }
 
+  /**
+   * Gets the tag value.
+   *
+   * @param string the string
+   * @return the tag value
+   */
+  public int getTagValue(String tagname) {
+    int val = 0;
+    if (HashTagsName.containsKey(tagname))
+      val = HashTagsName.get(tagname).value;
+    return val;
   }
 }
