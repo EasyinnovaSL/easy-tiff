@@ -32,8 +32,6 @@
 package com.easyinnova.main;
 
 import java.nio.MappedByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * The Class IFD.
@@ -57,50 +55,37 @@ public class IFD {
     UNDEFINED
   };
 
-  /** Tag list. */
-  public ArrayList<IfdEntry> Tags;
-
-  /** The Hash tags id. */
-  public HashMap<Integer, IfdEntry> HashTagsId;
-
-  /** The Hash tags name. */
-  public HashMap<String, IfdEntry> HashTagsName;
+  /** The tags. */
+  public IfdTags tags;
 
   /** The Next ifd. */
-  public int NextIFD = 0;
+  public int nextIFD = 0;
 
   /** The Offset. */
-  public int Offset = 0;
+  public int offset = 0;
 
   /** The Correct. */
-  public boolean Correct;
+  public boolean correct;
   
   /** The Type. */
-  public ImageType Type;
+  public ImageType type;
+
+  /** The validation. */
+  ValidationResult validation;
+
+  /** The data. */
+  MappedByteBuffer data;
 
   /**
    * Instantiates a new ifd.
    */
-  public IFD(int offset) {
-    Offset = offset;
-    Tags = new ArrayList<IfdEntry>();
-    HashTagsId = new HashMap<Integer, IfdEntry>();
-    HashTagsName = new HashMap<String, IfdEntry>();
-    Correct = true;
-    Type = ImageType.UNDEFINED;
-  }
-
-  /**
-   * Adds a tag.
-   *
-   * @param tag the tag
-   */
-  public void AddTag(IfdEntry tag) {
-    Tags.add(tag);
-    HashTagsId.put(tag.id, tag);
-    Tag t = TiffTags.getTag(tag.id);
-    if (t != null)
-      HashTagsName.put(t.name, tag);
+  public IFD(int offset, MappedByteBuffer data) {
+    this.offset = offset;
+    tags = new IfdTags();
+    correct = true;
+    type = ImageType.UNDEFINED;
+    validation = new ValidationResult();
+    this.data = data;
   }
 
   /**
@@ -109,7 +94,7 @@ public class IFD {
    * @return true, if next IFD exists
    */
   public boolean hasNextIFD() {
-    return NextIFD > 0;
+    return nextIFD > 0;
   }
 
   /**
@@ -118,7 +103,7 @@ public class IFD {
    * @return the next ifd
    */
   public int nextIFDOffset() {
-    return NextIFD;
+    return nextIFD;
   }
 
   /**
@@ -126,99 +111,59 @@ public class IFD {
    *
    * @param validation_result the validation_result
    */
-  public void Validate(ValidationResult validation_result, MappedByteBuffer data) {
-    if (Correct) {
+  public void validate() {
+    if (correct) {
       // Validate tags
-      for (IfdEntry ie : Tags) {
-        ie.Validate(validation_result);
-      }
+      tags.validate(validation);
 
       // Validate image
-      CheckImage(validation_result, data);
+      checkImage();
     }
   }
 
   /**
    * Check image.
    */
-  public boolean CheckImage(ValidationResult validation_result, MappedByteBuffer data) {
+  public boolean checkImage() {
     boolean ok = true;
-    if (!HashTagsId.containsKey(256)) {
-      ok = false;
-      validation_result.addError("Missing image width tag");
-    } else if (HashTagsId.get(256).value.isOffset) {
-      ok = false;
-      validation_result.addError("Incorrect image width tag");
-    }
 
-    if (!HashTagsId.containsKey(257)) {
-      ok = false;
-      validation_result.addError("Missing image height tag");
-    } else if (HashTagsId.get(257).value.isOffset) {
-      ok = false;
-      validation_result.addError("Incorrect image height tag");
-    }
-
-    if (!HashTagsId.containsKey(262)) {
-      ok = false;
-      validation_result.addError("Missing Photometric Interpretation tag");
-    } else if (HashTagsId.get(262).value.isOffset) {
-      long val = HashTagsId.get(262).value.Value;
-      ok = val == 0 || val == 1;
-      if (!ok)
-        validation_result.addError("Incorrect Photometric Interpretation tag");
-    }
+    ok &= tags.checkField(256, validation);
+    ok &= tags.checkField(257, validation);
+    ok &= tags.checkField(262, validation);
     
-    if (!HashTagsId.containsKey(258)) {
-      Type = ImageType.BILEVEL;
+    if (!tags.containsTagId(258)) {
+      type = ImageType.BILEVEL;
     } else {
-      if (HashTagsId.containsKey(320)) {
-        Type = ImageType.PALETTE;
-        if (HashTagsId.get(258).value.isOffset)
-          validation_result.addError("Incorrect Bits Per Sample tag type");
-        else if (HashTagsId.get(258).value.getLongValue() != 4
-            && HashTagsId.get(258).value.getLongValue() != 8)
-          validation_result.addError("Bits Per Sample tag != 8",
-              (int) HashTagsId.get(258).value.getLongValue());
-      } else if (HashTagsId.containsKey(277)) {
-        Type = ImageType.RGB;
-        if (HashTagsId.get(257).value.getLongValue() < 3) {
-          validation_result.addError("Samples per Pixel < 3",
-              (int) HashTagsId.get(257).value.getLongValue());
-        }
-        if (!HashTagsId.get(258).value.isOffset)
-          validation_result.addError("Incorrect Bits Per Sample tag type");
+      if (tags.containsTagId(320)) {
+        type = ImageType.PALETTE;
+        ok &= tags.checkField(258, validation);
+      } else if (tags.containsTagId(277)) {
+        type = ImageType.RGB;
+        ok &= tags.checkField(258, validation);
+        long val = tags.get(257).value.getLongValue();
+        if (val < 3)
+          validation.addError("Samples per Pixel < 3", (int) val);
+        if (!tags.get(258).value.isOffset)
+          validation.addError("Incorrect Bits Per Sample tag type");
         else {
-          int short1 = data.getShort((int) HashTagsId.get(258).value.Value);
-          int short2 = data.getShort((int) HashTagsId.get(258).value.Value + 2);
-          int short3 = data.getShort((int) HashTagsId.get(258).value.Value + 4);
+          TagValue tag = tags.get(258).value;
+          int short1 = data.getShort((int) tag.value);
+          int short2 = data.getShort((int) tag.value + 2);
+          int short3 = data.getShort((int) tag.value + 4);
           if (short1 < 8 || short2 < 8 || short3 < 8) {
-            validation_result.addError("Bits Per Sample != 8", short3);
+            validation.addError("Bits Per Sample != 8", short3);
           }
         }
       } else {
-        Type = ImageType.GRAYSCALE;
-        if (HashTagsId.get(258).value.isOffset)
-          validation_result.addError("Incorrect Bits Per Sample tag type");
-        else if (HashTagsId.get(258).value.getLongValue() != 4
-            && HashTagsId.get(258).value.getLongValue() != 8)
-          validation_result.addError("Incorrect Bits Per Sample tag");
+        type = ImageType.GRAYSCALE;
+        long val = tags.get(258).value.getLongValue();
+        if (tags.get(258).value.isOffset)
+          validation.addError("Incorrect Bits Per Sample tag type");
+        else if (val != 4 && val != 8)
+          validation.addError("Incorrect Bits Per Sample tag", (int) val);
       }
     }
 
     return ok;
-  }
-
-  /**
-   * Gets the tag value.
-   *
-   * @param string the string
-   * @return the tag value
-   */
-  public String getTagValue(String tagname) {
-    String val = "";
-    if (HashTagsName.containsKey(tagname))
-      val = HashTagsName.get(tagname).value.getValue();
-    return val;
   }
 }

@@ -36,7 +36,7 @@ package com.easyinnova.main;
 public class TagValue {
 
   /** The Value. */
-  long Value;
+  long value;
 
   /** The is offset. */
   boolean isOffset;
@@ -48,7 +48,7 @@ public class TagValue {
    * @param isOffset the is offset
    */
   public TagValue(long value, boolean isOffset) {
-    this.Value = value;
+    this.value = value;
     this.isOffset = isOffset;
   }
 
@@ -59,9 +59,9 @@ public class TagValue {
    */
   public String getValue() {
     if (!isOffset)
-      return "" + Value;
+      return "" + value;
     else
-      return "Offset to " + Value;
+      return "Offset to " + value;
   }
 
   /**
@@ -70,7 +70,7 @@ public class TagValue {
    * @return the long value
    */
   public long getLongValue() {
-    return Value;
+    return value;
   }
 }
 

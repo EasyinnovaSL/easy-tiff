@@ -61,7 +61,7 @@ public class TiffReaderWriter {
           break;
         }
       } else if (arg == "-help") {
-        DisplayHelp();
+        displayHelp();
       } else if (arg.startsWith("-")) {
         args_error = true;
         break;
@@ -81,13 +81,13 @@ public class TiffReaderWriter {
     }
     if (args_error) {
       // Shows the program usage
-      DisplayHelp();
+      displayHelp();
     } else {
       // Process files
       for (final String filename : files) {
         TiffFile tiffFile = new TiffFile(filename);
-        int result = tiffFile.Read();
-        ReportResults(tiffFile, result, output_file);
+        int result = tiffFile.read();
+        reportResults(tiffFile, result, output_file);
       }
     }
   }
@@ -96,8 +96,8 @@ public class TiffReaderWriter {
    * @param tiffFile
    * @param result
    */
-  private static void ReportResults(TiffFile tiffFile, int result, String output_file) {
-    String filename = tiffFile.Filename;
+  private static void reportResults(TiffFile tiffFile, int result, String output_file) {
+    String filename = tiffFile.filename;
     if (output_file != null) {
       // TODO: Create xml file with report
     } else {
@@ -113,22 +113,21 @@ public class TiffReaderWriter {
           System.out.println("Internal exception in file '" + filename + "'");
           break;
         case 0:
-          if (tiffFile.GetValidation(output_file)) {
+          if (tiffFile.validation.correct) {
             // The file is correct
             System.out.println("Everything ok in file '" + filename + "'");
-            System.out.println("IFDs: " + tiffFile.validation_result.nifds);
+            System.out.println("IFDs: " + tiffFile.ifdStructure.nIfds);
             int index = 0;
-            for (IFD ifd : tiffFile.IfdStructure.IFDs) {
-              System.out.println("IFD " + index++ + ", " + ifd.Type.toString() + ", Size: "
-                  + ifd.getTagValue("ImageWidth") + "x"
-                  + ifd.getTagValue("ImageLength"));
+            for (IFD ifd : tiffFile.ifdStructure.ifds) {
+              System.out.println("IFD " + index++ + ", " + ifd.type.toString() + ", Size: "
+                  + ifd.tags.getTagValue("ImageWidth") + "x" + ifd.tags.getTagValue("ImageLength"));
             }
           } else {
             // The file is not correct
             System.out.println("Errors in file '" + filename + "'");
-            tiffFile.PrintErrors();
+            tiffFile.validation.printErrors();
           }
-          tiffFile.PrintWarnings();
+          tiffFile.validation.printWarnings();
           break;
         default:
           System.out.println("Unknown result (" + result + ") in file '" + filename + "'");
@@ -140,7 +139,7 @@ public class TiffReaderWriter {
   /**
    * Shows program usage.
    */
-  static void DisplayHelp() {
+  static void displayHelp() {
     System.out.println("Usage: TiffReader [options] <file1> <file2> ... <fileN>");
     System.out.println("Options: -help displays help");
   }

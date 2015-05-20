@@ -37,21 +37,45 @@ import java.util.ArrayList;
  */
 public class ValidationResult {
 
-  /** The nifds. */
-  public int nifds = 0;
-
   /** Errors List. */
-  public ArrayList<ValidationError> Errors;
+  public ArrayList<ValidationError> errors;
 
   /** Warnings List. */
-  public ArrayList<ValidationError> Warnings;
+  public ArrayList<ValidationError> warnings;
+
+  /** The Correct. */
+  public boolean correct;
 
   /**
    * Instantiates a new validation result object.
    */
   public ValidationResult() {
-    Errors = new ArrayList<ValidationError>();
-    Warnings = new ArrayList<ValidationError>();
+    errors = new ArrayList<ValidationError>();
+    warnings = new ArrayList<ValidationError>();
+    correct = true;
+  }
+
+  /**
+   * Adds the error.
+   *
+   * @param desc description
+   * @param value the value
+   */
+  private void iaddError(String desc, String value) {
+    ValidationError ve = new ValidationError(desc, value);
+    errors.add(ve);
+    correct = false;
+  }
+
+  /**
+   * Adds the warning.
+   *
+   * @param desc description
+   * @param value the value
+   */
+  private void iaddWarning(String desc, String value) {
+    ValidationError ve = new ValidationError(desc, value);
+    warnings.add(ve);
   }
 
   /**
@@ -61,10 +85,7 @@ public class ValidationResult {
    * @param value Value
    */
   public void addError(String desc, int value) {
-    ValidationError ve = new ValidationError();
-    ve.Description = desc;
-    ve.Value = "" + value;
-    Errors.add(ve);
+    iaddError(desc, "" + value);
   }
 
   /**
@@ -74,10 +95,7 @@ public class ValidationResult {
    * @param value Value
    */
   public void addError(String desc, String value) {
-    ValidationError ve = new ValidationError();
-    ve.Description = desc;
-    ve.Value = value;
-    Errors.add(ve);
+    iaddError(desc, value);
   }
 
   /**
@@ -86,10 +104,7 @@ public class ValidationResult {
    * @param desc Error description
    */
   public void addError(String desc) {
-    ValidationError ve = new ValidationError();
-    ve.Description = desc;
-    ve.Value = null;
-    Errors.add(ve);
+    iaddError(desc, null);
   }
 
   /**
@@ -98,9 +113,35 @@ public class ValidationResult {
    * @param desc Warning description
    */
   public void addWarning(String desc) {
-    ValidationError ve = new ValidationError();
-    ve.Description = desc;
-    ve.Value = null;
-    Warnings.add(ve);
+    iaddWarning(desc, null);
+  }
+
+  /**
+   * Adds a validation result to this.
+   *
+   * @param validation the validation to add
+   */
+  public void add(ValidationResult validation) {
+    correct &= validation.correct;
+    errors.addAll(validation.errors);
+    warnings.addAll(validation.warnings);
+  }
+
+  /**
+   * Prints the errors.
+   */
+  public void printErrors() {
+    for (ValidationError ve : errors) {
+      ve.print();
+    }
+  }
+
+  /**
+   * Prints the warnings.
+   */
+  public void printWarnings() {
+    for (ValidationError ve : warnings) {
+      ve.printWarning();
+    }
   }
 }

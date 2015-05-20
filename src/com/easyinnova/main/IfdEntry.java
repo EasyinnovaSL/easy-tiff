@@ -47,7 +47,7 @@ public class IfdEntry {
   int n;
 
   /** The value. */
-  TagValue value;
+  public TagValue value;
 
   /**
    * Instantiates a new tag.
@@ -111,7 +111,7 @@ public class IfdEntry {
    * Validates the tag.
    *
    */
-  public void Validate(ValidationResult validation_result) {
+  public void validate(ValidationResult validation_result) {
     TiffTags.getTiffTags();
     if (!TiffTags.tagMap.containsKey(id))
       validation_result.addError("Undefined tag id " + id);

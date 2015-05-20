@@ -36,37 +36,48 @@ package com.easyinnova.main;
 public class ValidationError {
 
   /** The Description. */
-  public String Description;
+  public String description;
 
   /** The Value. */
-  public String Value;
+  public String value;
 
   /**
    * Instantiates a new validation error.
    */
   public ValidationError() {
-    Description = "";
-    Value = null;
+    description = "";
+    value = null;
+  }
+
+  /**
+   * Instantiates a new validation error.
+   *
+   * @param desc the desc
+   * @param value the value
+   */
+  public ValidationError(String desc, String value) {
+    this.description = desc;
+    this.value = value;
   }
 
   /**
    * Prints the error in the console.
    */
-  public void Print() {
-    System.out.print(Description);
-    if (Value != null)
-      System.out.print(" (" + Value + ")");
+  public void print() {
+    System.out.print(description);
+    if (value != null)
+      System.out.print(" (" + value + ")");
     System.out.println();
   }
 
   /**
    * Prints the warning.
    */
-  public void PrintWarning() {
+  public void printWarning() {
     System.out.print("Warning: ");
-    System.out.print(Description);
-    if (Value != null)
-      System.out.print(" (" + Value + ")");
+    System.out.print(description);
+    if (value != null)
+      System.out.print(" (" + value + ")");
     System.out.println();
   }
 }
