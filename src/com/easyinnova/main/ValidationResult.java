@@ -94,6 +94,16 @@ public class ValidationResult {
    * @param desc Error description
    * @param value Value
    */
+  public void addError(String desc, float value) {
+    iaddError(desc, "" + value);
+  }
+
+  /**
+   * Adds an error.
+   *
+   * @param desc Error description
+   * @param value Value
+   */
   public void addError(String desc, String value) {
     iaddError(desc, value);
   }

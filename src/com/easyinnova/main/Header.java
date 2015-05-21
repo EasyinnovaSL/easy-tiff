@@ -74,10 +74,11 @@ public class Header {
       validation.addError("Invalid Byte Order", "" + data.get(0) + data.get(1));
     }
 
-    // set byte ordering
-    data.order(byteOrder);
-
     if (validation.correct) {
+
+      // set byte ordering
+      data.order(byteOrder);
+
       try {
         magicNumber = data.getShort(2);
         if (magicNumber != 42) {

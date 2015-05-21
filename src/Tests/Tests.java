@@ -1,5 +1,5 @@
 /**
- * <h1>TagValue.java</h1> 
+ * <h1>Test1.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,52 +25,63 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 19/5/2015
+ * @since 21/5/2015
  *
  */
-package com.easyinnova.main;
+package Tests;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import com.easyinnova.main.TiffFile;
 
 /**
- * The Class TagValue.
+ * The Class Tests.
  */
-public class TagValue {
-
-  /** The Value. */
-  long value;
-
-  /** The is offset. */
-  boolean isOffset;
+public class Tests {
 
   /**
-   * Instantiates a new tag value.
-   *
-   * @param value the value
-   * @param isOffset the is offset
+   * Valid examples.
    */
-  public TagValue(long value, boolean isOffset) {
-    this.value = value;
-    this.isOffset = isOffset;
+  @Test
+  public void ValidExamples() {
+    TiffFile tf;
+    int result;
+
+    tf = new TiffFile("tests\\Header\\Classic Intel.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Header\\Classic Motorola.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Colorspace\\F32.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
   }
 
   /**
-   * Gets the value.
-   *
-   * @return the value
+   * Invalid examples.
    */
-  public String getValue() {
-    if (!isOffset)
-      return "" + value;
-    else
-      return "Offset to " + value;
-  }
+  @Test
+  public void InvalidExamples() {
+    TiffFile tf;
+    int result;
 
-  /**
-   * Gets the long value.
-   *
-   * @return the long value
-   */
-  public long getLongValue() {
-    return value;
+    tf = new TiffFile("tests\\Header\\Nonsense byteorder E.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(false, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Header\\Incorrect version E.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(false, tf.validation.correct);
   }
 }
 

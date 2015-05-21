@@ -50,7 +50,7 @@ public class TiffReaderWriter {
     String output_file = null;
     boolean args_error = false;
 
-    // Creates an array of files to process
+    // Reads the parameters
     for (int i = 0; i < args.length; i++) {
       String arg = args[i];
       if (arg == "-o") {
@@ -62,10 +62,13 @@ public class TiffReaderWriter {
         }
       } else if (arg == "-help") {
         displayHelp();
+        break;
       } else if (arg.startsWith("-")) {
+        // unknown option
         args_error = true;
         break;
       } else {
+        // File or directory to process
         File f = new File(arg);
         if (f.isFile())
           files.add(arg);
@@ -119,12 +122,20 @@ public class TiffReaderWriter {
             System.out.println("IFDs: " + tiffFile.ifdStructure.nIfds);
             int index = 0;
             for (IFD ifd : tiffFile.ifdStructure.ifds) {
-              System.out.println("IFD " + index++ + ", " + ifd.type.toString() + ", Size: "
-                  + ifd.tags.getTagValue("ImageWidth") + "x" + ifd.tags.getTagValue("ImageLength"));
+              System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
+              ifd.printTags();
             }
           } else {
             // The file is not correct
             System.out.println("Errors in file '" + filename + "'");
+            if (tiffFile.ifdStructure != null) {
+              System.out.println("IFDs: " + tiffFile.ifdStructure.nIfds);
+              int index = 0;
+              for (IFD ifd : tiffFile.ifdStructure.ifds) {
+                System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
+                ifd.printTags();
+              }
+            }
             tiffFile.validation.printErrors();
           }
           tiffFile.validation.printWarnings();

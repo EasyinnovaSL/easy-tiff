@@ -58,7 +58,7 @@ public class TiffFile {
   IfdStructure ifdStructure;
 
   /** The result of the validation. */
-  ValidationResult validation;
+  public ValidationResult validation;
 
   /**
    * Instantiates a new tiff file.
@@ -91,7 +91,7 @@ public class TiffFile {
         try {
           readTiff();
         } catch (Exception ex) {
-          // Internal exception
+          // Internal parsing exception
           error = -3;
         }
 
@@ -102,7 +102,7 @@ public class TiffFile {
         error = -1;
       }
     } catch (IOException ex) {
-      // External exception
+      // IO exception
       error = -2;
     }
 

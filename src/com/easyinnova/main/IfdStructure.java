@@ -96,7 +96,7 @@ public class IfdStructure {
     int offset0 = (int) data.getInt(4);
     IFD ifd0 = readIFD(offset0);
     if (ifd0 == null) {
-      validation.addError("IFD 0 does not exist");
+      validation.addError("Error in IFD 0");
     } else {
       ifd0.validate();
       validation.add(ifd0.validation);
@@ -114,7 +114,7 @@ public class IfdStructure {
         } else {
           current_ifd = readIFD(offset);
           if (current_ifd == null) {
-            validation.addError("Next IFD does not exist", "" + offset);
+            validation.addError("Error in IFD " + nIfds, "" + offset);
             break;
           } else {
             current_ifd.validate();
@@ -148,14 +148,19 @@ public class IfdStructure {
           int tagid = data.getShort(index);
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
-          IfdEntry tag = new IfdEntry(tagid, tagType, tagN);
-          tag.getValue(data, index + 8, tagType);
-          ifd.tags.addTag(tag);
+          IfdEntry tag = new IfdEntry(tagid, tagType, tagN, index + 8, data);
+          if (ifd.tags.containsTagId(tagid))
+            validation.addError("Duplicate tag", tagid);
+          else
+            ifd.tags.addTag(tag);
 
           index += 12;
         }
         // Reads the position of the next IFD
         ifd.nextIFD = (int) data.getInt(index);
+        if (ifd.hasNextIFD())
+          if (ifd.nextIFD < 7)
+            validation.addError("Invalid next IFD offset", ifd.nextIFD);
       }
     } catch (IndexOutOfBoundsException ex) {
       ifd = null;

@@ -32,6 +32,7 @@
 package com.easyinnova.main;
 
 import java.nio.MappedByteBuffer;
+import java.util.ArrayList;
 
 /**
  * The Class IFD.
@@ -114,56 +115,238 @@ public class IFD {
   public void validate() {
     if (correct) {
       // Validate tags
-      tags.validate(validation);
+      tags.validate();
 
       // Validate image
       checkImage();
+
+      validation.add(tags.validation);
     }
   }
 
   /**
    * Check image.
    */
-  public boolean checkImage() {
-    boolean ok = true;
-
-    ok &= tags.checkField(256, validation);
-    ok &= tags.checkField(257, validation);
-    ok &= tags.checkField(262, validation);
-    
+  public void checkImage() {
     if (!tags.containsTagId(258)) {
       type = ImageType.BILEVEL;
+      CheckBilevelImage();
     } else {
-      if (tags.containsTagId(320)) {
+      int photo = -1;
+      if (tags.containsTagId(262))
+        photo = (int) tags.get(262).getIntValue();
+
+      if (tags.containsTagId(320) && photo == 3) {
         type = ImageType.PALETTE;
-        ok &= tags.checkField(258, validation);
-      } else if (tags.containsTagId(277)) {
+        CheckPalleteImage();
+      } else if (photo == 2) {
         type = ImageType.RGB;
-        ok &= tags.checkField(258, validation);
-        long val = tags.get(257).value.getLongValue();
-        if (val < 3)
-          validation.addError("Samples per Pixel < 3", (int) val);
-        if (!tags.get(258).value.isOffset)
-          validation.addError("Incorrect Bits Per Sample tag type");
-        else {
-          TagValue tag = tags.get(258).value;
-          int short1 = data.getShort((int) tag.value);
-          int short2 = data.getShort((int) tag.value + 2);
-          int short3 = data.getShort((int) tag.value + 4);
-          if (short1 < 8 || short2 < 8 || short3 < 8) {
-            validation.addError("Bits Per Sample != 8", short3);
-          }
-        }
+        CheckRGBImage();
       } else {
         type = ImageType.GRAYSCALE;
-        long val = tags.get(258).value.getLongValue();
-        if (tags.get(258).value.isOffset)
-          validation.addError("Incorrect Bits Per Sample tag type");
-        else if (val != 4 && val != 8)
-          validation.addError("Incorrect Bits Per Sample tag", (int) val);
+        CheckGrayscaleImage();
       }
     }
+  }
 
-    return ok;
+  /**
+   * Check common fields.
+   */
+  private void CheckCommonFields() {
+    int id;
+
+    // Width
+    id = 256;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int val = tags.get(id).getIntValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // Height
+    id = 257;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int val = tags.get(id).getIntValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // Resolution Unit
+    id = 296;
+    if (!tags.containsTagId(id)) {
+      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+    }
+    else {
+      int val = tags.get(id).getIntValue();
+      if (val != 1 && val != 2 && val != 3)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // XResolution
+    id = 282;
+    if (!tags.containsTagId(id)) {
+      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+    }
+    else {
+      float val = tags.get(id).getRationalValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // YResolution
+    id = 283;
+    if (!tags.containsTagId(id)) {
+      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+    }
+    else {
+      float val = tags.get(id).getRationalValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // Strip offsets
+    id = 273;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int offset = (int) tags.get(id).value;
+      if (offset <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+    }
+
+    // Rows per Strip
+    id = 278;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int offset = (int) tags.get(id).value;
+      if (offset <= 0 || tags.get(id).isOffset)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+    }
+
+    // Strip Byte Counts
+    id = 279;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int offset = (int) tags.get(id).value;
+      if (offset <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+    }
+  }
+
+  /**
+   * Check Bilevel Image.
+   */
+  private void CheckBilevelImage() {
+    CheckCommonFields();
+
+    // Photometric interpretation
+    int photo = tags.get(262).getIntValue();
+    if (photo != 0 && photo != 1)
+      validation.addError("Invalid Photometric Interpretation", photo);
+
+    // Compression
+    int comp = tags.get(259).getIntValue();
+    if (comp != 1 && comp != 2 && comp != 32773)
+      validation.addError("Invalid Compression", comp);
+  }
+
+  /**
+   * Check Grayscale Image.
+   */
+  private void CheckGrayscaleImage() {
+    CheckCommonFields();
+
+    // Bits per Sample
+    int bps = tags.get(258).getIntValue();
+    if (bps != 4 && bps != 8)
+      validation.addError("Invalid Bits per Sample", bps);
+
+    // Photometric interpretation
+    int photo = tags.get(262).getIntValue();
+    if (photo != 0 && photo != 1)
+      validation.addError("Invalid Photometric Interpretation", photo);
+
+    // Compression
+    int comp = tags.get(259).getIntValue();
+    if (comp != 1 && comp != 32773)
+      validation.addError("Invalid Compression", comp);
+  }
+
+  /**
+   * Check Pallete Color Image.
+   */
+  private void CheckPalleteImage() {
+    CheckCommonFields();
+
+    // Bits per Sample
+    int bps = tags.get(258).getIntValue();
+    if (bps != 4 && bps != 8)
+      validation.addError("Invalid Bits per Sample", bps);
+
+    // Photometric interpretation
+    int photo = tags.get(262).getIntValue();
+    if (photo != 3)
+      validation.addError("Invalid Photometric Interpretation", photo);
+
+    // Compression
+    int comp = tags.get(259).getIntValue();
+    if (comp != 1 && comp != 32773)
+      validation.addError("Invalid Compression", comp);
+
+    // Color Map
+    int colormap = tags.get(320).getIntValue();
+    if (colormap <= 0)
+      validation.addError("Color Map", colormap);
+  }
+
+  /**
+   * Check RGB Image.
+   */
+  private void CheckRGBImage() {
+    CheckCommonFields();
+
+    // Bits per Sample
+    ArrayList<Integer> bps = tags.get(258).getIntArray();
+    if (bps == null) {
+      validation.addError("Invalid Bits per Sample");
+    } else if (bps.get(0) != 8 || bps.get(1) != 8 || bps.get(2) != 8) {
+      // validation.addError("Invalid Bits per Sample value");
+    }
+
+    // Photometric interpretation
+    int photo = tags.get(262).getIntValue();
+    if (photo != 2)
+      validation.addError("Invalid Photometric Interpretation", photo);
+
+    // Samples per Pixel
+    int samples = tags.get(277).getIntValue();
+    if (samples < 3)
+      validation.addError("Invalid Samples per Pixel", photo);
+
+    // Compression
+    int comp = tags.get(259).getIntValue();
+    if (comp != 1 && comp != 32773)
+      validation.addError("Invalid Compression", comp);
+  }
+
+  /**
+   * Prints the tags.
+   */
+  public void printTags() {
+    for (IfdEntry ie : tags.tags) {
+      String name = TiffTags.getTag(ie.id).name;
+      String val = ie.toString();
+      String off = "";
+      if (ie.isOffset)
+        off = "*";
+      System.out.println(name + "(" + ie.n + "x" + TiffTags.tagTypes.get(ie.type) + off + "): "
+          + val);
+    }
   }
 }

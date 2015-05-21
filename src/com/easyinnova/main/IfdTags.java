@@ -46,6 +46,9 @@ public class IfdTags {
   /** The Hash tags name. */
   public HashMap<String, IfdEntry> hashTagsName;
 
+  /** The validation. */
+  ValidationResult validation;
+
   /**
    * Instantiates a new ifd tags.
    */
@@ -53,6 +56,7 @@ public class IfdTags {
     tags = new ArrayList<IfdEntry>();
     hashTagsId = new HashMap<Integer, IfdEntry>();
     hashTagsName = new HashMap<String, IfdEntry>();
+    validation = new ValidationResult();
   }
 
   /**
@@ -73,65 +77,32 @@ public class IfdTags {
    *
    * @param validation the validation
    */
-  public void validate(ValidationResult validation) {
+  public void validate() {
+    int prevTagId = 0;
     for (IfdEntry ie : tags) {
-      ie.validate(validation);
+      ie.validate();
+      validation.add(ie.validation);
+      if (ie.id < prevTagId)
+        validation.addError("Tags are not in ascending order");
+      prevTagId = ie.id;
     }
   }
 
   /**
-   * Gets the tag value.
+   * Gets the field.
    *
-   * @param string the string
-   * @return the tag value
+   * @param id the id
+   * @return the field
    */
-  public String getTagValue(String tagname) {
-    String val = "";
-    if (hashTagsName.containsKey(tagname))
-      val = hashTagsName.get(tagname).value.getValue();
-    return val;
-  }
-
-  /**
-   * @param tag id
-   * @return
-   */
-  public boolean checkField(int id, ValidationResult validation) {
-    boolean ok = true;
-
+  public long getField(int id) {
+    long tv = 0;
     String tagDesc = TiffTags.tagMap.get(id).name;
-
-    switch (id) {
-      case 256:
-      case 257:
-        if (!hashTagsId.containsKey(id)) {
-          ok = false;
-          validation.addError("Missing tag " + id + " (" + tagDesc + ")");
-        } else if (hashTagsId.get(id).value.isOffset) {
-          ok = false;
-          validation.addError("Incorrect tag " + id + " (" + tagDesc + ")");
-        }
-        break;
-      case 262:
-        if (!hashTagsId.containsKey(id)) {
-          ok = false;
-          validation.addError("Missing tag " + id + " (" + tagDesc + ")");
-        } else if (hashTagsId.get(id).value.isOffset) {
-          long val = hashTagsId.get(id).value.value;
-          ok = val == 0 || val == 1;
-          if (!ok)
-            validation.addError("Incorrect tag " + id + " (" + tagDesc + ")");
-        }
-        break;
-      case 258:
-        TagValue val = hashTagsId.get(id).value;
-        if (!val.isOffset) {
-          if (val.getLongValue() != 4 && val.getLongValue() != 8)
-            validation.addError("Tag " + tagDesc + " != 8", (int) val.getLongValue());
-        }
-        break;
+    if (!hashTagsId.containsKey(id)) {
+      validation.addError("Missing tag " + id + " (" + tagDesc + ")");
+    } else {
+      tv = hashTagsId.get(id).value;
     }
-    return ok;
+    return tv;
   }
 
   /**
