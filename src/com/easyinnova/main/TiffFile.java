@@ -32,12 +32,8 @@
 package com.easyinnova.main;
 
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -48,8 +44,8 @@ public class TiffFile {
   /** The filename. */
   String filename;
 
-  /** The file data (buffered). */
-  MappedByteBuffer data;
+  /** The file data. */
+  TiffStreamIO data;
 
   /** The header. */
   Header header;
@@ -76,17 +72,11 @@ public class TiffFile {
    * @return Error code (0: successful, -1: file not found, -2: IO exception, -3: other exception)
    */
   public int read() {
-    Path path = Paths.get(filename);
     int error = 0;
 
     try {
-      if (Files.exists(path)) {
-        RandomAccessFile aFile = new RandomAccessFile(filename, "rw");
-        FileChannel channel = aFile.getChannel();
-        data = channel.map(FileChannel.MapMode.READ_WRITE, 0, channel.size());
-
-        // loads the file in memory
-        data.load();
+      if (Files.exists(Paths.get(filename))) {
+        data = new TiffStreamIO(filename);
 
         validation.correct = true;
 
@@ -98,8 +88,7 @@ public class TiffFile {
           error = -3;
         }
 
-        channel.close();
-        aFile.close();
+        data.close();
       } else {
         // File not found
         error = -1;

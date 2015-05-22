@@ -30,7 +30,6 @@
  */
 package com.easyinnova.main;
 
-import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 
 /**
@@ -60,7 +59,7 @@ public class IfdEntry {
   ValidationResult validation;
 
   /** The data. */
-  MappedByteBuffer data;
+  TiffStreamIO data;
 
   /**
    * Instantiates a new tag.
@@ -69,7 +68,7 @@ public class IfdEntry {
    * @param type Tag type
    * @param n Number of values
    */
-  public IfdEntry(int id, int type, int n, MappedByteBuffer data) {
+  public IfdEntry(int id, int type, int n, TiffStreamIO data) {
     this.id = id;
     this.type = type;
     this.n = n;
@@ -171,8 +170,10 @@ public class IfdEntry {
 
         switch (tagsize) {
           case 1:
-            if (type == 2)
-              s += (char) (data.get(offset));
+            if (type == 2) {
+              if (data.get(offset) != 0)
+                s += (char) (data.get(offset));
+            }
             else
               s += data.get(offset);
             break;
@@ -226,12 +227,29 @@ public class IfdEntry {
   /**
    * Gets the int array.
    *
-   * @return the int array
+   * @return the int array or null if error
    */
   public ArrayList<Integer> getIntArray() {
     ArrayList<Integer> l = new ArrayList<Integer>();
-    for (int i=0;i<n;i++) {
-      l.add(data.getInt((int) value + i * 2));
+    try {
+      for (int i = 0; i < n; i++) {
+        switch (tagsize) {
+          case 1:
+            l.add(data.get((int) value + i * 2));
+            break;
+          case 2:
+            l.add(data.getShort((int) value + i * 2));
+            break;
+          case 4:
+            l.add(data.getInt((int) value + i * 2));
+            break;
+          case 8:
+            l.add((int) data.getLong((int) value + i * 2));
+            break;
+        }
+      }
+    } catch (Exception ex) {
+      l = null;
     }
     return l;
   }

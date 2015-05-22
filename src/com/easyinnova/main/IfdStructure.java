@@ -30,7 +30,6 @@
  */
 package com.easyinnova.main;
 
-import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 
 /**
@@ -45,7 +44,7 @@ public class IfdStructure {
   ValidationResult validation;
 
   /** The data. */
-  MappedByteBuffer data;
+  TiffStreamIO data;
 
   /** The number of ifds. */
   int nIfds;
@@ -64,7 +63,7 @@ public class IfdStructure {
   /**
    * Instantiates a new tiff structure object.
    */
-  public IfdStructure(MappedByteBuffer data) {
+  public IfdStructure(TiffStreamIO data) {
     ifds = new ArrayList<IFD>();
     validation = new ValidationResult();
     this.data = data;

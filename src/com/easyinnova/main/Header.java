@@ -31,7 +31,6 @@
 package com.easyinnova.main;
 
 import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
 
 /**
  * The Tiff Header.
@@ -48,7 +47,7 @@ public class Header {
   public ValidationResult validation;
 
   /** The data. */
-  private MappedByteBuffer data;
+  private TiffStreamIO data;
   
   /**
    * The byte order error tolerance.<br>
@@ -65,7 +64,7 @@ public class Header {
   /**
    * Instantiates a new header.
    */
-  public Header(MappedByteBuffer data) {
+  public Header(TiffStreamIO data) {
     validation = new ValidationResult();
     this.data = data;
   }
