@@ -127,6 +127,26 @@ public class ValidationResult {
   }
 
   /**
+   * Adds an warning.
+   *
+   * @param desc Warning description
+   * @param value the value
+   */
+  public void addWarning(String desc, String value) {
+    iaddWarning(desc, value);
+  }
+
+  /**
+   * Adds an warning.
+   *
+   * @param desc Warning description
+   * @param value the value
+   */
+  public void addWarning(String desc, int value) {
+    iaddWarning(desc, "" + value);
+  }
+
+  /**
    * Adds a validation result to this.
    *
    * @param validation the validation to add

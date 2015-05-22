@@ -73,7 +73,7 @@ public class TiffFile {
   /**
    * Reads a Tiff File.
    *
-   * @return Error code (0 if successful)
+   * @return Error code (0: successful, -1: file not found, -2: IO exception, -3: other exception)
    */
   public int read() {
     Path path = Paths.get(filename);
@@ -84,11 +84,14 @@ public class TiffFile {
         RandomAccessFile aFile = new RandomAccessFile(filename, "rw");
         FileChannel channel = aFile.getChannel();
         data = channel.map(FileChannel.MapMode.READ_WRITE, 0, channel.size());
+
+        // loads the file in memory
         data.load();
 
         validation.correct = true;
 
         try {
+          // parses the file
           readTiff();
         } catch (Exception ex) {
           // Internal parsing exception
@@ -110,20 +113,21 @@ public class TiffFile {
   }
 
   /**
-   * Read tiff.
+   * Parses the data.
    */
   private void readTiff() {
-    // Read the Tiff Head
+    // Read the Head
     header = new Header(data);
     header.read();
     validation.add(header.validation);
 
     // Read the IFDs
-    if (validation.correct) {
+    if (header.validation.correct) {
       ifdStructure = new IfdStructure(data);
       ifdStructure.read();
       validation.add(ifdStructure.validation);
     }
+    // else if the header is not correct we can't read anything more
   }
 
   /**

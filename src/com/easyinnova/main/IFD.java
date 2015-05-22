@@ -116,12 +116,21 @@ public class IFD {
     if (correct) {
       // Validate tags
       tags.validate();
+      validation.add(tags.validation);
 
       // Validate image
       checkImage();
 
-      validation.add(tags.validation);
+      // Checks the color data
+      CheckColorProfile();
     }
+  }
+
+  /**
+   * Checks the color profile.
+   */
+  private void CheckColorProfile() {
+    // TODO: Everything
   }
 
   /**
@@ -135,7 +144,6 @@ public class IFD {
       int photo = -1;
       if (tags.containsTagId(262))
         photo = (int) tags.get(262).getIntValue();
-
       if (tags.containsTagId(320) && photo == 3) {
         type = ImageType.PALETTE;
         CheckPalleteImage();
@@ -146,96 +154,6 @@ public class IFD {
         type = ImageType.GRAYSCALE;
         CheckGrayscaleImage();
       }
-    }
-  }
-
-  /**
-   * Check common fields.
-   */
-  private void CheckCommonFields() {
-    int id;
-
-    // Width
-    id = 256;
-    if (!tags.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
-    else {
-      int val = tags.get(id).getIntValue();
-      if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
-    }
-
-    // Height
-    id = 257;
-    if (!tags.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
-    else {
-      int val = tags.get(id).getIntValue();
-      if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
-    }
-
-    // Resolution Unit
-    id = 296;
-    if (!tags.containsTagId(id)) {
-      // validation.addError("Missing required field", TiffTags.getTag(id).name);
-    }
-    else {
-      int val = tags.get(id).getIntValue();
-      if (val != 1 && val != 2 && val != 3)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
-    }
-
-    // XResolution
-    id = 282;
-    if (!tags.containsTagId(id)) {
-      // validation.addError("Missing required field", TiffTags.getTag(id).name);
-    }
-    else {
-      float val = tags.get(id).getRationalValue();
-      if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
-    }
-
-    // YResolution
-    id = 283;
-    if (!tags.containsTagId(id)) {
-      // validation.addError("Missing required field", TiffTags.getTag(id).name);
-    }
-    else {
-      float val = tags.get(id).getRationalValue();
-      if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
-    }
-
-    // Strip offsets
-    id = 273;
-    if (!tags.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
-    else {
-      int offset = (int) tags.get(id).value;
-      if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
-    }
-
-    // Rows per Strip
-    id = 278;
-    if (!tags.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
-    else {
-      int offset = (int) tags.get(id).value;
-      if (offset <= 0 || tags.get(id).isOffset)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
-    }
-
-    // Strip Byte Counts
-    id = 279;
-    if (!tags.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
-    else {
-      int offset = (int) tags.get(id).value;
-      if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
     }
   }
 
@@ -336,17 +254,108 @@ public class IFD {
   }
 
   /**
+   * Check common fields.
+   */
+  private void CheckCommonFields() {
+    int id;
+
+    // Width
+    id = 256;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int val = tags.get(id).getIntValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // Height
+    id = 257;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int val = tags.get(id).getIntValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // Resolution Unit
+    id = 296;
+    if (!tags.containsTagId(id)) {
+      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+    } else {
+      int val = tags.get(id).getIntValue();
+      if (val != 1 && val != 2 && val != 3)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // XResolution
+    id = 282;
+    if (!tags.containsTagId(id)) {
+      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+    } else {
+      float val = tags.get(id).getRationalValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // YResolution
+    id = 283;
+    if (!tags.containsTagId(id)) {
+      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+    } else {
+      float val = tags.get(id).getRationalValue();
+      if (val <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+    }
+
+    // Strip offsets
+    id = 273;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int offset = (int) tags.get(id).value;
+      if (offset <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+    }
+
+    // Rows per Strip
+    id = 278;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int offset = (int) tags.get(id).value;
+      if (offset <= 0 || tags.get(id).isOffset)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+    }
+
+    // Strip Byte Counts
+    id = 279;
+    if (!tags.containsTagId(id))
+      validation.addError("Missing required field", TiffTags.getTag(id).name);
+    else {
+      int offset = (int) tags.get(id).value;
+      if (offset <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+    }
+  }
+
+  /**
    * Prints the tags.
    */
   public void printTags() {
     for (IfdEntry ie : tags.tags) {
-      String name = TiffTags.getTag(ie.id).name;
-      String val = ie.toString();
-      String off = "";
-      if (ie.isOffset)
-        off = "*";
-      System.out.println(name + "(" + ie.n + "x" + TiffTags.tagTypes.get(ie.type) + off + "): "
-          + val);
+      try {
+        String name = TiffTags.getTag(ie.id).name;
+        String val = ie.toString();
+        String off = "";
+        String type = TiffTags.tagTypes.get(ie.type);
+        if (ie.isOffset)
+          off = "*";
+        System.out.println(name + "(" + ie.n + "x" + type + off + "): " + val);
+      } catch (Exception ex) {
+        System.out.println("Tag error");
+      }
     }
   }
 }

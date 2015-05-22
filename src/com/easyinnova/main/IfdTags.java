@@ -50,6 +50,12 @@ public class IfdTags {
   ValidationResult validation;
 
   /**
+   * The tag order tolerance.<br>
+   * 0: No tolerance. 10: Full tolerance (no matter if tags are not in ascending order)
+   * */
+  private int tagOrderTolerance = 10;
+
+  /**
    * Instantiates a new ifd tags.
    */
   public IfdTags() {
@@ -73,7 +79,7 @@ public class IfdTags {
   }
 
   /**
-   * Validate.
+   * Validates the ifd entries.
    *
    * @param validation the validation
    */
@@ -82,8 +88,12 @@ public class IfdTags {
     for (IfdEntry ie : tags) {
       ie.validate();
       validation.add(ie.validation);
-      if (ie.id < prevTagId)
-        validation.addError("Tags are not in ascending order");
+      if (ie.id < prevTagId) {
+        if (tagOrderTolerance > 0)
+          validation.addWarning("Tags are not in ascending order");
+        else
+          validation.addError("Tags are not in ascending order");
+      }
       prevTagId = ie.id;
     }
   }

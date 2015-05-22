@@ -51,6 +51,17 @@ public class IfdStructure {
   int nIfds;
 
   /**
+   * The duplicate tag tolerance.<br>
+   * 0: No tolerance. 10: Full tolerance (keep first appearance only)
+   */
+  int duplicateTagTolerance = 10;
+
+  /**
+   * The next ifd tolerance. 0: No tolerance. 10: Full tolerance (assume 0)
+   */
+  int nextIFDTolerance = 0;
+
+  /**
    * Instantiates a new tiff structure object.
    */
   public IfdStructure(MappedByteBuffer data) {
@@ -93,44 +104,44 @@ public class IfdStructure {
    */
   public void read() {
     // Read first IFD
-    int offset0 = (int) data.getInt(4);
-    IFD ifd0 = readIFD(offset0);
-    if (ifd0 == null) {
-      validation.addError("Error in IFD 0");
-    } else {
-      ifd0.validate();
-      validation.add(ifd0.validation);
-      addIfd(ifd0);
-      nIfds++;
-      IFD current_ifd = ifd0;
+    try {
+      int offset0 = (int) data.getInt(4);
+      IFD ifd0 = readIFD(offset0);
+      if (ifd0 == null) {
+        validation.addError("Parsing error in first IFD");
+      } else {
+        addIfd(ifd0);
+        nIfds++;
+        IFD current_ifd = ifd0;
 
-      // Read next IFDs
-      while (current_ifd.hasNextIFD()) {
-        int offset = current_ifd.nextIFDOffset();
-        if (usedOffset(offset)) {
-          // Circular reference check
-          validation.addError("IFD offset already used");
-          break;
-        } else {
-          current_ifd = readIFD(offset);
-          if (current_ifd == null) {
-            validation.addError("Error in IFD " + nIfds, "" + offset);
+        // Read next IFDs
+        while (current_ifd.hasNextIFD()) {
+          int offset = current_ifd.nextIFDOffset();
+          if (usedOffset(offset)) {
+            // Circular reference
+            validation.addError("IFD offset already used");
             break;
           } else {
-            current_ifd.validate();
-            validation.add(current_ifd.validation);
-            addIfd(current_ifd);
+            current_ifd = readIFD(offset);
+            if (current_ifd == null) {
+              validation.addError("Error in IFD " + nIfds, "" + offset);
+              break;
+            } else {
+              addIfd(current_ifd);
+              nIfds++;
+            }
           }
-          nIfds++;
         }
       }
+    } catch (Exception ex) {
+      validation.addError("IFD parsing error");
     }
   }
 
   /**
    * Reads a ifd.
    *
-   * @param IFD_idx Offset
+   * @param IFD_idx Position in file
    * @return the ifd
    */
   IFD readIFD(int offset) {
@@ -143,24 +154,47 @@ public class IfdStructure {
         ifd.correct = false;
       } else {
         index += 2;
+
+        // Reads the tags
         for (int i = 0; i < directoryEntries; i++) {
-          // Read a tag
           int tagid = data.getShort(index);
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
-          IfdEntry tag = new IfdEntry(tagid, tagType, tagN, index + 8, data);
-          if (ifd.tags.containsTagId(tagid))
-            validation.addError("Duplicate tag", tagid);
-          else
+          IfdEntry tag = new IfdEntry(tagid, tagType, tagN, data);
+          if (ifd.tags.containsTagId(tagid)) {
+            if (duplicateTagTolerance > 0)
+              validation.addWarning("Duplicate tag", tagid);
+            else
+              validation.addError("Duplicate tag", tagid);
+          } else {
             ifd.tags.addTag(tag);
+            try {
+              tag.getValueOrOffset(index + 8);
+            } catch (Exception ex) {
+              validation.addError("Parse error in tag " + tagid + " value");
+            }
+          }
 
           index += 12;
         }
+
         // Reads the position of the next IFD
-        ifd.nextIFD = (int) data.getInt(index);
+        try {
+          ifd.nextIFD = (int) data.getInt(index);
+        } catch (Exception ex) {
+          ifd.nextIFD = 0;
+          if (nextIFDTolerance > 0)
+            validation.addWarning("Unreadable next IFD offset");
+          else
+            validation.addError("Unreadable next IFD offset");
+        }
         if (ifd.hasNextIFD())
           if (ifd.nextIFD < 7)
             validation.addError("Invalid next IFD offset", ifd.nextIFD);
+
+        // Validate ifd entries
+        ifd.validate();
+        validation.add(ifd.validation);
       }
     } catch (IndexOutOfBoundsException ex) {
       ifd = null;

@@ -69,24 +69,25 @@ public class IfdEntry {
    * @param type Tag type
    * @param n Number of values
    */
-  public IfdEntry(int id, int type, int n, int offset, MappedByteBuffer data) {
+  public IfdEntry(int id, int type, int n, MappedByteBuffer data) {
     this.id = id;
     this.type = type;
     this.n = n;
     this.data = data;
     isOffset = false;
     validation = new ValidationResult();
-    getValue(offset);
   }
 
   /**
-   * Gets the value.
+   * Gets the value if it fits in the tag field.<br>
+   * Otherwise, sets the offset flag to true, indicating that the actual value of the tag is
+   * contained in another position of the file.
    *
    * @param data Tiff File
    * @param offset the position of the tag
    * @param tagType the tag type
    */
-  private void getValue(int offset) {
+  public void getValueOrOffset(int offset) {
     switch (type) {
       case 1:
       case 2:
@@ -127,7 +128,7 @@ public class IfdEntry {
   }
 
   /**
-   * Validates the tag.
+   * Validates that the tag type and cardinality have correct values.
    *
    */
   public void validate() {
@@ -146,7 +147,7 @@ public class IfdEntry {
         if (card != n)
           validation.addError("Cardinality for tag " + id + " must be " + card, n);
       } catch (Exception e) {
-        // TODO: Deal with formulas
+        // TODO: Deal with formulas?
       }
     }
   }

@@ -49,6 +49,18 @@ public class Header {
 
   /** The data. */
   private MappedByteBuffer data;
+  
+  /**
+   * The byte order error tolerance.<br>
+   * 0: No tolerance. 1: Lower case tolerance. 10: Full tolerance (assume little endian).
+   * */
+  private int byteOrderErrorTolerance = 0;
+
+  /**
+   * The magic number error tolerance.<br>
+   * 0: No tolerance. 10: Full tolerance (assume 42).
+   * */
+  private int magicNumberTolerance = 0;
 
   /**
    * Instantiates a new header.
@@ -65,30 +77,45 @@ public class Header {
    * @return true, if successful
    */
   public void read() {
-    // read the first two bytes to know the byte ordering
-    if (data.get(0) == 'I' && data.get(1) == 'I')
-      byteOrder = ByteOrder.LITTLE_ENDIAN;
-    else if (data.get(0) == 'M' && data.get(1) == 'M')
-      byteOrder = ByteOrder.BIG_ENDIAN;
-    else {
-      validation.addError("Invalid Byte Order", "" + data.get(0) + data.get(1));
+    try {
+      // read the first two bytes to know the byte ordering
+      if (data.get(0) == 'I' && data.get(1) == 'I')
+        byteOrder = ByteOrder.LITTLE_ENDIAN;
+      else if (data.get(0) == 'M' && data.get(1) == 'M')
+        byteOrder = ByteOrder.BIG_ENDIAN;
+      else if (byteOrderErrorTolerance > 0 && data.get(0) == 'i' && data.get(1) == 'i') {
+        validation.addWarning("Byte Order in lower case");
+        byteOrder = ByteOrder.LITTLE_ENDIAN;
+      } else if (byteOrderErrorTolerance > 0 && data.get(0) == 'm' && data.get(1) == 'm') {
+        validation.addWarning("Byte Order in lower case");
+        byteOrder = ByteOrder.BIG_ENDIAN;
+      } else if (byteOrderErrorTolerance > 1) {
+        validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
+        byteOrder = ByteOrder.LITTLE_ENDIAN;
+      } else {
+        validation.addError("Invalid Byte Order", "" + data.get(0) + data.get(1));
+      }
+    } catch (Exception ex) {
+      validation.addError("Header format error");
     }
 
     if (validation.correct) {
-
       // set byte ordering
       data.order(byteOrder);
 
       try {
+        // read magic number
         magicNumber = data.getShort(2);
         if (magicNumber != 42) {
-          validation.addError("Magic number != 42", magicNumber);
+          if (magicNumberTolerance > 0)
+            validation.addWarning("Invalid magic number. Assuming 42.", magicNumber);
+          else
+            validation.addError("Magic number != 42", magicNumber);
         }
       } catch (IndexOutOfBoundsException ex) {
         validation.addError("Magic number format error");
       }
     }
   }
-
 }
 
