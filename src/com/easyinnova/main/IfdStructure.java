@@ -156,7 +156,7 @@ public class IfdStructure {
 
         // Reads the tags
         for (int i = 0; i < directoryEntries; i++) {
-          int tagid = data.getShort(index);
+          int tagid = data.getUshort(index);
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
           IfdEntry tag = new IfdEntry(tagid, tagType, tagN, data);

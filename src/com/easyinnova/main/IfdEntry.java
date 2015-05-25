@@ -61,6 +61,9 @@ public class IfdEntry {
   /** The data. */
   TiffStreamIO data;
 
+  /** The icc profile. */
+  IccProfile iccProfile;
+
   /**
    * Instantiates a new tag.
    *
@@ -75,6 +78,7 @@ public class IfdEntry {
     this.data = data;
     isOffset = false;
     validation = new ValidationResult();
+    iccProfile = null;
   }
 
   /**
@@ -123,6 +127,10 @@ public class IfdEntry {
     } else if (totalsize > 4) {
       value = data.getInt(offset);
       isOffset = true;
+      if (id == 34675) {
+        iccProfile = new IccProfile((int) value, n, data);
+        validation.add(iccProfile.validation);
+      }
     }
   }
 
@@ -139,8 +147,15 @@ public class IfdEntry {
     else {
       Tag t = TiffTags.getTag(id);
       String stype = TiffTags.tagTypes.get(type);
-      if (!t.type.contains(stype))
-        validation.addError("Invalid type for tag " + id, stype);
+      if (!t.validType(stype)) {
+        String stypes = "";
+        for (String tt : t.type) {
+          if (stypes.length() > 0)
+            stypes += ",";
+          stypes += tt;
+        }
+        validation.addError("Invalid type for tag " + id + "[" + stypes + "]", stype);
+      }
       try {
         int card = Integer.parseInt(t.cardinality);
         if (card != n)
@@ -161,39 +176,54 @@ public class IfdEntry {
     if (!isOffset)
       s += value;
     else if (isOffset) {
-      if (n > 1)
-        s += "[";
-      for (int i = 0; i < n; i++) {
-        if (i > 0 && type != 2)
-          s += ", ";
-        int offset = (int) value + i * tagsize;
+      if (id == 34675) {
+        s += printICCProfile();
+      } else {
+        if (n > 1)
+          s += "[";
+        for (int i = 0; i < n; i++) {
+          if (i > 0 && type != 2)
+            s += ", ";
+          int offset = (int) value + i * tagsize;
 
-        switch (tagsize) {
-          case 1:
-            if (type == 2) {
-              if (data.get(offset) != 0)
-                s += (char) (data.get(offset));
-            }
-            else
-              s += data.get(offset);
-            break;
-          case 2:
-            s += data.getShort(offset);
-            break;
-          case 4:
-            s += data.getInt(offset);
-            break;
-          case 8:
-            if (type == 5 || type == 10)
-              s += data.getInt(offset) + "/" + data.getInt(offset + 4);
-            else
-              s += data.getLong(offset);
-            break;
+          switch (tagsize) {
+            case 1:
+              if (type == 2) {
+                if (data.get(offset) != 0)
+                  s += (char) (data.get(offset));
+              } else
+                s += data.get(offset);
+              break;
+            case 2:
+              s += data.getShort(offset);
+              break;
+            case 4:
+              s += data.getInt(offset);
+              break;
+            case 8:
+              if (type == 5 || type == 10)
+                s += data.getInt(offset) + "/" + data.getInt(offset + 4);
+              else
+                s += data.getLong(offset);
+              break;
+          }
         }
+        if (n > 1)
+          s += "]";
       }
-      if (n > 1)
-        s += "]";
     }
+    return s;
+  }
+
+  /**
+   * Prints the icc profile.
+   *
+   * @return the string
+   */
+  private String printICCProfile() {
+    int iccProfileSize = n;
+    String s = "";
+    s += "Size:" + iccProfileSize;
     return s;
   }
 

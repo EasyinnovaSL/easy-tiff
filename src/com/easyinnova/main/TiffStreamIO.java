@@ -125,5 +125,15 @@ public class TiffStreamIO {
   public long getLong(int offset) {
     return data.getLong(offset);
   }
+
+  /**
+   * Gets a ushort (8 bytes).
+   *
+   * @param offset the file position offset
+   * @return the ushort
+   */
+  public int getUshort(int offset) {
+    return getShort(offset) & 0xFFFF;
+  }
 }
 

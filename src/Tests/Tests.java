@@ -103,6 +103,47 @@ public class Tests {
     result = tf.read();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
+
+    // Compression
+    // tf = new TiffFile("tests\\Compression\\Motorola nopred comp.TIF");
+    // result = tf.read();
+    // assertEquals(0, result);
+    // assertEquals(true, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Compression\\Motorola nopred nocomp.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
+
+    // tf = new TiffFile("tests\\Compression\\Motorola pred comp.TIF");
+    // result = tf.read();
+    // assertEquals(0, result);
+    // assertEquals(true, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Compression\\Motorola pred nocomp.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
+
+    // tf = new TiffFile("tests\\Compression\\Intel nopred comp.TIF");
+    // result = tf.read();
+    // assertEquals(0, result);
+    // assertEquals(true, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Compression\\Intel nopred nocomp.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
+
+    // tf = new TiffFile("tests\\Compression\\Intel pred comp.TIF");
+    // result = tf.read();
+    // assertEquals(0, result);
+    // assertEquals(true, tf.validation.correct);
+
+    tf = new TiffFile("tests\\Compression\\Intel pred nocomp.TIF");
+    result = tf.read();
+    assertEquals(0, result);
+    assertEquals(true, tf.validation.correct);
   }
 
   /**

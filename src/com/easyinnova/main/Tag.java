@@ -32,8 +32,6 @@
 
 package com.easyinnova.main;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -273,11 +271,26 @@ public class Tag {
     this.ifd = ""; 
     this.description = "";
     this.source = "";
-    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");    
+    // DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
     Date date = new Date();
     this.created = date;
     this.modified= date;
   
-}
+  }
+
+  /**
+   * Valid type.
+   *
+   * @param type the type
+   * @return true, if is valid
+   */
+  public boolean validType(String type) {
+    boolean valid = false;
+    if (type.contains(type))
+      valid = true;
+    if (type == "LONG" && type.contains("UNDEFINED"))
+      valid = true;
+    return valid;
+  }
 
 }
