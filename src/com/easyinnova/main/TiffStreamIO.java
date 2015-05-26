@@ -51,19 +51,38 @@ public class TiffStreamIO {
   /** The channel. */
   FileChannel channel;
 
+  /** The filename. */
+  String filename;
+
   /**
    * Instantiates a new tiff stream reader.
    *
    * @param filename the path
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  public TiffStreamIO(String filename) throws IOException {
+  public TiffStreamIO(String filename) {
+    this.filename = filename;
+  }
+
+  /**
+   * Read.
+   */
+  public void read() throws IOException {
     aFile = new RandomAccessFile(filename, "rw");
     channel = aFile.getChannel();
     data = channel.map(FileChannel.MapMode.READ_WRITE, 0, channel.size());
 
     // loads the file in memory
     data.load();
+  }
+
+  /**
+   * Write.
+   */
+  public void write() throws IOException {
+    aFile = new RandomAccessFile(filename, "rw");
+    channel = aFile.getChannel();
+    data = channel.map(FileChannel.MapMode.READ_WRITE, 0, 10000000);
   }
 
   /**
@@ -85,6 +104,36 @@ public class TiffStreamIO {
    */
   public int get(int offset) {
     return data.get(offset);
+  }
+
+  /**
+   * Puts a byte.
+   *
+   * @param offset the file position offset
+   * @return the int
+   */
+  public void put(byte val) {
+    data.put(val);
+  }
+
+  /**
+   * Puts a short (2 bytes).
+   *
+   * @param offset the file position offset
+   * @return the int
+   */
+  public void putShort(short val) {
+    data.putShort(val);
+  }
+
+  /**
+   * Puts a int (4 bytes).
+   *
+   * @param offset the file position offset
+   * @return the int
+   */
+  public void putInt(int val) {
+    data.putInt(val);
   }
 
   /**

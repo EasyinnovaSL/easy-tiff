@@ -77,6 +77,7 @@ public class TiffFile {
     try {
       if (Files.exists(Paths.get(filename))) {
         data = new TiffStreamIO(filename);
+        data.read();
 
         validation.correct = true;
 
@@ -126,7 +127,9 @@ public class TiffFile {
    * @param order the order
    * @return the short
    * @throws IOException Signals that an I/O exception has occurred.
+   * @deprecated use {data.getShort} instead.
    */
+  @Deprecated
   int readShort(int index, ByteOrder order) throws IOException {
     int result = 0;
 
@@ -153,7 +156,9 @@ public class TiffFile {
    * @param order the order
    * @return the long
    * @throws IOException Signals that an I/O exception has occurred.
+   * @deprecated use {data.getInt} instead.
    */
+  @Deprecated
   long readLong(int index, ByteOrder order) throws IOException {
     long result = 0;
 
@@ -179,5 +184,20 @@ public class TiffFile {
       throw new IOException();
     }
     return result;
+  }
+
+  /**
+   * Write.
+   */
+  public void write(TiffFile data) {
+    TiffStreamIO odata = new TiffStreamIO("out.tif");
+    try {
+      odata.write();
+      data.header.write(odata);
+      data.ifdStructure.write(odata);
+      odata.close();
+    } catch (Exception ex) {
+      ex.toString();
+    }
   }
 }

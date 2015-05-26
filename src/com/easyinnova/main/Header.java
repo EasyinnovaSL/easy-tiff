@@ -116,5 +116,25 @@ public class Header {
       }
     }
   }
+
+  /**
+   * Writes the header.
+   *
+   * @param odata the odata
+   */
+  public void write(TiffStreamIO odata) {
+    if (byteOrder == ByteOrder.LITTLE_ENDIAN) {
+      odata.put((byte) 'I');
+      odata.put((byte) 'I');
+    } else if (byteOrder == ByteOrder.BIG_ENDIAN) {
+      odata.put((byte) 'M');
+      odata.put((byte) 'M');
+    }
+    odata.order(byteOrder);
+
+    odata.putShort((short) 42);
+
+    odata.putInt(8);
+  }
 }
 

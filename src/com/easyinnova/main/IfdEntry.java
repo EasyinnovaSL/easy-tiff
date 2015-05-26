@@ -64,6 +64,9 @@ public class IfdEntry {
   /** The icc profile. */
   IccProfile iccProfile;
 
+  /** The total size. */
+  int totalSize;
+
   /**
    * Instantiates a new tag.
    *
@@ -117,14 +120,14 @@ public class IfdEntry {
         tagsize = 8;
         break;
     }
-    int totalsize = tagsize * n;
-    if (totalsize == 1) {
+    totalSize = tagsize * n;
+    if (totalSize == 1) {
       value = data.get(offset);
-    } else if (totalsize == 2) {
+    } else if (totalSize == 2) {
       value = data.getShort(offset);
-    } else if (totalsize == 4) {
+    } else if (totalSize == 4) {
       value = data.getInt(offset);
-    } else if (totalsize > 4) {
+    } else if (totalSize > 4) {
       value = data.getInt(offset);
       isOffset = true;
       if (id == 34675) {
@@ -282,5 +285,40 @@ public class IfdEntry {
       l = null;
     }
     return l;
+  }
+
+  /**
+   * Write.
+   *
+   * @param odata the odata
+   * @param offset the offset
+   * @return the int
+   */
+  public int write(TiffStreamIO odata, int offset) {
+    odata.putShort((short) id);
+    odata.putShort((short) type);
+    odata.putInt((int) n);
+    int contentSize = 0;
+    if (isOffset) {
+      contentSize = totalSize;
+      odata.putInt(offset);
+    } else {
+      odata.putInt((int) value);
+    }
+    return contentSize;
+  }
+
+  /**
+   * Write content.
+   *
+   * @param odata the odata
+   * @return the int
+   */
+  public int writeContent(TiffStreamIO odata) {
+    for (int i = 0; i < totalSize; i++) {
+      int v = data.get((int) value + i);
+      odata.put((byte) v);
+    }
+    return totalSize;
   }
 }

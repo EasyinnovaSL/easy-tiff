@@ -467,4 +467,19 @@ public class IFD {
       }
     }
   }
+
+  /**
+   * Write.
+   *
+   * @param odata the odata
+   * @param offset the offset
+   * @return the int
+   */
+  public int write(TiffStreamIO odata, int offset) {
+    int offset2 = offset;
+    offset2 += tags.write(odata, offset2);
+    offset2 += 4;
+    odata.putInt(offset2);
+    return offset2;
+  }
 }

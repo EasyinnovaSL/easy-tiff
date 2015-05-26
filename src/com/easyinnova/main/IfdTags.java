@@ -134,5 +134,31 @@ public class IfdTags {
   public IfdEntry get(int id) {
     return hashTagsId.get(id);
   }
+
+  /**
+   * Write.
+   *
+   * @param odata the odata
+   * @param offset the offset
+   * @return the int
+   */
+  public int write(TiffStreamIO odata, int offset) {
+    int size = 0;
+    odata.putShort((short) tags.size());
+    int offset2 = offset + tags.size() * 12;
+    for (IfdEntry tag : tags) {
+      offset2 += tag.write(odata, offset2);
+      size += 12;
+    }
+    for (IfdEntry tag : tags) {
+      if (tag.isOffset) {
+        size += tag.writeContent(odata);
+      }
+    }
+    if (this.containsTagId(273) && this.containsTagId(279)) {
+
+    }
+    return size;
+  }
 }
 

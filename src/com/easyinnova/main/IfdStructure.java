@@ -200,5 +200,17 @@ public class IfdStructure {
     }
     return ifd;
   }
+
+  /**
+   * Write.
+   *
+   * @param odata the odata
+   */
+  public void write(TiffStreamIO odata) {
+    int offset = 8;
+    for (IFD ifd : ifds) {
+      offset = ifd.write(odata, offset);
+    }
+  }
 }
 

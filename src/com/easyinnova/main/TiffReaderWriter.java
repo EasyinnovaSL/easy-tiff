@@ -91,6 +91,8 @@ public class TiffReaderWriter {
         TiffFile tiffFile = new TiffFile(filename);
         int result = tiffFile.read();
         reportResults(tiffFile, result, output_file);
+
+        tiffFile.write(tiffFile);
       }
     }
   }
