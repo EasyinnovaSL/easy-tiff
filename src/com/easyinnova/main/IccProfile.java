@@ -53,6 +53,7 @@ public class IccProfile {
   public IccProfile(int offset, int size, TiffStreamIO data) {
     this.data = data;
     validation = new ValidationResult();
+    tags = new IccTags();
     readIccProfile(offset, size);
   }
 
@@ -78,6 +79,19 @@ public class IccProfile {
       tags.addTag(tag);
       index += 12;
     }
+  }
+
+  /**
+   * To string.
+   *
+   * @return the string
+   */
+  public String ToString() {
+    String s = "";
+    for (IccTag tag : tags.tags) {
+      s += "[" + tag.signature + "->" + tag.offset + "]";
+    }
+    return s;
   }
 }
 

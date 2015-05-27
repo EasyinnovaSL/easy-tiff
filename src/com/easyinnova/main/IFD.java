@@ -155,7 +155,7 @@ public class IFD {
       switch (photometric) {
         case 0:
         case 1:
-          if (!tags.containsTagId(258)) {
+          if (!tags.containsTagId(258) || tags.get(258).value == 1) {
             type = ImageType.BILEVEL;
             CheckBilevelImage();
           } else {
@@ -469,17 +469,15 @@ public class IFD {
   }
 
   /**
-   * Write.
+   * Write IFD data.
    *
    * @param odata the odata
    * @param offset the offset
    * @return the int
    */
   public int write(TiffStreamIO odata, int offset) {
-    int offset2 = offset;
-    offset2 += tags.write(odata, offset2);
-    offset2 += 4;
-    odata.putInt(offset2);
+    int offset2 = tags.write(data, odata);
+    odata.putInt(offset);
     return offset2;
   }
 }

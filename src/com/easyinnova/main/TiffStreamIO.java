@@ -184,5 +184,14 @@ public class TiffStreamIO {
   public int getUshort(int offset) {
     return getShort(offset) & 0xFFFF;
   }
+
+  /**
+   * Position.
+   *
+   * @return the int
+   */
+  public int position() {
+    return data.position();
+  }
 }
 

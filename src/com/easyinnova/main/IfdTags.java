@@ -139,26 +139,58 @@ public class IfdTags {
    * Write.
    *
    * @param odata the odata
-   * @param offset the offset
    * @return the int
    */
-  public int write(TiffStreamIO odata, int offset) {
-    int size = 0;
-    odata.putShort((short) tags.size());
-    int offset2 = offset + tags.size() * 12;
-    for (IfdEntry tag : tags) {
-      offset2 += tag.write(odata, offset2);
-      size += 12;
-    }
+  public int write(TiffStreamIO data, TiffStreamIO odata) {
+    int offset = odata.position();
     for (IfdEntry tag : tags) {
       if (tag.isOffset) {
-        size += tag.writeContent(odata);
+        if (tag.id == 273) {
+          writeStripData(data, odata);
+        } else if (tag.id == 279) {
+          // Nothing to do here, writeStripData does everything
+        } else {
+          int size = tag.writeContent(odata);
+          tag.value = offset;
+          offset += size;
+        }
       }
     }
-    if (this.containsTagId(273) && this.containsTagId(279)) {
-
+    odata.putShort((short) tags.size());
+    for (IfdEntry tag : tags) {
+      tag.write(odata);
     }
-    return size;
+    return odata.position();
+  }
+
+  /**
+   * Write strip data.
+   *
+   * @param odata the odata
+   */
+  private void writeStripData(TiffStreamIO data, TiffStreamIO odata) {
+    ArrayList<Integer> stripOffsets = tags.get(273).getIntArray();
+    ArrayList<Integer> stripSizes = tags.get(279).getIntArray();
+    ArrayList<Integer> stripOffsets2 = new ArrayList<Integer>();
+    ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
+    for (int i = 0; i < stripOffsets.size(); i++) {
+      stripOffsets2.add(odata.position());
+      stripSizes2.add(stripSizes.get(i));
+      for (int j = 0; j < stripSizes.get(i); j++) {
+        int v = data.get((int) stripOffsets.get(i));
+        odata.put((byte) v);
+      }
+    }
+    int offsetStripOffsets = odata.position();
+    for (int i = 0; i < stripOffsets2.size(); i++) {
+      odata.putInt(stripOffsets2.get(i));
+    }
+    int offsetStripSizes = odata.position();
+    for (int i = 0; i < stripSizes2.size(); i++) {
+      odata.putInt(stripOffsets2.get(i));
+    }
+    tags.get(273).value = offsetStripOffsets;
+    tags.get(279).value = offsetStripSizes;
   }
 }
 

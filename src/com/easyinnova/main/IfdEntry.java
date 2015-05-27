@@ -180,7 +180,9 @@ public class IfdEntry {
       s += value;
     else if (isOffset) {
       if (id == 34675) {
-        s += printICCProfile();
+        s += iccProfile.ToString();
+      } else if (id == 700 || id == 33723 || id == 34377) {
+        // XMP, IPTC, Photoshop
       } else {
         if (n > 1)
           s += "[";
@@ -215,18 +217,6 @@ public class IfdEntry {
           s += "]";
       }
     }
-    return s;
-  }
-
-  /**
-   * Prints the icc profile.
-   *
-   * @return the string
-   */
-  private String printICCProfile() {
-    int iccProfileSize = n;
-    String s = "";
-    s += "Size:" + iccProfileSize;
     return s;
   }
 
@@ -292,20 +282,12 @@ public class IfdEntry {
    *
    * @param odata the odata
    * @param offset the offset
-   * @return the int
    */
-  public int write(TiffStreamIO odata, int offset) {
+  public void write(TiffStreamIO odata) {
     odata.putShort((short) id);
     odata.putShort((short) type);
     odata.putInt((int) n);
-    int contentSize = 0;
-    if (isOffset) {
-      contentSize = totalSize;
-      odata.putInt(offset);
-    } else {
-      odata.putInt((int) value);
-    }
-    return contentSize;
+    odata.putInt((int) value);
   }
 
   /**
