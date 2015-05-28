@@ -39,7 +39,6 @@ import java.util.List;
  * @param <T> the generic type
  */
 public class TagValue<T> {
-//T stands for "Type"
   private List <T> value;
   
   private String type;

@@ -30,6 +30,11 @@
  */
 package com.easyinnova.main;
 
+import com.easyinnova.tiff.model.IFD;
+import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.reader.TiffReader;
+import com.easyinnova.tiff.writer.TiffWriter;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,11 +93,17 @@ public class TiffReaderWriter {
     } else {
       // Process files
       for (final String filename : files) {
-        TiffFile tiffFile = new TiffFile(filename);
-        int result = tiffFile.read();
-        reportResults(tiffFile, result, output_file);
+        TiffReader tr = new TiffReader();
+        int result = tr.readFile(filename);
+        reportResults(tr, result, output_file);
 
-        tiffFile.write(tiffFile);
+        TiffWriter tw = new TiffWriter(tr.getStream());
+        tw.SetModel(tr.getModel());
+        try {
+          tw.write("out.tiff");
+        } catch (Exception ex) {
+          System.out.println("Error writing TIFF");
+        }
       }
     }
   }
@@ -101,8 +112,9 @@ public class TiffReaderWriter {
    * @param tiffFile
    * @param result
    */
-  private static void reportResults(TiffFile tiffFile, int result, String output_file) {
-    String filename = tiffFile.filename;
+  private static void reportResults(TiffReader tiffReader, int result, String output_file) {
+    String filename = tiffReader.getFilename();
+    TiffObject to = tiffReader.getModel();
     if (output_file != null) {
       // TODO: Create xml file with report
     } else {
@@ -118,29 +130,29 @@ public class TiffReaderWriter {
           System.out.println("Internal exception in file '" + filename + "'");
           break;
         case 0:
-          if (tiffFile.validation.correct) {
+          if (to.validation.correct) {
             // The file is correct
             System.out.println("Everything ok in file '" + filename + "'");
-            System.out.println("IFDs: " + tiffFile.ifdStructure.nIfds);
+            System.out.println("IFDs: " + to.ifdStructure.nIfds);
             int index = 0;
-            for (IFD ifd : tiffFile.ifdStructure.ifds) {
+            for (IFD ifd : to.ifdStructure.ifds) {
               System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
               ifd.printTags();
             }
           } else {
             // The file is not correct
             System.out.println("Errors in file '" + filename + "'");
-            if (tiffFile.ifdStructure != null) {
-              System.out.println("IFDs: " + tiffFile.ifdStructure.nIfds);
+            if (to.ifdStructure != null) {
+              System.out.println("IFDs: " + to.ifdStructure.nIfds);
               int index = 0;
-              for (IFD ifd : tiffFile.ifdStructure.ifds) {
+              for (IFD ifd : to.ifdStructure.ifds) {
                 System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
                 ifd.printTags();
               }
             }
-            tiffFile.validation.printErrors();
+            to.validation.printErrors();
           }
-          tiffFile.validation.printWarnings();
+          to.validation.printWarnings();
           break;
         default:
           System.out.println("Unknown result (" + result + ") in file '" + filename + "'");

@@ -36,6 +36,9 @@ package com.easyinnova.tiff.model.types;
  * The Class Long.
  */
 public class Long {
+
+  /** The value. */
+  private long value;
   
   /**
    * Instantiates a new long.
@@ -47,8 +50,6 @@ public class Long {
     this.value=value;
     // TODO Auto-generated constructor stub
   }
-
-  private long value;
   
  /**
   * Gets the value.

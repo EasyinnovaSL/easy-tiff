@@ -31,8 +31,6 @@
  */
 package com.easyinnova.tiff.io;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -89,10 +87,11 @@ public class DataByteOrderInputStream extends FilterInputStream implements TiffD
     ByteOrder = byteOrder;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readFully(byte[])
+  /**
+   * Read fully.
+   *
+   * @param b the b
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   @Override
   public void readFully(byte[] b) throws IOException {

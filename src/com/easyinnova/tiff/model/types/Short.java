@@ -37,6 +37,7 @@ package com.easyinnova.tiff.model.types;
  */
 public class Short extends abstractTiffType{
   
+  /** The value. */
   private char value;
 
   /**

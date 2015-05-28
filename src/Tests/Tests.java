@@ -34,7 +34,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.easyinnova.main.TiffFile;
+import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.reader.TiffReader;
 
 /**
  * The Class Tests.
@@ -46,102 +47,105 @@ public class Tests {
    */
   @Test
   public void ValidExamples() {
-    TiffFile tf;
+    TiffObject tf;
+    TiffReader tr;
     int result;
 
-    tf = new TiffFile("tests\\Header\\Classic Intel.TIF");
-    result = tf.read();
+    tr = new TiffReader();
+
+    result = tr.readFile("tests\\Header\\Classic Intel.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Header\\Classic Motorola.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Header\\Classic Motorola.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Colorspace\\F32.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Colorspace\\F32.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD tree\\Recommended list.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD tree\\Recommended list.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD tree\\Old school E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD tree\\Old school E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Organization\\Chunky multistrip.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Organization\\Chunky multistrip.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Organization\\Chunky singlestrip.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Organization\\Chunky singlestrip.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Organization\\Chunky tile.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Organization\\Chunky tile.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Organization\\Planar multistrip.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Organization\\Planar multistrip.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Organization\\Planar singlestrip.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Organization\\Planar singlestrip.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Organization\\Planar tile.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Organization\\Planar tile.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
     // Compression
     // tf = new TiffFile("tests\\Compression\\Motorola nopred comp.TIF");
-    // result = tf.read();
+    // tf = tr.getModel();
     // assertEquals(0, result);
     // assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Compression\\Motorola nopred nocomp.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Compression\\Motorola nopred nocomp.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
     // tf = new TiffFile("tests\\Compression\\Motorola pred comp.TIF");
-    // result = tf.read();
+    // tf = tr.getModel();
     // assertEquals(0, result);
     // assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Compression\\Motorola pred nocomp.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Compression\\Motorola pred nocomp.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
     // tf = new TiffFile("tests\\Compression\\Intel nopred comp.TIF");
-    // result = tf.read();
+    // tf = tr.getModel();
     // assertEquals(0, result);
     // assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Compression\\Intel nopred nocomp.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Compression\\Intel nopred nocomp.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
 
     // tf = new TiffFile("tests\\Compression\\Intel pred comp.TIF");
-    // result = tf.read();
+    // tf = tr.getModel();
     // assertEquals(0, result);
     // assertEquals(true, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Compression\\Intel pred nocomp.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Compression\\Intel pred nocomp.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(true, tf.validation.correct);
   }
@@ -151,46 +155,49 @@ public class Tests {
    */
   @Test
   public void InvalidExamples() {
-    TiffFile tf;
+    TiffObject tf;
+    TiffReader tr;
     int result;
 
-    tf = new TiffFile("tests\\Header\\Nonsense byteorder E.TIF");
-    result = tf.read();
+    tr = new TiffReader();
+
+    result = tr.readFile("tests\\Header\\Nonsense byteorder E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Header\\Incorrect version E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Header\\Incorrect version E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD Struct\\Insane tag count E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD Struct\\Insane tag count E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD Struct\\Circular E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD Struct\\Circular E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD Struct\\Circular Short E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD Struct\\Circular Short E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD Struct\\Beyond EOF E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD Struct\\Beyond EOF E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\IFD Struct\\Premature EOF E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\IFD Struct\\Premature EOF E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
 
-    tf = new TiffFile("tests\\Colorspace\\I8 bad BitsPerSample count E.TIF");
-    result = tf.read();
+    result = tr.readFile("tests\\Colorspace\\I8 bad BitsPerSample count E.TIF");
+    tf = tr.getModel();
     assertEquals(0, result);
     assertEquals(false, tf.validation.correct);
   }

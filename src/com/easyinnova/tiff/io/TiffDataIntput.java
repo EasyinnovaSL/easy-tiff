@@ -30,9 +30,16 @@
  */
 package com.easyinnova.tiff.io;
 
-import java.io.IOException;
-
 import com.easyinnova.tiff.model.types.Ascii;
+import com.easyinnova.tiff.model.types.Rational;
+import com.easyinnova.tiff.model.types.SByte;
+import com.easyinnova.tiff.model.types.SLong;
+import com.easyinnova.tiff.model.types.SRational;
+import com.easyinnova.tiff.model.types.SShort;
+import com.easyinnova.tiff.model.types.Undefined;
+import com.easyinnova.tiff.model.types.tiffType;
+
+import java.io.IOException;
 
 /**
  * The Interface TiffDataIntput.
@@ -74,18 +81,94 @@ public interface TiffDataIntput {
    */
   Ascii readAscii(int n) throws IOException;
 
-  byte readShort() throws IOException;
-  byte readLong() throws IOException;
-  byte readRational() throws IOException;
-  byte readSByte() throws IOException;
-  byte readUndefined() throws IOException;
-  byte readSShort() throws IOException;
-  byte readSLong() throws IOException;
-  byte readSRational() throws IOException;
-  byte readFloat() throws IOException;
-  byte readDouble() throws IOException;
-  byte readType() throws IOException;
+  /**
+   * Read short.
+   *
+   * @return the short
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  Short readShort() throws IOException;
+
+  /**
+   * Read long.
+   *
+   * @return the long
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  Long readLong() throws IOException;
+
+  /**
+   * Read rational.
+   *
+   * @return the rational
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  Rational readRational() throws IOException;
+
+  /**
+   * Read s byte.
+   *
+   * @return the s byte
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  SByte readSByte() throws IOException;
+
+  /**
+   * Read undefined.
+   *
+   * @return the undefined
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  Undefined readUndefined() throws IOException;
+
+  /**
+   * Read s short.
+   *
+   * @return the s short
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  SShort readSShort() throws IOException;
   
+  /**
+   * Read s long.
+   *
+   * @return the s long
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  SLong readSLong() throws IOException;
+
+  /**
+   * Read s rational.
+   *
+   * @return the s rational
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  SRational readSRational() throws IOException;
+
+  /**
+   * Read float.
+   *
+   * @return the float
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  Float readFloat() throws IOException;
+
+  /**
+   * Read double.
+   *
+   * @return the double
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  Double readDouble() throws IOException;
+
+  /**
+   * Read type.
+   *
+   * @return the tiff type
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  tiffType readType() throws IOException;
+
 }
 /*
 1 = BYTE 8-bit unsigned integer.

@@ -37,6 +37,7 @@ package com.easyinnova.tiff.model.types;
  */
 public class Byte extends abstractTiffType {
   
+  /** The value. */
   private byte value;
 
   /**
