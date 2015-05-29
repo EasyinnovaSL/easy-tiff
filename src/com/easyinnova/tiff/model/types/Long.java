@@ -35,7 +35,7 @@ package com.easyinnova.tiff.model.types;
 /**
  * The Class Long.
  */
-public class Long {
+public class Long extends abstractTiffType {
 
   /** The value. */
   private long value;
@@ -48,7 +48,7 @@ public class Long {
   public Long(long value) {
     super();
     this.value=value;
-    // TODO Auto-generated constructor stub
+    setTypeSize(4);
   }
   
  /**
@@ -56,7 +56,7 @@ public class Long {
   *
   * @return the value
   */
- public long getValue() {
+  public long getValue() {
     return value;
   }
 
@@ -69,4 +69,8 @@ public class Long {
     this.value = value;
   }
 
+  @Override
+  public String toString() {
+    return "" + value;
+  }
 }

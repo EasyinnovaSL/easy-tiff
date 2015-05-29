@@ -41,9 +41,6 @@ public class TiffObject {
   /** The file data. */
   TiffStreamIO data;
 
-  /** The header. */
-  public Header header;
-
   /** Structure of the Tiff file. */
   public IfdStructure ifdStructure;
 
@@ -73,17 +70,9 @@ public class TiffObject {
    * Parses the data.
    */
   public void readTiff() {
-    // Read the Head
-    header = new Header(data);
-    header.read();
-    validation.add(header.validation);
-
     // Read the IFDs
-    if (header.validation.correct) {
-      ifdStructure = new IfdStructure(data);
-      ifdStructure.read();
-      validation.add(ifdStructure.validation);
-    }
-    // else if the header is not correct we can't read anything more
+    ifdStructure = new IfdStructure(data);
+    ifdStructure.read();
+    validation.add(ifdStructure.validation);
   }
 }

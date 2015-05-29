@@ -30,12 +30,74 @@
  */
 package com.easyinnova.tiff.model.types;
 
-
-
 /**
  * The Class abstractTiffTag.
  */
 public class abstractTiffType implements tiffType{
 
-  
+  /** The tag size. */
+  private int typeSize;
+
+  /** Number of values. */
+  private int count;
+
+  /**
+   * Instantiates a new abstract tiff type.
+   */
+  public abstractTiffType() {
+  }
+
+  /**
+   * Sets the n.
+   *
+   * @param n the new n
+   */
+  public void setN(int n) {
+    this.count = n;
+  }
+
+  /**
+   * Gets the n.
+   *
+   * @return the n
+   */
+  public int getN() {
+    return count;
+  }
+
+  /**
+   * Sets the type size.
+   *
+   * @param size the new type size
+   */
+  public void setTypeSize(int size) {
+    typeSize = size;
+  }
+
+  /**
+   * Gets the type size.
+   *
+   * @return the type size
+   */
+  public int getTypeSize() {
+    return typeSize;
+  }
+
+  /**
+   * Gets the total byte size.
+   *
+   * @return the total byte size
+   */
+  public int getTotalByteSize() {
+    return count * typeSize;
+  }
+
+  /**
+   * Checks if is offset.
+   *
+   * @return true, if is offset
+   */
+  public boolean isOffset() {
+    return getTotalByteSize() > 4;
+  }
 }

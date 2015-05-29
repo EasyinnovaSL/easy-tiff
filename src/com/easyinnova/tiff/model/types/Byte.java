@@ -48,6 +48,7 @@ public class Byte extends abstractTiffType {
   public Byte(byte value) {
     super();
     this.value = value;
+    setTypeSize(1);
   }
 
   /**

@@ -38,4 +38,5 @@ package com.easyinnova.tiff.model.types;
 public interface tiffType {
 
   public String toString();
+
 }

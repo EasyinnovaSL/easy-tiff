@@ -69,7 +69,7 @@ public class TiffWriter {
     TiffStreamIO odata = new TiffStreamIO(null);
     try {
       odata.write(filename);
-      model.header.write(odata);
+      odata.writeHeader();
       model.ifdStructure.write(odata);
       odata.close();
     } catch (Exception ex) {

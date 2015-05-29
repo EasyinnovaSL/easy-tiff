@@ -163,16 +163,16 @@ public class IfdStructure {
           int tagid = data.getUshort(index);
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
-          IfdEntry tag = new IfdEntry(tagid, tagType, tagN, data);
-          if (ifd.tags.containsTagId(tagid)) {
+          IfdEntry tag = new IfdEntry(tagid, tagType, data);
+          if (ifd.metadata.containsTagId(tagid)) {
             if (duplicateTagTolerance > 0)
               validation.addWarning("Duplicate tag", tagid);
             else
               validation.addError("Duplicate tag", tagid);
           } else {
-            ifd.tags.addTag(tag);
+            ifd.metadata.addTag(tag);
             try {
-              tag.getValueOrOffset(index + 8);
+              tag.getValueOrOffset(index + 8, tagN);
             } catch (Exception ex) {
               validation.addError("Parse error in tag " + tagid + " value");
             }

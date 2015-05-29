@@ -100,7 +100,7 @@ public class TiffReaderWriter {
         TiffWriter tw = new TiffWriter(tr.getStream());
         tw.SetModel(tr.getModel());
         try {
-          tw.write("out.tiff");
+          tw.write("out.tif");
         } catch (Exception ex) {
           System.out.println("Error writing TIFF");
         }
@@ -128,6 +128,9 @@ public class TiffReaderWriter {
           break;
         case -3:
           System.out.println("Internal exception in file '" + filename + "'");
+          break;
+        case -5:
+          System.out.println("Incorrect magic number");
           break;
         case 0:
           if (to.validation.correct) {

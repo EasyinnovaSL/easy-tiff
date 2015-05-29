@@ -44,7 +44,7 @@ public class Tag {
   protected Integer id;
 
   /** The name. */
-  protected String name = "";
+  public String name = "";
 
   /** The type. */
   protected List<String> type;

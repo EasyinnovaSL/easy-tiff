@@ -70,13 +70,25 @@ public class TiffReader {
     try {
       if (Files.exists(Paths.get(filename))) {
         TiffStreamIO data = new TiffStreamIO(null);
-        data.load(filename);
+        boolean ok = true;
         try {
-          tiffFile = new TiffObject(data);
-          tiffFile.readTiff();
+          data.load(filename);
+          if (data.getMagicNumber() != 42) {
+            result = -5;
+          }
         } catch (Exception ex) {
-          // Internal parsing exception
-          result = -3;
+          ok = false;
+        }
+        if (ok) {
+          try {
+            tiffFile = new TiffObject(data);
+            tiffFile.readTiff();
+          } catch (Exception ex) {
+            // Internal parsing exception
+            result = -3;
+          }
+        } else {
+          result = -4;
         }
 
         data.close();
@@ -84,7 +96,7 @@ public class TiffReader {
         // File not found
         result = -1;
       }
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       // Exception
       result = -2;
     }

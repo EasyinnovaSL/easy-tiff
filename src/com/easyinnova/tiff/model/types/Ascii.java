@@ -41,7 +41,6 @@ public class Ascii extends abstractTiffType {
   /** The value. */
   private String value;
   
-  
   /**
    * Instantiates a new ascii.
    *
@@ -50,6 +49,7 @@ public class Ascii extends abstractTiffType {
   public Ascii(String value) {
     super();
     this.value = value;
+    setTypeSize(1);
   }
 
   /**
@@ -69,6 +69,9 @@ public class Ascii extends abstractTiffType {
   public void setValue(String value) {
     this.value = value;
   }
-  
-  
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }

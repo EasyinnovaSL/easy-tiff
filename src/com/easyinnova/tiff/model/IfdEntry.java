@@ -31,6 +31,8 @@
 package com.easyinnova.tiff.model;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
+import com.easyinnova.tiff.model.types.IccProfile;
+import com.easyinnova.tiff.model.types.abstractTiffType;
 
 import java.util.ArrayList;
 
@@ -45,17 +47,8 @@ public class IfdEntry {
   /** The type. */
   int type;
 
-  /** Number of values. */
-  int n;
-
-  /** The tagsize. */
-  int tagsize;
-
-  /** The Value. */
-  long value;
-
-  /** The is offset. */
-  boolean isOffset;
+  /** The value. */
+  abstractTiffType value;
 
   /** The Validation. */
   ValidationResult validation;
@@ -63,28 +56,19 @@ public class IfdEntry {
   /** The data. */
   TiffStreamIO data;
 
-  /** The icc profile. */
-  IccProfile iccProfile;
-
-  /** The total size. */
-  int totalSize;
-
   /**
    * Instantiates a new tag.
    *
    * @param id Tag identifier
    * @param type Tag type
-   * @param n Number of values
+   * @param count Number of values
    * @param data the data
    */
-  public IfdEntry(int id, int type, int n, TiffStreamIO data) {
+  public IfdEntry(int id, int type, TiffStreamIO data) {
     this.id = id;
     this.type = type;
-    this.n = n;
     this.data = data;
-    isOffset = false;
     validation = new ValidationResult();
-    iccProfile = null;
   }
 
   /**
@@ -92,52 +76,59 @@ public class IfdEntry {
    * Otherwise, sets the offset flag to true, indicating that the actual value of the tag is
    * contained in another position of the file.
    *
-   * @param data Tiff File
    * @param offset the position of the tag
-   * @param tagType the tag type
+   * @param n the cardinality
+   * @return the value or offset
    */
-  public void getValueOrOffset(int offset) {
+  public void getValueOrOffset(int offset, int n) {
     switch (type) {
       case 1:
+        value = new com.easyinnova.tiff.model.types.Byte((byte) data.get(offset));
+        break;
       case 2:
+        value = new com.easyinnova.tiff.model.types.Byte((byte) data.get(offset));
+        break;
       case 6:
+        value = new com.easyinnova.tiff.model.types.SByte((byte) data.get(offset));
+        break;
       case 7:
-        tagsize = 1;
+        value = new com.easyinnova.tiff.model.types.Undefined((byte) data.get(offset));
         break;
       case 3:
+        value = new com.easyinnova.tiff.model.types.Short((char) data.getShort(offset));
+        break;
       case 8:
-        tagsize = 2;
+        value = new com.easyinnova.tiff.model.types.SShort((short) data.getShort(offset));
         break;
       case 4:
+        value = new com.easyinnova.tiff.model.types.Long((long) data.getInt(offset));
+        break;
       case 9:
-        tagsize = 4;
+        value = new com.easyinnova.tiff.model.types.SLong((long) data.getInt(offset));
         break;
       case 5:
+        value =
+            new com.easyinnova.tiff.model.types.Rational(data.getInt(offset),
+                data.getInt(offset + 4));
+        break;
       case 10:
-        tagsize = 8;
+        value =
+            new com.easyinnova.tiff.model.types.SRational(data.getInt(offset),
+                data.getInt(offset + 4));
         break;
       case 11:
-        tagsize = 4;
+        value = new com.easyinnova.tiff.model.types.Float(data.getInt(offset));
         break;
       case 12:
-        tagsize = 8;
+        value = new com.easyinnova.tiff.model.types.Double(data.getInt(offset));
         break;
     }
-    totalSize = tagsize * n;
-    if (totalSize == 1) {
-      value = data.get(offset);
-    } else if (totalSize == 2) {
-      value = data.getShort(offset);
-    } else if (totalSize == 4) {
-      value = data.getInt(offset);
-    } else if (totalSize > 4) {
-      value = data.getInt(offset);
-      isOffset = true;
-      if (id == 34675) {
-        iccProfile = new IccProfile((int) value, n, data);
-        validation.add(iccProfile.validation);
-      }
+    if (id == 34675) {
+      value = new IccProfile(getNumericValue(), n, data);
+      validation.add(((IccProfile) value).validation);
     }
+
+    value.setN(n);
   }
 
   /**
@@ -164,8 +155,8 @@ public class IfdEntry {
       }
       try {
         int card = Integer.parseInt(t.cardinality);
-        if (card != n)
-          validation.addError("Cardinality for tag " + id + " must be " + card, n);
+        if (card != value.getN())
+          validation.addError("Cardinality for tag " + id + " must be " + card, value.getN());
       } catch (Exception e) {
         // TODO: Deal with formulas?
       }
@@ -179,22 +170,23 @@ public class IfdEntry {
    */
   public String toString() {
     String s = "";
-    if (!isOffset)
-      s += value;
-    else if (isOffset) {
+    if (!value.isOffset())
+      s += value.toString();
+    else if (value.isOffset()) {
       if (id == 34675) {
-        s += iccProfile.ToString();
+        s += value.toString();
       } else if (id == 700 || id == 33723 || id == 34377) {
         // XMP, IPTC, Photoshop
       } else {
-        if (n > 1)
+        if (value.getN() > 1)
           s += "[";
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < value.getN(); i++) {
           if (i > 0 && type != 2)
             s += ", ";
-          int offset = (int) value + i * tagsize;
+          int intval = (int) ((com.easyinnova.tiff.model.types.Long) value).getValue();
+          int offset = intval + i * value.getTypeSize();
 
-          switch (tagsize) {
+          switch (value.getTypeSize()) {
             case 1:
               if (type == 2) {
                 if (data.get(offset) != 0)
@@ -216,7 +208,7 @@ public class IfdEntry {
               break;
           }
         }
-        if (n > 1)
+        if (value.getN() > 1)
           s += "]";
       }
     }
@@ -228,26 +220,22 @@ public class IfdEntry {
    *
    * @return the int value
    */
-  public int getIntValue() {
-    int val = 0;
-    if (!isOffset)
-      val = (int) value;
-    return val;
-  }
-
-  /**
-   * Gets the rational value.
-   *
-   * @return the rational value
-   */
-  public float getRationalValue() {
-    float val = 0;
-    if (isOffset) {
-      int numerator = data.getInt((int) value);
-      int denominator = data.getInt((int) value + 4);
-      val = (float) numerator / denominator;
+  public int getNumericValue() {
+    int intval = 0;
+    try {
+      intval = (int) ((com.easyinnova.tiff.model.types.Long) value).getValue();
+    } catch (Exception ex) {
+      try {
+        intval = (int) ((com.easyinnova.tiff.model.types.Short) value).getValue();
+      } catch (Exception ex2) {
+        try {
+          intval = (int) ((com.easyinnova.tiff.model.types.Byte) value).getValue();
+        } catch (Exception ex3) {
+          throw ex3;
+        }
+      }
     }
-    return val;
+    return intval;
   }
 
   /**
@@ -258,19 +246,19 @@ public class IfdEntry {
   public ArrayList<Integer> getIntArray() {
     ArrayList<Integer> l = new ArrayList<Integer>();
     try {
-      for (int i = 0; i < n; i++) {
-        switch (tagsize) {
+      for (int i = 0; i < value.getN(); i++) {
+        switch (value.getTypeSize()) {
           case 1:
-            l.add(data.get((int) value + i * 2));
+            l.add(data.get(getNumericValue() + i * 2));
             break;
           case 2:
-            l.add(data.getShort((int) value + i * 2));
+            l.add(data.getShort(getNumericValue() + i * 2));
             break;
           case 4:
-            l.add(data.getInt((int) value + i * 2));
+            l.add(data.getInt(getNumericValue() + i * 2));
             break;
           case 8:
-            l.add((int) data.getLong((int) value + i * 2));
+            l.add((int) data.getLong(getNumericValue() + i * 2));
             break;
         }
       }
@@ -289,8 +277,8 @@ public class IfdEntry {
   public void write(TiffStreamIO odata) {
     odata.putShort((short) id);
     odata.putShort((short) type);
-    odata.putInt((int) n);
-    odata.putInt((int) value);
+    odata.putInt((int) value.getN());
+    odata.putInt(getNumericValue());
   }
 
   /**
@@ -300,10 +288,20 @@ public class IfdEntry {
    * @return the int
    */
   public int writeContent(TiffStreamIO odata) {
+    int totalSize = value.getTotalByteSize();
     for (int i = 0; i < totalSize; i++) {
-      int v = data.get((int) value + i);
+      int v = data.get(getNumericValue() + i);
       odata.put((byte) v);
     }
     return totalSize;
+  }
+
+  /**
+   * Sets the int value.
+   *
+   * @param offset the new int value
+   */
+  public void setIntValue(int offset) {
+    ((com.easyinnova.tiff.model.types.Long) value).setValue(offset);
   }
 }

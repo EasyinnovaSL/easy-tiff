@@ -34,7 +34,7 @@ package com.easyinnova.tiff.model.types;
 /**
  * The Class Rational.
  */
-public class Rational {
+public class Rational extends abstractTiffType {
   
   /** The numerator. */
   private int numerator;
@@ -52,6 +52,7 @@ public class Rational {
     super();
     this.numerator=numerator;
     this.denominator=denominator;
+    setTypeSize(8);
   }
   /**
    * Gets the numerator.
@@ -87,6 +88,15 @@ public class Rational {
    */
   public void setDenominator(int denominator) {
     this.denominator = denominator;
+  }
+
+  /**
+   * Gets the float value.
+   *
+   * @return the float value
+   */
+  public float getFloatValue() {
+    return (float) numerator / denominator;
   }
 
 }

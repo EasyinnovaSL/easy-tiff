@@ -48,6 +48,7 @@ public class SShort extends abstractTiffType{
   public SShort(short value) {
     super();
     this.setValue(value);
+    setTypeSize(2);
   }
 
   /**

@@ -33,7 +33,7 @@ package com.easyinnova.tiff.model.types;
 /**
  * The Class SRational.
  */
-public class SRational {
+public class SRational extends abstractTiffType {
 
   /** The numerator. */
   private int numerator;
@@ -51,6 +51,7 @@ public class SRational {
     super();
     this.numerator = numerator;
     this.denominator = denominator;
+    setTypeSize(8);
   }
 
   /**

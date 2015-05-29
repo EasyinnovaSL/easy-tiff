@@ -45,6 +45,7 @@ public class Undefined extends abstractTiffType{
   public Undefined(byte value) {
     super();
     this.value=value;
+    setTypeSize(1);
   }
 
   /**

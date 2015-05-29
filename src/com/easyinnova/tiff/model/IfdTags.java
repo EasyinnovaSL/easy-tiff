@@ -101,23 +101,6 @@ public class IfdTags {
   }
 
   /**
-   * Gets the field.
-   *
-   * @param id the id
-   * @return the field
-   */
-  public long getField(int id) {
-    long tv = 0;
-    String tagDesc = TiffTags.tagMap.get(id).name;
-    if (!hashTagsId.containsKey(id)) {
-      validation.addError("Missing tag " + id + " (" + tagDesc + ")");
-    } else {
-      tv = hashTagsId.get(id).value;
-    }
-    return tv;
-  }
-
-  /**
    * Contains tag id.
    *
    * @param id the id
@@ -147,14 +130,14 @@ public class IfdTags {
   public int write(TiffStreamIO data, TiffStreamIO odata) {
     int offset = odata.position();
     for (IfdEntry tag : tags) {
-      if (tag.isOffset) {
+      if (tag.value.isOffset()) {
         if (tag.id == 273) {
           writeStripData(data, odata);
         } else if (tag.id == 279) {
           // Nothing to do here, writeStripData does everything
         } else {
           int size = tag.writeContent(odata);
-          tag.value = offset;
+          tag.setIntValue(offset);
           offset += size;
         }
       }
@@ -172,8 +155,8 @@ public class IfdTags {
    * @param odata the odata
    */
   private void writeStripData(TiffStreamIO data, TiffStreamIO odata) {
-    ArrayList<Integer> stripOffsets = tags.get(273).getIntArray();
-    ArrayList<Integer> stripSizes = tags.get(279).getIntArray();
+    ArrayList<Integer> stripOffsets = hashTagsId.get(273).getIntArray();
+    ArrayList<Integer> stripSizes = hashTagsId.get(279).getIntArray();
     ArrayList<Integer> stripOffsets2 = new ArrayList<Integer>();
     ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
     for (int i = 0; i < stripOffsets.size(); i++) {
@@ -192,8 +175,8 @@ public class IfdTags {
     for (int i = 0; i < stripSizes2.size(); i++) {
       odata.putInt(stripOffsets2.get(i));
     }
-    tags.get(273).value = offsetStripOffsets;
-    tags.get(279).value = offsetStripSizes;
+    hashTagsId.get(273).setIntValue(offsetStripOffsets);
+    hashTagsId.get(279).setIntValue(offsetStripSizes);
   }
 }
 

@@ -46,6 +46,7 @@ public class SByte extends abstractTiffType {
   public SByte(byte value) {
     super();
     this.value=value;
+    setTypeSize(1);
   }
 
   /**

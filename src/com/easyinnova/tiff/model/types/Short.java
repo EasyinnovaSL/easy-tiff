@@ -48,6 +48,7 @@ public class Short extends abstractTiffType{
   public Short(char value) {
     super();
     this.value=value;
+    setTypeSize(2);
   }
 
   /**
@@ -68,4 +69,8 @@ public class Short extends abstractTiffType{
     this.value = value;
   }
 
+  @Override
+  public String toString() {
+    return "" + (int) value;
+  }
 }
