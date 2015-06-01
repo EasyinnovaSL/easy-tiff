@@ -74,6 +74,7 @@ public class abstractTiffType implements tiffType{
     typeSize = size;
   }
 
+
   /**
    * Gets the type size.
    *
