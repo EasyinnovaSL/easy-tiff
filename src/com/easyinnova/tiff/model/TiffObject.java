@@ -31,48 +31,86 @@
  */
 package com.easyinnova.tiff.model;
 
-import com.easyinnova.tiff.io.TiffStreamIO;
+import java.util.ArrayList;
+
 
 /**
  * The Class TiffFile.
  */
 public class TiffObject {
 
-  /** The file data. */
-  TiffStreamIO data;
+  /** The magic number. */
+  private int magicNumber;
 
-  /** Structure of the Tiff file. */
-  public IfdStructure ifdStructure;
+  /** The list of Ifd. */
+  private ArrayList<IFD> ifds;
 
-  /** The result of the validation. */
-  public ValidationResult validation;
+  /** The number of ifds. */
+  private int nIfds;
 
   /**
    * Instantiates a new tiff file.
    *
    * @param data the data
    */
-  public TiffObject(TiffStreamIO data) {
-    this.data = data;
-    validation = new ValidationResult();
+  public TiffObject() {
+    ifds = new ArrayList<IFD>();
+    nIfds = 0;
   }
 
   /**
-   * Gets the stream.
+   * Adds an IFD to the list.
    *
-   * @return the stream
+   * @param ifd the ifd
    */
-  public TiffStreamIO getStream() {
-    return data;
+  public void addIfd(IFD ifd) {
+    ifds.add(ifd);
+    nIfds++;
   }
 
   /**
-   * Parses the data.
+   * Gets the ifd count.
+   *
+   * @return the ifd count
    */
-  public void readTiff() {
-    // Read the IFDs
-    ifdStructure = new IfdStructure(data);
-    ifdStructure.read();
-    validation.add(ifdStructure.validation);
+  public int getIfdCount() {
+    return nIfds;
+  }
+
+  /**
+   * Gets the ifds.
+   *
+   * @return the ifds
+   */
+  public ArrayList<IFD> getIfds() {
+    return ifds;
+  }
+
+  /**
+   * Gets the ifd.
+   *
+   * @param index the index
+   * @return the ifd
+   */
+  public IFD getIfd(int index) {
+    return ifds.get(index);
+  }
+
+  /**
+   * Gets the magic number.
+   *
+   * @return the magic number
+   */
+  public int getMagicNumber() {
+    return magicNumber;
+  }
+
+  /**
+   * Sets the magic number.
+   *
+   * @param magic the new magic number
+   */
+  public void setMagicNumber(int magic) {
+    this.magicNumber = magic;
   }
 }

@@ -30,8 +30,6 @@
  */
 package com.easyinnova.tiff.model;
 
-import com.easyinnova.tiff.io.TiffStreamIO;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -74,10 +72,13 @@ public class IfdTags {
    */
   public void addTag(IfdEntry tag) {
     tags.add(tag);
-    hashTagsId.put(tag.id, tag);
+    if (!hashTagsId.containsKey(tag.id)) {
+      hashTagsId.put(tag.id, tag);
+    }
     Tag t = TiffTags.getTag(tag.id);
-    if (t != null)
+    if (t != null) {
       hashTagsName.put(t.name, tag);
+    }
   }
 
   /**
@@ -118,65 +119,6 @@ public class IfdTags {
    */
   public IfdEntry get(int id) {
     return hashTagsId.get(id);
-  }
-
-  /**
-   * Write.
-   *
-   * @param data the data
-   * @param odata the odata
-   * @return the int
-   */
-  public int write(TiffStreamIO data, TiffStreamIO odata) {
-    int offset = odata.position();
-    for (IfdEntry tag : tags) {
-      if (tag.value.isOffset()) {
-        if (tag.id == 273) {
-          writeStripData(data, odata);
-        } else if (tag.id == 279) {
-          // Nothing to do here, writeStripData does everything
-        } else {
-          int size = tag.writeContent(odata);
-          tag.setIntValue(offset);
-          offset += size;
-        }
-      }
-    }
-    odata.putShort((short) tags.size());
-    for (IfdEntry tag : tags) {
-      tag.write(odata);
-    }
-    return odata.position();
-  }
-
-  /**
-   * Write strip data.
-   *
-   * @param odata the odata
-   */
-  private void writeStripData(TiffStreamIO data, TiffStreamIO odata) {
-    ArrayList<Integer> stripOffsets = hashTagsId.get(273).getIntArray();
-    ArrayList<Integer> stripSizes = hashTagsId.get(279).getIntArray();
-    ArrayList<Integer> stripOffsets2 = new ArrayList<Integer>();
-    ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
-    for (int i = 0; i < stripOffsets.size(); i++) {
-      stripOffsets2.add(odata.position());
-      stripSizes2.add(stripSizes.get(i));
-      for (int j = 0; j < stripSizes.get(i); j++) {
-        int v = data.get((int) stripOffsets.get(i));
-        odata.put((byte) v);
-      }
-    }
-    int offsetStripOffsets = odata.position();
-    for (int i = 0; i < stripOffsets2.size(); i++) {
-      odata.putInt(stripOffsets2.get(i));
-    }
-    int offsetStripSizes = odata.position();
-    for (int i = 0; i < stripSizes2.size(); i++) {
-      odata.putInt(stripOffsets2.get(i));
-    }
-    hashTagsId.get(273).setIntValue(offsetStripOffsets);
-    hashTagsId.get(279).setIntValue(offsetStripSizes);
   }
 }
 

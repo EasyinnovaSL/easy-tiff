@@ -97,10 +97,10 @@ public class TiffReaderWriter {
         int result = tr.readFile(filename);
         reportResults(tr, result, output_file);
 
-        TiffWriter tw = new TiffWriter(tr.getStream());
+        TiffWriter tw = new TiffWriter();
         tw.SetModel(tr.getModel());
         try {
-          tw.write("out.tif");
+          // tw.write("out.tif");
         } catch (Exception ex) {
           System.out.println("Error writing TIFF");
         }
@@ -133,29 +133,29 @@ public class TiffReaderWriter {
           System.out.println("Incorrect magic number");
           break;
         case 0:
-          if (to.validation.correct) {
+          if (tiffReader.validation.correct) {
             // The file is correct
             System.out.println("Everything ok in file '" + filename + "'");
-            System.out.println("IFDs: " + to.ifdStructure.nIfds);
+            System.out.println("IFDs: " + to.getIfdCount());
             int index = 0;
-            for (IFD ifd : to.ifdStructure.ifds) {
+            for (IFD ifd : to.getIfds()) {
               System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
               ifd.printTags();
             }
           } else {
             // The file is not correct
             System.out.println("Errors in file '" + filename + "'");
-            if (to.ifdStructure != null) {
-              System.out.println("IFDs: " + to.ifdStructure.nIfds);
+            if (to != null) {
+              System.out.println("IFDs: " + to.getIfdCount());
               int index = 0;
-              for (IFD ifd : to.ifdStructure.ifds) {
+              for (IFD ifd : to.getIfds()) {
                 System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
                 ifd.printTags();
               }
             }
-            to.validation.printErrors();
+            tiffReader.validation.printErrors();
           }
-          to.validation.printWarnings();
+          tiffReader.validation.printWarnings();
           break;
         default:
           System.out.println("Unknown result (" + result + ") in file '" + filename + "'");

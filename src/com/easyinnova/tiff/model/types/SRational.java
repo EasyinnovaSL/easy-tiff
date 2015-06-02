@@ -55,6 +55,13 @@ public class SRational extends abstractTiffType {
   }
 
   /**
+   * Instantiates a new s rational.
+   */
+  public SRational() {
+    // TODO Auto-generated constructor stub
+  }
+
+  /**
    * Gets the numerator.
    *
    * @return the numerator

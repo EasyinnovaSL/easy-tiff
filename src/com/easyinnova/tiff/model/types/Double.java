@@ -42,10 +42,17 @@ public class Double extends abstractTiffType {
    *
    * @param value the value
    */
-  public Double(int value) {
+  public Double(double value) {
     super();
     this.value = value;
     setTypeSize(8);
+  }
+
+  /**
+   * Instantiates a new double.
+   */
+  public Double() {
+    // TODO Auto-generated constructor stub
   }
 
   /**

@@ -100,4 +100,35 @@ public class abstractTiffType implements tiffType{
   public boolean isOffset() {
     return getTotalByteSize() > 4;
   }
+
+  /**
+   * Gets the int value.
+   *
+   * @return the int value
+   */
+  public int getNumericValue() {
+    int intval = 0;
+    try {
+      intval = (int) ((com.easyinnova.tiff.model.types.Long) this).getValue();
+    } catch (Exception ex) {
+      try {
+        intval = (int) ((com.easyinnova.tiff.model.types.Short) this).getValue();
+      } catch (Exception ex2) {
+        try {
+          intval = (int) ((com.easyinnova.tiff.model.types.Byte) this).getValue();
+        } catch (Exception ex3) {
+          try {
+            intval = (int) ((com.easyinnova.tiff.model.types.SByte) this).getIntValue();
+          } catch (Exception ex4) {
+            try {
+              intval = (int) ((com.easyinnova.tiff.model.types.SLong) this).getIntValue();
+            } catch (Exception ex5) {
+              throw ex5;
+            }
+          }
+        }
+      }
+    }
+    return intval;
+  }
 }
