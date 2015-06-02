@@ -53,6 +53,9 @@ public class TiffTags {
   /** The tag map. */
   protected static HashMap<Integer, Tag> tagMap = new HashMap<Integer, Tag>();
 
+  /** The tag names. */
+  protected static HashMap<String, Tag> tagNames = new HashMap<String, Tag>();
+
   /** The tag types. */
   protected static HashMap<Integer, String> tagTypes = new HashMap<Integer, String>();
 
@@ -60,10 +63,9 @@ public class TiffTags {
    * Instantiates a new tiff tags.
    */
   protected TiffTags() {
-   
     File folder = new File("./config/tifftags/");
     Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
-    
+
     for (final File fileEntry : folder.listFiles()) {
       try {
         BufferedReader br = new BufferedReader(  
@@ -72,11 +74,12 @@ public class TiffTags {
         Tag tag = gson.fromJson(br, Tag.class); 
         
         tagMap.put(tag.getId(), tag);
+        tagNames.put(tag.getName(), tag);
       } catch (FileNotFoundException e) {
         
         e.printStackTrace();
       }  
-   } 
+    }
     
     tagTypes.put(1, "BYTE");
     tagTypes.put(2, "ASCII");
@@ -118,5 +121,15 @@ public class TiffTags {
       return tagMap.get(identifier);
     else
       return null;
+  }
+
+  /**
+   * Gets the tag id.
+   *
+   * @param name the name
+   * @return the tag id
+   */
+  public static int getTagId(String name) {
+    return tagNames.get(name).getId();
   }
 }

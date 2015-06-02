@@ -49,6 +49,13 @@ public class Undefined extends abstractTiffType{
   }
 
   /**
+   * Instantiates a new undefined.
+   */
+  public Undefined() {
+    // TODO Auto-generated constructor stub
+  }
+
+  /**
    * Gets the value.
    *
    * @return the value
@@ -64,6 +71,16 @@ public class Undefined extends abstractTiffType{
    */
   public void setValue(byte value) {
     this.value = value;
+  }
+
+  /**
+   * Adds the.
+   *
+   * @param b the b
+   */
+  public void add(byte b) {
+    // TODO Auto-generated method stub
+
   }
 
 }

@@ -49,6 +49,13 @@ public class SLong extends abstractTiffType {
   }
 
   /**
+   * Instantiates a new s long.
+   */
+  public SLong() {
+    // TODO Auto-generated constructor stub
+  }
+
+  /**
    * Gets the value.
    *
    * @return the value
@@ -64,6 +71,28 @@ public class SLong extends abstractTiffType {
    */
   public void setValue(long value) {
     this.value = value;
+  }
+
+  /**
+   * Adds the.
+   *
+   * @param int1 the int1
+   */
+  public void add(int int1) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * Gets the int value.
+   *
+   * @return the int value
+   */
+  public int getIntValue() {
+    int v = (int) value;
+    if (v > Math.pow(2, 32))
+      v = v - (int) Math.pow(2, 32);
+    return v;
   }
 }
 

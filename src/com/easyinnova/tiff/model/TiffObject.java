@@ -31,48 +31,74 @@
  */
 package com.easyinnova.tiff.model;
 
-import com.easyinnova.tiff.io.TiffStreamIO;
+import java.util.ArrayList;
+
 
 /**
  * The Class TiffFile.
  */
 public class TiffObject {
 
-  /** The file data. */
-  TiffStreamIO data;
+  /** The magic number. */
+  public int magicNumber;
 
-  /** Structure of the Tiff file. */
-  public IfdStructure ifdStructure;
+  /** The list of Ifd. */
+  public ArrayList<IFD> ifds;
 
-  /** The result of the validation. */
-  public ValidationResult validation;
+  /** The number of ifds. */
+  private int nIfds;
 
   /**
    * Instantiates a new tiff file.
    *
    * @param data the data
    */
-  public TiffObject(TiffStreamIO data) {
-    this.data = data;
-    validation = new ValidationResult();
+  public TiffObject() {
+    ifds = new ArrayList<IFD>();
+    nIfds = 0;
   }
 
   /**
-   * Gets the stream.
+   * Adds an IFD to the list.
    *
-   * @return the stream
+   * @param ifd the ifd
    */
-  public TiffStreamIO getStream() {
-    return data;
+  public void addIfd(IFD ifd) {
+    ifds.add(ifd);
+    nIfds++;
   }
 
   /**
-   * Parses the data.
+   * Circular offset.
+   *
+   * @param offset the offset
+   * @return true, if successful
    */
-  public void readTiff() {
-    // Read the IFDs
-    ifdStructure = new IfdStructure(data);
-    ifdStructure.read();
-    validation.add(ifdStructure.validation);
+  public boolean usedOffset(int offset) {
+    for (IFD ifd : ifds) {
+      if (ifd.offset == offset) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Gets the ifd count.
+   *
+   * @return the ifd count
+   */
+  public int getIfdCount() {
+    return nIfds;
+  }
+
+  /**
+   * Gets the ifd.
+   *
+   * @param index the index
+   * @return the ifd
+   */
+  public IFD getIfd(int index) {
+    return ifds.get(index);
   }
 }

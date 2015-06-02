@@ -77,15 +77,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
   /** The byte order. */
   ByteOrder byteOrder;
 
-  /** The magic number. */
-  int magicNumber;
-
-  /**
-   * The byte order error tolerance.<br>
-   * 0: No tolerance. 1: Lower case tolerance. 10: Full tolerance (assume little endian).
-   * */
-  private int byteOrderErrorTolerance = 0;
-
   /**
    * Read.
    *
@@ -98,54 +89,8 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
     channel = aFile.getChannel();
     data = channel.map(FileChannel.MapMode.READ_WRITE, 0, channel.size());
 
-    // loads the file in memory
+    // loads the entire file into memory
     data.load();
-
-    // read header
-    readHeader();
-  }
-
-  /**
-   * Read header.
-   * 
-   * @throws Exception
-   */
-  private void readHeader() throws Exception {
-    boolean correct = true;
-    try {
-      // read the first two bytes to know the byte ordering
-      if (data.get(0) == 'I' && data.get(1) == 'I')
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      else if (data.get(0) == 'M' && data.get(1) == 'M')
-        byteOrder = ByteOrder.BIG_ENDIAN;
-      else if (byteOrderErrorTolerance > 0 && data.get(0) == 'i' && data.get(1) == 'i') {
-        // validation.addWarning("Byte Order in lower case");
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      } else if (byteOrderErrorTolerance > 0 && data.get(0) == 'm' && data.get(1) == 'm') {
-        // validation.addWarning("Byte Order in lower case");
-        byteOrder = ByteOrder.BIG_ENDIAN;
-      } else if (byteOrderErrorTolerance > 1) {
-        // validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      } else {
-        throw new Exception("Invalid Byte Order " + data.get(0) + data.get(1));
-      }
-    } catch (Exception ex) {
-      correct = false;
-      throw new Exception("Header format error");
-    }
-
-    if (correct) {
-      // set byte ordering
-      data.order(byteOrder);
-
-      try {
-        // read magic number
-        magicNumber = data.getShort(2);
-      } catch (IndexOutOfBoundsException ex) {
-        throw new Exception("Magic number format error");
-      }
-    }
   }
 
   /**
@@ -277,6 +222,26 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    */
   public int getUshort(int offset) {
     return getShort(offset) & 0xFFFF;
+  }
+
+  /**
+   * Gets a float (4 bytes).
+   *
+   * @param offset the file position offset
+   * @return the int
+   */
+  public float getFloat(int offset) {
+    return data.getFloat(offset);
+  }
+
+  /**
+   * Gets a double (4 bytes).
+   *
+   * @param offset the file position offset
+   * @return the int
+   */
+  public double getDouble(int offset) {
+    return data.getDouble(offset);
   }
 
   /**
@@ -449,15 +414,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
   public tiffType readType() throws IOException {
     // TODO Auto-generated method stub
     return null;
-  }
-
-  /**
-   * Gets the magic number.
-   *
-   * @return the magic number
-   */
-  public int getMagicNumber() {
-    return magicNumber;
   }
 }
 

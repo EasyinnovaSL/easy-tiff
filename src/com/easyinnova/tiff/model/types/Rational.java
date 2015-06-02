@@ -54,6 +54,13 @@ public class Rational extends abstractTiffType {
     this.denominator=denominator;
     setTypeSize(8);
   }
+
+  /**
+   * Instantiates a new rational.
+   */
+  public Rational() {
+    // TODO Auto-generated constructor stub
+  }
   /**
    * Gets the numerator.
    *

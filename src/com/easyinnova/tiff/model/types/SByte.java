@@ -50,6 +50,13 @@ public class SByte extends abstractTiffType {
   }
 
   /**
+   * Instantiates a new s byte.
+   */
+  public SByte() {
+    // TODO Auto-generated constructor stub
+  }
+
+  /**
    * Gets the value.
    *
    * @return the value
@@ -65,6 +72,28 @@ public class SByte extends abstractTiffType {
    */
   public void setValue(byte value) {
     this.value = value;
+  }
+
+  /**
+   * Adds the.
+   *
+   * @param b the b
+   */
+  public void add(byte b) {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * Gets the int value.
+   *
+   * @return the int value
+   */
+  public int getIntValue() {
+    int v = value;
+    if (v > 127)
+      v = v - 256;
+    return v;
   }
 
 }

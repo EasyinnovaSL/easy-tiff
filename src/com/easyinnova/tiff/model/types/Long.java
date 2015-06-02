@@ -51,11 +51,18 @@ public class Long extends abstractTiffType {
     setTypeSize(4);
   }
   
- /**
-  * Gets the value.
-  *
-  * @return the value
-  */
+  /**
+   * Instantiates a new long.
+   */
+  public Long() {
+    // TODO Auto-generated constructor stub
+  }
+
+  /**
+   * Gets the value.
+   *
+   * @return the value
+   */
   public long getValue() {
     return value;
   }
@@ -72,5 +79,15 @@ public class Long extends abstractTiffType {
   @Override
   public String toString() {
     return "" + value;
+  }
+
+  /**
+   * Adds the.
+   *
+   * @param b the b
+   */
+  public void add(int b) {
+    // TODO Auto-generated method stub
+
   }
 }

@@ -30,30 +30,69 @@
  */
 package com.easyinnova.tiff.model.types;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * The Class TagValue.
  *
- * @param <T> the generic type
  */
-public class TagValue<T> {
-  private List <T> value;
+public class TagValue {
+
+  /** The list of values. */
+  private List<com.easyinnova.tiff.model.types.abstractTiffType> value;
   
-  private String type;
-  
-  
-  public TagValue(String type) {
-      this.type=type;
+  /**
+   * Instantiates a new tag value.
+   */
+  public TagValue() {
+    value = new ArrayList<com.easyinnova.tiff.model.types.abstractTiffType>();
   }
-  
-  public void setValue(List<T> value) {
+
+  /**
+   * Sets the value.
+   *
+   * @param value the new value
+   */
+  public void setValue(List<com.easyinnova.tiff.model.types.abstractTiffType> value) {
     this.value = value; 
     }
   
-  public List<T> getValue() {
+  /**
+   * Gets the value.
+   *
+   * @return the value
+   */
+  public List<com.easyinnova.tiff.model.types.abstractTiffType> getValue() {
     return this.value; 
    }
+
+  /**
+   * Adds a value to the list.
+   *
+   * @param value the value
+   */
+  public void add(com.easyinnova.tiff.model.types.abstractTiffType value) {
+    this.value.add(value);
+  }
+
+  /**
+   * Gets the cardinality.
+   *
+   * @return the cardinality
+   */
+  public int getCardinality() {
+    return value.size();
+  }
+
+  /**
+   * Gets the first numeric value.
+   *
+   * @return the first numeric value
+   */
+  public int getFirstNumericValue() {
+    return value.get(0).getNumericValue();
+  }
 }
 

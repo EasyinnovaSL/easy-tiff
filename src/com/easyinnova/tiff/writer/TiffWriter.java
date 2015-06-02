@@ -31,7 +31,13 @@
 package com.easyinnova.tiff.writer;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
+import com.easyinnova.tiff.model.IFD;
+import com.easyinnova.tiff.model.IfdEntry;
+import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.model.types.TagValue;
+
+import java.util.ArrayList;
 
 /**
  * The Class TiffWriter.
@@ -41,13 +47,16 @@ public class TiffWriter {
   /** The model. */
   TiffObject model;
 
+  /** The odata. */
+  TiffStreamIO data;
+
   /**
    * Instantiates a new tiff writer.
    *
    * @param data the data
    */
-  public TiffWriter(TiffStreamIO data) {
-    model = new TiffObject(data);
+  public TiffWriter() {
+    model = new TiffObject();
   }
 
   /**
@@ -66,15 +75,111 @@ public class TiffWriter {
    * @throws Exception
    */
   public void write(String filename) throws Exception {
-    TiffStreamIO odata = new TiffStreamIO(null);
+    data = new TiffStreamIO(null);
     try {
-      odata.write(filename);
-      odata.writeHeader();
-      model.ifdStructure.write(odata);
-      odata.close();
+      data.write(filename);
+      data.writeHeader();
+      writeTiff();
+      data.close();
     } catch (Exception ex) {
       throw ex;
     }
+  }
+
+  /**
+   * Write.
+   *
+   * @param odata the odata
+   */
+  public void writeTiff() {
+    for (int i = model.ifds.size() - 1; i >= 0; i--) {
+      IFD ifd = model.ifds.get(i);
+      writeIFD(ifd);
+    }
+  }
+
+  /**
+   * Write IFD data.
+   *
+   * @param ifd the ifd
+   * @return the int
+   */
+  public int writeIFD(IFD ifd) {
+    int offset2 = writeMetadata(ifd.metadata);
+    data.putInt(ifd.offset);
+    return offset2;
+  }
+
+  /**
+   * Write.
+   *
+   * @param metadata the metadata
+   * @return the int
+   */
+  public int writeMetadata(IfdTags metadata) {
+    ArrayList<IfdEntry> tags = metadata.tags;
+    int offset = data.position();
+    for (IfdEntry tag : tags) {
+      if (tag.id == 273) {
+        writeStripData(metadata);
+      } else if (tag.id == 279) {
+        // Nothing to do here, writeStripData does everything
+      } else {
+        int size = writeTag(tag);
+        tag.setIntValue(offset);
+        offset += size;
+      }
+    }
+    data.putShort((short) tags.size());
+    for (IfdEntry tag : tags) {
+      tag.write(data);
+    }
+    return data.position();
+  }
+
+  /**
+   * Write strip data.
+   *
+   * @param odata the odata
+   */
+  private void writeStripData(IfdTags metadata) {
+    TagValue stripOffsets = metadata.hashTagsId.get(273).value;
+    TagValue stripSizes = metadata.hashTagsId.get(279).value;
+    ArrayList<Integer> stripOffsets2 = new ArrayList<Integer>();
+    ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
+    for (int i = 0; i < stripOffsets.getCardinality(); i++) {
+      stripOffsets2.add(data.position());
+      stripSizes2.add((int) stripSizes.getValue().get(i).getNumericValue());
+      for (int j = 0; j < stripSizes.getValue().get(i).getNumericValue(); j++) {
+        int v = data.get((int) stripOffsets.getValue().get(i).getNumericValue());
+        data.put((byte) v);
+      }
+    }
+    int offsetStripOffsets = data.position();
+    for (int i = 0; i < stripOffsets2.size(); i++) {
+      data.putInt(stripOffsets2.get(i));
+    }
+    int offsetStripSizes = data.position();
+    for (int i = 0; i < stripSizes2.size(); i++) {
+      data.putInt(stripOffsets2.get(i));
+    }
+    metadata.hashTagsId.get(273).setIntValue(offsetStripOffsets);
+    metadata.hashTagsId.get(279).setIntValue(offsetStripSizes);
+  }
+
+  /**
+   * Write content.
+   *
+   * @param tag the tag
+   * @return the int
+   */
+  public int writeTag(IfdEntry tag) {
+    int totalSize = 0;
+    for (int i = 0; i < totalSize; i++) {
+      int v = data.get(tag.getNumericValue() + i);
+      data.put((byte) v);
+    }
+    return totalSize;
   }
 }
 

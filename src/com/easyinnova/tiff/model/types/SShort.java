@@ -52,6 +52,13 @@ public class SShort extends abstractTiffType{
   }
 
   /**
+   * Instantiates a new s short.
+   */
+  public SShort() {
+    // TODO Auto-generated constructor stub
+  }
+
+  /**
    * Gets the value.
    *
    * @return the value
@@ -67,6 +74,16 @@ public class SShort extends abstractTiffType{
    */
   public void setValue(short value) {
     this.value = value;
+  }
+
+  /**
+   * Adds the.
+   *
+   * @param s the b
+   */
+  public void add(short s) {
+    // TODO Auto-generated method stub
+
   }
   
 

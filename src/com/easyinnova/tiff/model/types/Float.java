@@ -43,10 +43,17 @@ public class Float extends abstractTiffType {
    *
    * @param value the value
    */
-  public Float(int value) {
+  public Float(float value) {
     super();
     this.value = value;
     setTypeSize(4);
+  }
+
+  /**
+   * Instantiates a new float.
+   */
+  public Float() {
+    // TODO Auto-generated constructor stub
   }
 
   /**
