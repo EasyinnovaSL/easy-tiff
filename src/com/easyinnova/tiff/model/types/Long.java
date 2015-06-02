@@ -50,13 +50,6 @@ public class Long extends abstractTiffType {
     this.value=value;
     setTypeSize(4);
   }
-  
-  /**
-   * Instantiates a new long.
-   */
-  public Long() {
-    // TODO Auto-generated constructor stub
-  }
 
   /**
    * Gets the value.
@@ -79,15 +72,5 @@ public class Long extends abstractTiffType {
   @Override
   public String toString() {
     return "" + value;
-  }
-
-  /**
-   * Adds the.
-   *
-   * @param b the b
-   */
-  public void add(int b) {
-    // TODO Auto-generated method stub
-
   }
 }

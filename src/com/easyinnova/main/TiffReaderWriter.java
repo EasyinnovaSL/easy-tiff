@@ -139,8 +139,10 @@ public class TiffReaderWriter {
             System.out.println("IFDs: " + to.getIfdCount());
             int index = 0;
             for (IFD ifd : to.getIfds()) {
-              System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
-              ifd.printTags();
+              if (ifd != null) {
+                System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
+                ifd.printTags();
+              }
             }
           } else {
             // The file is not correct

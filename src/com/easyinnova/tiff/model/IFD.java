@@ -458,10 +458,8 @@ public class IFD {
       try {
         String name = TiffTags.getTag(ie.id).name;
         String val = ie.toString();
-        String off = "";
         String type = TiffTags.tagTypes.get(ie.type);
-        System.out
-            .println(name + "(" + ie.value.getValue().get(0) + "x" + type + off + "): " + val);
+        System.out.println(name + "(" + type + "): " + val);
       } catch (Exception ex) {
         System.out.println("Tag error");
       }

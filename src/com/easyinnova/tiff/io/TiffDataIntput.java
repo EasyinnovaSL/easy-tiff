@@ -37,7 +37,6 @@ import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
 import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.Undefined;
-import com.easyinnova.tiff.model.types.tiffType;
 
 import java.io.IOException;
 
@@ -160,14 +159,6 @@ public interface TiffDataIntput {
    * @throws IOException Signals that an I/O exception has occurred.
    */
   Double readDouble() throws IOException;
-
-  /**
-   * Read type.
-   *
-   * @return the tiff type
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  tiffType readType() throws IOException;
 
 }
 /*

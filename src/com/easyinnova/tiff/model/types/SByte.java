@@ -50,13 +50,6 @@ public class SByte extends abstractTiffType {
   }
 
   /**
-   * Instantiates a new s byte.
-   */
-  public SByte() {
-    // TODO Auto-generated constructor stub
-  }
-
-  /**
    * Gets the value.
    *
    * @return the value
@@ -75,16 +68,6 @@ public class SByte extends abstractTiffType {
   }
 
   /**
-   * Adds the.
-   *
-   * @param b the b
-   */
-  public void add(byte b) {
-    // TODO Auto-generated method stub
-
-  }
-
-  /**
    * Gets the int value.
    *
    * @return the int value
@@ -96,4 +79,8 @@ public class SByte extends abstractTiffType {
     return v;
   }
 
+  @Override
+  public String toString() {
+    return "" + value;
+  }
 }

@@ -50,13 +50,6 @@ public class Float extends abstractTiffType {
   }
 
   /**
-   * Instantiates a new float.
-   */
-  public Float() {
-    // TODO Auto-generated constructor stub
-  }
-
-  /**
    * Gets the value.
    *
    * @return the value

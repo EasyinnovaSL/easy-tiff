@@ -57,7 +57,7 @@ public class IccProfile extends abstractTiffType {
   public IccProfile(int offset, int size, TiffStreamIO data) {
     this.data = data;
     validation = new ValidationResult();
-    setTypeSize(getN());
+    setTypeSize(size);
     tags = new IccTags();
     readIccProfile(offset, size);
   }
