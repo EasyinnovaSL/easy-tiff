@@ -138,7 +138,7 @@ public class TiffReaderWriter {
             System.out.println("Everything ok in file '" + filename + "'");
             System.out.println("IFDs: " + to.getIfdCount());
             int index = 0;
-            for (IFD ifd : to.ifds) {
+            for (IFD ifd : to.getIfds()) {
               System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
               ifd.printTags();
             }
@@ -148,7 +148,7 @@ public class TiffReaderWriter {
             if (to != null) {
               System.out.println("IFDs: " + to.getIfdCount());
               int index = 0;
-              for (IFD ifd : to.ifds) {
+              for (IFD ifd : to.getIfds()) {
                 System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
                 ifd.printTags();
               }

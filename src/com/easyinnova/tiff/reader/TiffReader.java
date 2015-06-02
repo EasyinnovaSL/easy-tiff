@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 
 /**
  * The Class TiffReader.
@@ -127,7 +128,7 @@ public class TiffReader {
           validation = new ValidationResult();
           data.load(filename);
           readHeader();
-          if (tiffModel.magicNumber != 42) {
+          if (tiffModel.getMagicNumber() != 42) {
             // Incorrect tiff magic number
             result = -5;
           }
@@ -190,7 +191,7 @@ public class TiffReader {
 
       try {
         // read magic number
-        tiffModel.magicNumber = data.getShort(2);
+        tiffModel.setMagicNumber(data.getShort(2));
       } catch (IndexOutOfBoundsException ex) {
         throw new Exception("Magic number parsing error");
       }
@@ -206,27 +207,32 @@ public class TiffReader {
     try {
       // The pointer to the first IFD is located in bytes 4-7
       int offset0 = (int) data.getInt(4);
-      IFD ifd0 = readIFD(offset0);
+      int id = 0;
+
+      IfdReader ifd0 = readIFD(offset0, id++);
+      HashSet<Integer> usedOffsets = new HashSet<Integer>();
+      usedOffsets.add(offset0);
       if (ifd0 == null) {
         validation.addError("Parsing error in first IFD");
       } else {
-        tiffModel.addIfd(ifd0);
-        IFD current_ifd = ifd0;
+        tiffModel.addIfd(ifd0.getIfd());
+
+        IfdReader current_ifd = ifd0;
 
         // Read next IFDs
-        while (current_ifd.hasNextIFD()) {
-          int offset = current_ifd.nextIFDOffset();
-          if (tiffModel.usedOffset(offset)) {
+        while (current_ifd.getNextIfdOffset() > 0) {
+          usedOffsets.add(current_ifd.getNextIfdOffset());
+          if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
             // Circular reference
             validation.addError("IFD offset already used");
             break;
           } else {
-            current_ifd = readIFD(offset);
+            current_ifd = readIFD(current_ifd.getNextIfdOffset(), id++);
             if (current_ifd == null) {
-              validation.addError("Error in IFD " + tiffModel.getIfdCount(), "" + offset);
+              validation.addError("Error in IFD " + tiffModel.getIfdCount());
               break;
             } else {
-              tiffModel.addIfd(current_ifd);
+              tiffModel.addIfd(current_ifd.getIfd());
             }
           }
         }
@@ -242,8 +248,9 @@ public class TiffReader {
    * @param IFD_idx Position in file
    * @return the ifd
    */
-  IFD readIFD(int offset) {
-    IFD ifd = new IFD(offset);
+  IfdReader readIFD(int offset, int id) {
+    IFD ifd = new IFD(id);
+    int nextIfdOffset = 0;
     try {
       int index = offset;
       int directoryEntries = data.getShort(offset);
@@ -279,17 +286,20 @@ public class TiffReader {
         }
 
         // Reads the position of the next IFD
+        nextIfdOffset = 0;
         try {
-          ifd.nextIFD = (int) data.getInt(index);
+          nextIfdOffset = (int) data.getInt(index);
         } catch (Exception ex) {
-          ifd.nextIFD = 0;
+          nextIfdOffset = 0;
           if (nextIFDTolerance > 0)
             validation.addWarning("Unreadable next IFD offset");
           else
             validation.addError("Unreadable next IFD offset");
         }
-        if (ifd.nextIFD > 0 && ifd.nextIFD < 7)
-          validation.addError("Invalid next IFD offset", ifd.nextIFD);
+        if (nextIfdOffset > 0 && nextIfdOffset < 7) {
+          validation.addError("Invalid next IFD offset", nextIfdOffset);
+          nextIfdOffset = 0;
+        }
 
         // Validate ifd entries
         ifd.validate();
@@ -298,7 +308,10 @@ public class TiffReader {
     } catch (Exception ex) {
       ifd = null;
     }
-    return ifd;
+    IfdReader ir = new IfdReader();
+    ir.setIfd(ifd);
+    ir.setNextIfdOffset(nextIfdOffset);
+    return ir;
   }
 
   /**

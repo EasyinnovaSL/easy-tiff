@@ -61,10 +61,10 @@ public class IFD {
   public IfdTags metadata;
 
   /** The Next ifd. */
-  public int nextIFD = 0;
+  private IFD nextIFD;
 
-  /** The Offset. */
-  public int offset = 0;
+  /** The id. */
+  private int id;
 
   /** The Correct. */
   public boolean correct;
@@ -87,15 +87,15 @@ public class IFD {
   /**
    * Instantiates a new ifd.
    *
-   * @param offset the offset
-   * @param data the data
+   * @param id the id
    */
-  public IFD(int offset) {
-    this.offset = offset;
+  public IFD(int id) {
+    this.id = id;
     metadata = new IfdTags();
     correct = true;
     type = ImageType.UNDEFINED;
     validation = new ValidationResult();
+    nextIFD = null;
   }
 
   /**
@@ -104,16 +104,7 @@ public class IFD {
    * @return true, if next IFD exists
    */
   public boolean hasNextIFD() {
-    return nextIFD > 0;
-  }
-
-  /**
-   * Get Next IFD.
-   *
-   * @return the next ifd
-   */
-  public int nextIFDOffset() {
-    return nextIFD;
+    return nextIFD != null;
   }
 
   /**
@@ -140,6 +131,15 @@ public class IFD {
    */
   private void CheckColorProfile() {
     // TODO: Everything
+  }
+
+  /**
+   * Gets the id.
+   *
+   * @return the id
+   */
+  public int getId() {
+    return id;
   }
 
   /**

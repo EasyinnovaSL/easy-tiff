@@ -40,10 +40,10 @@ import java.util.ArrayList;
 public class TiffObject {
 
   /** The magic number. */
-  public int magicNumber;
+  private int magicNumber;
 
   /** The list of Ifd. */
-  public ArrayList<IFD> ifds;
+  private ArrayList<IFD> ifds;
 
   /** The number of ifds. */
   private int nIfds;
@@ -69,27 +69,21 @@ public class TiffObject {
   }
 
   /**
-   * Circular offset.
-   *
-   * @param offset the offset
-   * @return true, if successful
-   */
-  public boolean usedOffset(int offset) {
-    for (IFD ifd : ifds) {
-      if (ifd.offset == offset) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Gets the ifd count.
    *
    * @return the ifd count
    */
   public int getIfdCount() {
     return nIfds;
+  }
+
+  /**
+   * Gets the ifds.
+   *
+   * @return the ifds
+   */
+  public ArrayList<IFD> getIfds() {
+    return ifds;
   }
 
   /**
@@ -100,5 +94,23 @@ public class TiffObject {
    */
   public IFD getIfd(int index) {
     return ifds.get(index);
+  }
+
+  /**
+   * Gets the magic number.
+   *
+   * @return the magic number
+   */
+  public int getMagicNumber() {
+    return magicNumber;
+  }
+
+  /**
+   * Sets the magic number.
+   *
+   * @param magic the new magic number
+   */
+  public void setMagicNumber(int magic) {
+    this.magicNumber = magic;
   }
 }

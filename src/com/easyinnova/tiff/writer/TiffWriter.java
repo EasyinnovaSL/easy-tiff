@@ -92,8 +92,8 @@ public class TiffWriter {
    * @param odata the odata
    */
   public void writeTiff() {
-    for (int i = model.ifds.size() - 1; i >= 0; i--) {
-      IFD ifd = model.ifds.get(i);
+    for (int i = model.getIfds().size() - 1; i >= 0; i--) {
+      IFD ifd = model.getIfds().get(i);
       writeIFD(ifd);
     }
   }
@@ -106,7 +106,7 @@ public class TiffWriter {
    */
   public int writeIFD(IFD ifd) {
     int offset2 = writeMetadata(ifd.metadata);
-    data.putInt(ifd.offset);
+    // data.putInt(ifd.offset);
     return offset2;
   }
 

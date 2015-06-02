@@ -72,10 +72,13 @@ public class IfdTags {
    */
   public void addTag(IfdEntry tag) {
     tags.add(tag);
-    hashTagsId.put(tag.id, tag);
+    if (!hashTagsId.containsKey(tag.id)) {
+      hashTagsId.put(tag.id, tag);
+    }
     Tag t = TiffTags.getTag(tag.id);
-    if (t != null)
+    if (t != null) {
       hashTagsName.put(t.name, tag);
+    }
   }
 
   /**
