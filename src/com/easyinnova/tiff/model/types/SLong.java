@@ -17,13 +17,13 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the ï¿½ statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * ï¿½ 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author Vï¿½ctor Muï¿½oz Solï¿½
  * @version 1.0
  * @since 28/5/2015
  *
@@ -35,14 +35,14 @@ package com.easyinnova.tiff.model.types;
  */
 public class SLong extends abstractTiffType {
   /** The value. */
-  private long value;
+  private int value;
 
   /**
    * Instantiates a new long.
    *
    * @param value the value
    */
-  public SLong(long value) {
+  public SLong(int value) {
     super();
     this.value = value;
     setTypeSize(4);
@@ -62,7 +62,7 @@ public class SLong extends abstractTiffType {
    *
    * @param value the new value
    */
-  public void setValue(long value) {
+  public void setValue(int value) {
     this.value = value;
   }
 }

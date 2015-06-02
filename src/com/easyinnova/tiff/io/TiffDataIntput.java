@@ -30,31 +30,26 @@
  */
 package com.easyinnova.tiff.io;
 
+import java.io.IOException;
+import java.util.List;
+
+import com.easyinnova.tiff.model.types.Byte;
 import com.easyinnova.tiff.model.types.Ascii;
+import com.easyinnova.tiff.model.types.Short;
+import com.easyinnova.tiff.model.types.Long;
 import com.easyinnova.tiff.model.types.Rational;
 import com.easyinnova.tiff.model.types.SByte;
+import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
-import com.easyinnova.tiff.model.types.SShort;
+import com.easyinnova.tiff.model.types.Float;
+import com.easyinnova.tiff.model.types.Double;
 import com.easyinnova.tiff.model.types.Undefined;
-import com.easyinnova.tiff.model.types.tiffType;
-
-import java.io.IOException;
 
 /**
  * The Interface TiffDataIntput.
  */
 public interface TiffDataIntput {
-  
-  
-  /**
-   * Skip bytes.
-   *
-   * @param n the n
-   * @return the int
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  int skipBytes(int n) throws IOException;
   
   /**
    * Read byte.
@@ -65,11 +60,13 @@ public interface TiffDataIntput {
   Byte readByte() throws IOException;
   
   /**
-   * Read ascii.
+   * Read byte.
    *
-   * @return the ascii
+   * @param n the n
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
+ 
   Ascii readAscii() throws IOException;
   
   /**
@@ -79,52 +76,45 @@ public interface TiffDataIntput {
    * @return the ascii
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  Ascii readAscii(int n) throws IOException;
-
-  /**
-   * Read short.
-   *
-   * @return the short
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
+ 
   Short readShort() throws IOException;
-
+  
   /**
    * Read long.
    *
-   * @return the long
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   Long readLong() throws IOException;
-
+  
   /**
    * Read rational.
    *
-   * @return the rational
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   Rational readRational() throws IOException;
-
+  
   /**
    * Read s byte.
    *
-   * @return the s byte
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   SByte readSByte() throws IOException;
-
+  
   /**
    * Read undefined.
    *
-   * @return the undefined
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   Undefined readUndefined() throws IOException;
-
+  
   /**
    * Read s short.
    *
-   * @return the s short
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   SShort readSShort() throws IOException;
@@ -132,59 +122,33 @@ public interface TiffDataIntput {
   /**
    * Read s long.
    *
-   * @return the s long
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   SLong readSLong() throws IOException;
-
+  
   /**
    * Read s rational.
    *
-   * @return the s rational
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   SRational readSRational() throws IOException;
-
+  
   /**
    * Read float.
    *
-   * @return the float
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
   Float readFloat() throws IOException;
-
+  
   /**
    * Read double.
    *
-   * @return the double
+   * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
-  Double readDouble() throws IOException;
-
-  /**
-   * Read type.
-   *
-   * @return the tiff type
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  tiffType readType() throws IOException;
-
+   Double readDouble() throws IOException;
+    
 }
-/*
-1 = BYTE 8-bit unsigned integer.
-2 = ASCII 8-bit byte that contains a 7-bit ASCII code; the last byte
-must be NUL (binary zero).
-3 = SHORT 16-bit (2-byte) unsigned integer.
-4 = LONG 32-bit (4-byte) unsigned integer.
-5 = RATIONAL Two LONGs: the first represents the numerator of a
-fraction; the second, the denominator.
-6 = SBYTE An 8-bit signed (twos-complement) integer.
-7 = UNDEFINED An 8-bit byte that may contain anything, depending on
-the definition of the field.
-8 = SSHORT A 16-bit (2-byte) signed (twos-complement) integer.
-9 = SLONG A 32-bit (4-byte) signed (twos-complement) integer.
-10 = SRATIONAL Two SLONG’s: the first represents the numerator of a
-fraction, the second the denominator.
-11 = FLOAT Single precision (4-byte) IEEE format.
-12 = DOUBLE Double precision (8-byte) IEEE format.
-*/

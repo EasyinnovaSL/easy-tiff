@@ -1,4 +1,5 @@
 /**
+ /**
  * <h1>DataByteOrderInputStream.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -31,11 +32,19 @@
  */
 package com.easyinnova.tiff.io;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.easyinnova.tiff.model.types.*;
+import com.easyinnova.tiff.model.types.Byte;
+import com.easyinnova.tiff.model.types.Long;
+import com.easyinnova.tiff.model.types.Short;
 
 
 /**
@@ -87,102 +96,31 @@ public class DataByteOrderInputStream extends FilterInputStream implements TiffD
     ByteOrder = byteOrder;
   }
 
-  /**
-   * Read fully.
-   *
-   * @param b the b
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  @Override
-  public void readFully(byte[] b) throws IOException {
-    readFully(b, 0, b.length);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readFully(byte[], int, int)
-   */
-  @Override
-  public void readFully(byte[] b, int off, int len) throws IOException {
-    if (len < 0) {
-      throw new IndexOutOfBoundsException();
-    }
-    int n = 0;
-    while (n < len) {
-      int count = in.read(b, off + n, len - n);
-      if (count < 0)
-        throw new EOFException();
-      n += count;
-    }
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#skipBytes(int)
-   */
-  @Override
-  public int skipBytes(int n) throws IOException {
-    int total = 0;
-     int cur = 0;
-     
-    while ((total<n) && ((cur = (int) in.skip(n-total)) > 0)) {
-     total += cur;
-    }
-    
-  return total;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readBoolean()
-   */
-  @Override
-  public boolean readBoolean() throws IOException {
-    int ch = in.read();
-    if (ch < 0) {
-     throw new EOFException();
-    }
-    return (ch != 0);
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readByte()
-   */
-  @Override
-  public byte readByte() throws IOException {
+  public Byte readByte() throws IOException {
     int ch = in.read();
     if (ch < 0) {
     throw new EOFException();
     }
-    return (byte)(ch);
+    return new Byte(ch);
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readUnsignedByte()
-   */
-  @Override
-  public int readUnsignedByte() throws IOException {
+  
+  public Ascii readAscii() throws IOException {
     int ch = in.read();
     if (ch < 0) {
-      throw new EOFException();
+    throw new EOFException();
     }
-    return ch;
+    return new Ascii(ch);
+  }
+  
+  public SByte readSByte() throws IOException {
+    int ch = in.read();
+    if (ch < 0) {
+    throw new EOFException();
+    }
+    return new SByte(ch);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readShort()
-   */
-  @Override
-  public short readShort() throws IOException {
+  public Short readShort() throws IOException {
     int ch1 = in.read();
     int ch2 = in.read();
     if ((ch1 | ch2) < 0) {
@@ -194,110 +132,66 @@ public class DataByteOrderInputStream extends FilterInputStream implements TiffD
     }else{
       val = (short)((ch2 << 8) + (ch1 << 0));
     }         
-    return val;
+    return new Short(val);
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readUnsignedShort()
-   */
-  @Override
-  public int readUnsignedShort() throws IOException {
+  
+  public SShort readSShort() throws IOException {
     int ch1 = in.read();
     int ch2 = in.read();
     if ((ch1 | ch2) < 0) {
       throw new EOFException();
     }
-    int val;
+    short val;
     if(ByteOrder) {
-      val = ((ch1 << 8) + (ch2 << 0));
+      val = (short)((ch1 << 8) + (ch2 << 0));
     }else{
-      val = ((ch2 << 8) + (ch1 << 0));
+      val = (short)((ch2 << 8) + (ch1 << 0));
     }         
-    return val;
+    return new SShort(val);
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readChar()
-   */
-  @Override
-  public char readChar() throws IOException {
+  
+  public Long readLong() throws IOException {
+    int ch1 = in.read();
+    int ch2 = in.read();
+    int ch3 = in.read();
+    int ch4 = in.read();
+    if ((ch1 | ch2 | ch3 | ch4) < 0) {
+        throw new EOFException();
+    }
+    short val;
+    if(ByteOrder) {
+      val = (short)((ch1 << 8) + (ch2 << 0));
+    }else{
+      val = (short)((ch2 << 8) + (ch1 << 0));
+    }         
+    return new Long(val);
+  }
+  
+  public SLong readSLong() throws IOException {
     int ch1 = in.read();
     int ch2 = in.read();
     if ((ch1 | ch2) < 0) {
       throw new EOFException();
     }
-    return (char)((ch1 << 8) + (ch2 << 0));
+    short val;
+    if(ByteOrder) {
+      val = (short)((ch1 << 8) + (ch2 << 0));
+    }else{
+      val = (short)((ch2 << 8) + (ch1 << 0));
+    }         
+    return new SLong(val);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readInt()
-   */
-  @Override
-  public int readInt() throws IOException {
-    // TODO Auto-generated method stub
-    return 0;
+  
+  public Undefined readUndefined() throws IOException {
+    int ch = in.read();
+    if (ch < 0) {
+    throw new EOFException();
+    }
+    return new Undefined(ch);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readLong()
-   */
-  @Override
-  public long readLong() throws IOException {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readFloat()
-   */
-  @Override
-  public float readFloat() throws IOException {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readDouble()
-   */
-  @Override
-  public double readDouble() throws IOException {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readLine()
-   */
-  @Override
-  public String readLine() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.io.DataInput#readUTF()
-   */
-  @Override
-  public String readUTF() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
+ 
 
 
 
