@@ -56,12 +56,6 @@ public class Rational extends abstractTiffType {
   }
 
   /**
-   * Instantiates a new rational.
-   */
-  public Rational() {
-    // TODO Auto-generated constructor stub
-  }
-  /**
    * Gets the numerator.
    *
    * @return the numerator
@@ -106,4 +100,8 @@ public class Rational extends abstractTiffType {
     return (float) numerator / denominator;
   }
 
+  @Override
+  public String toString() {
+    return numerator + "/" + denominator;
+  }
 }

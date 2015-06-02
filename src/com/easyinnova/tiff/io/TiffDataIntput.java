@@ -150,5 +150,5 @@ public interface TiffDataIntput {
    * @throws IOException Signals that an I/O exception has occurred.
    */
    Double readDouble() throws IOException;
-    
+   
 }

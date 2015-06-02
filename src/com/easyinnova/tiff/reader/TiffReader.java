@@ -341,6 +341,7 @@ public class TiffReader {
         case 4:
         case 9:
         case 11:
+        case 13:
           typeSize = 4;
           break;
         case 5:
@@ -365,7 +366,7 @@ public class TiffReader {
             tv.add(new com.easyinnova.tiff.model.types.Byte((byte) data.get(offset)));
             break;
           case 2:
-            tv.add(new com.easyinnova.tiff.model.types.Byte((byte) data.get(offset)));
+            tv.add(new com.easyinnova.tiff.model.types.Ascii((byte) data.get(offset)));
             break;
           case 6:
             tv.add(new com.easyinnova.tiff.model.types.SByte((byte) data.get(offset)));
@@ -403,6 +404,9 @@ public class TiffReader {
             break;
           case 12:
             tv.add(new com.easyinnova.tiff.model.types.Double(data.getDouble(offset)));
+            break;
+          case 13:
+            tv.add(new com.easyinnova.tiff.model.types.Long(data.getLong(offset)));
             break;
         }
         offset += typeSize;

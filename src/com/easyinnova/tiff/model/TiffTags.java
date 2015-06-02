@@ -93,6 +93,7 @@ public class TiffTags {
     tagTypes.put(10, "SRATIONAL");
     tagTypes.put(11, "FLOAT");
     tagTypes.put(12, "DOUBLE");
+    tagTypes.put(13, "SUBIFD");
   }
   
   /**

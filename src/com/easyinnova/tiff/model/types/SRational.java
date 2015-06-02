@@ -55,13 +55,6 @@ public class SRational extends abstractTiffType {
   }
 
   /**
-   * Instantiates a new s rational.
-   */
-  public SRational() {
-    // TODO Auto-generated constructor stub
-  }
-
-  /**
    * Gets the numerator.
    *
    * @return the numerator
@@ -95,6 +88,11 @@ public class SRational extends abstractTiffType {
    */
   public void setDenominator(int denominator) {
     this.denominator = denominator;
+  }
+
+  @Override
+  public String toString() {
+    return numerator + "/" + denominator;
   }
 }
 

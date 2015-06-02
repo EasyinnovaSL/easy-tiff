@@ -109,7 +109,7 @@ public class IfdEntry {
       s += "[";
     for (int i = 0; i < n; i++) {
       s += value.getValue().get(i).toString();
-      if (n > 1 && i + 1 < n)
+      if (n > 1 && i + 1 < n && type != 2)
         s += ",";
     }
     if (n > 1)

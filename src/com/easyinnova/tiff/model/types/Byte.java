@@ -68,5 +68,9 @@ public class Byte extends abstractTiffType {
   public void setValue(byte value) {
     this.value = value;
   }
-  
+
+  @Override
+  public String toString() {
+    return "" + value;
+  }
 }

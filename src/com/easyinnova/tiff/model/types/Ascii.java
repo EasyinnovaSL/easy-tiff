@@ -39,14 +39,14 @@ package com.easyinnova.tiff.model.types;
 public class Ascii extends abstractTiffType {
   
   /** The value. */
-  private String value;
+  private byte value;
   
   /**
    * Instantiates a new ascii.
    *
    * @param value the value
    */
-  public Ascii(String value) {
+  public Ascii(byte value) {
     super();
     this.value = value;
     setTypeSize(1);
@@ -57,7 +57,7 @@ public class Ascii extends abstractTiffType {
    *
    * @return the value
    */
-  public String getValue() {
+  public byte getValue() {
     return value;
   }
 
@@ -66,12 +66,12 @@ public class Ascii extends abstractTiffType {
    *
    * @param value the value to set
    */
-  public void setValue(String value) {
+  public void setValue(byte value) {
     this.value = value;
   }
 
   @Override
   public String toString() {
-    return value;
+    return "" + (char) value;
   }
 }

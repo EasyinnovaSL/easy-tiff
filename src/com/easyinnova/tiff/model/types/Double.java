@@ -49,13 +49,6 @@ public class Double extends abstractTiffType {
   }
 
   /**
-   * Instantiates a new double.
-   */
-  public Double() {
-    // TODO Auto-generated constructor stub
-  }
-
-  /**
    * Gets the value.
    *
    * @return the value

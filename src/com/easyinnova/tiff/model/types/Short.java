@@ -52,13 +52,6 @@ public class Short extends abstractTiffType{
   }
 
   /**
-   * Instantiates a new short.
-   */
-  public Short() {
-    // TODO Auto-generated constructor stub
-  }
-
-  /**
    * Gets the value.
    *
    * @return the value
@@ -79,15 +72,5 @@ public class Short extends abstractTiffType{
   @Override
   public String toString() {
     return "" + (int) value;
-  }
-
-  /**
-   * Adds the.
-   *
-   * @param s the b
-   */
-  public void add(short s) {
-    // TODO Auto-generated method stub
-
   }
 }

@@ -1,5 +1,5 @@
 /**
- * <h1>TagValueType.java</h1> 
+ * <h1>SubIFD.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -17,23 +17,59 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * Â© 2015 Easy Innova, SL
+ * © 2015 Easy Innova, SL
  * </p>
  *
- * @author Xavier TarrÃ©s Bonet
+ * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 27/5/2015
+ * @since 2/6/2015
  *
  */
 package com.easyinnova.tiff.model.types;
 
+/**
+ * The Class SubIFD.
+ */
+public class SubIFD extends abstractTiffType {
 
+  /** The value. */
+  private long value;
 
-public class TagValueType {
-  
-  
+  /**
+   * Instantiates a new long.
+   *
+   * @param value the value
+   */
+  public SubIFD(long value) {
+    super();
+    this.value = value;
+    setTypeSize(4);
+  }
 
+  /**
+   * Gets the value.
+   *
+   * @return the value
+   */
+  public long getValue() {
+    return value;
+  }
+
+  /**
+   * Sets the value.
+   *
+   * @param value the new value
+   */
+  public void setValue(long value) {
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    return "->" + value;
+  }
 }
+

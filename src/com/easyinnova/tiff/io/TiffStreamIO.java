@@ -37,7 +37,6 @@ import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
 import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.Undefined;
-import com.easyinnova.tiff.model.types.tiffType;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -202,6 +201,16 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    */
   public int getInt(int offset) {
     return data.getInt(offset);
+  }
+
+  /**
+   * Gets a int (4 bytes).
+   *
+   * @param offset the file position offset
+   * @return the int
+   */
+  public int getUInt(int offset) {
+    return data.getInt(offset) & 0xFFFFFFFF;
   }
 
   /**
@@ -401,17 +410,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    */
   @Override
   public Double readDouble() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.easyinnova.tiff.io.TiffDataIntput#readType()
-   */
-  @Override
-  public tiffType readType() throws IOException {
     // TODO Auto-generated method stub
     return null;
   }
