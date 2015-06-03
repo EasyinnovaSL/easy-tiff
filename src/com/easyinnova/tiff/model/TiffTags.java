@@ -51,13 +51,13 @@ public class TiffTags {
   private static TiffTags instance = null;
 
   /** The tag map. */
-  protected static HashMap<Integer, Tag> tagMap = new HashMap<Integer, Tag>();
+  public static HashMap<Integer, Tag> tagMap = new HashMap<Integer, Tag>();
 
   /** The tag names. */
   protected static HashMap<String, Tag> tagNames = new HashMap<String, Tag>();
 
   /** The tag types. */
-  protected static HashMap<Integer, String> tagTypes = new HashMap<Integer, String>();
+  public static HashMap<Integer, String> tagTypes = new HashMap<Integer, String>();
 
   /**
    * Instantiates a new tiff tags.

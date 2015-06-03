@@ -32,10 +32,9 @@ package com.easyinnova.tiff.writer;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
 import com.easyinnova.tiff.model.IFD;
-import com.easyinnova.tiff.model.IfdEntry;
 import com.easyinnova.tiff.model.IfdTags;
+import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffObject;
-import com.easyinnova.tiff.model.types.TagValue;
 
 import java.util.ArrayList;
 
@@ -117,22 +116,22 @@ public class TiffWriter {
    * @return the int
    */
   public int writeMetadata(IfdTags metadata) {
-    ArrayList<IfdEntry> tags = metadata.tags;
+    ArrayList<TagValue> tags = metadata.tags;
     int offset = data.position();
-    for (IfdEntry tag : tags) {
-      if (tag.id == 273) {
+    for (TagValue tag : tags) {
+      if (tag.getId() == 273) {
         writeStripData(metadata);
-      } else if (tag.id == 279) {
+      } else if (tag.getId() == 279) {
         // Nothing to do here, writeStripData does everything
       } else {
         int size = writeTag(tag);
-        tag.setIntValue(offset);
+        // tag.setIntValue(offset);
         offset += size;
       }
     }
     data.putShort((short) tags.size());
-    for (IfdEntry tag : tags) {
-      tag.write(data);
+    for (TagValue tag : tags) {
+      // tag.write(data);
     }
     return data.position();
   }
@@ -143,8 +142,8 @@ public class TiffWriter {
    * @param odata the odata
    */
   private void writeStripData(IfdTags metadata) {
-    TagValue stripOffsets = metadata.hashTagsId.get(273).value;
-    TagValue stripSizes = metadata.hashTagsId.get(279).value;
+    TagValue stripOffsets = metadata.hashTagsId.get(273);
+    TagValue stripSizes = metadata.hashTagsId.get(279);
     ArrayList<Integer> stripOffsets2 = new ArrayList<Integer>();
     ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
     for (int i = 0; i < stripOffsets.getCardinality(); i++) {
@@ -163,8 +162,8 @@ public class TiffWriter {
     for (int i = 0; i < stripSizes2.size(); i++) {
       data.putInt(stripOffsets2.get(i));
     }
-    metadata.hashTagsId.get(273).setIntValue(offsetStripOffsets);
-    metadata.hashTagsId.get(279).setIntValue(offsetStripSizes);
+    // metadata.hashTagsId.get(273).setIntValue(offsetStripOffsets);
+    // metadata.hashTagsId.get(279).setIntValue(offsetStripSizes);
   }
 
   /**
@@ -173,10 +172,10 @@ public class TiffWriter {
    * @param tag the tag
    * @return the int
    */
-  public int writeTag(IfdEntry tag) {
+  public int writeTag(TagValue tag) {
     int totalSize = 0;
     for (int i = 0; i < totalSize; i++) {
-      int v = data.get(tag.value.getFirstNumericValue() + i);
+      int v = data.get(tag.getFirstNumericValue() + i);
       data.put((byte) v);
     }
     return totalSize;

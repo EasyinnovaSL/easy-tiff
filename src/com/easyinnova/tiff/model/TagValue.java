@@ -28,42 +28,55 @@
  * @since 27/5/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.tiff.model;
+
+import com.easyinnova.tiff.model.types.abstractTiffType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Class TagValue.
+ * The Class TagValue contains an array of values.
  *
  */
 public class TagValue {
 
+  /** The tag identifier. */
+  private int id;
+
+  /** The type of the tag. */
+  private int type;
+
   /** The list of values. */
-  private List<com.easyinnova.tiff.model.types.abstractTiffType> value;
+  private List<abstractTiffType> value;
   
   /**
    * Instantiates a new tag value.
+   *
+   * @param id tag id
+   * @param type tag type
    */
-  public TagValue() {
-    value = new ArrayList<com.easyinnova.tiff.model.types.abstractTiffType>();
+  public TagValue(int id, int type) {
+    this.id = id;
+    this.type = type;
+    value = new ArrayList<abstractTiffType>();
   }
 
   /**
-   * Sets the value.
+   * Sets the value list.
    *
-   * @param value the new value
+   * @param value the new list of values
    */
-  public void setValue(List<com.easyinnova.tiff.model.types.abstractTiffType> value) {
+  public void setValue(List<abstractTiffType> value) {
     this.value = value; 
     }
   
   /**
-   * Gets the value.
+   * Gets the list of values.
    *
-   * @return the value
+   * @return the list
    */
-  public List<com.easyinnova.tiff.model.types.abstractTiffType> getValue() {
+  public List<abstractTiffType> getValue() {
     return this.value; 
    }
 
@@ -72,12 +85,30 @@ public class TagValue {
    *
    * @param value the value
    */
-  public void add(com.easyinnova.tiff.model.types.abstractTiffType value) {
+  public void add(abstractTiffType value) {
     this.value.add(value);
   }
 
   /**
-   * Gets the cardinality.
+   * Gets the tag id.
+   *
+   * @return the id
+   */
+  public int getId() {
+    return id;
+  }
+
+  /**
+   * Gets the tag type.
+   *
+   * @return the type
+   */
+  public int getType() {
+    return type;
+  }
+
+  /**
+   * Gets the number of values in the list.
    *
    * @return the cardinality
    */
@@ -86,12 +117,34 @@ public class TagValue {
   }
 
   /**
-   * Gets the first numeric value.
+   * Gets the first value of the list parsed as a number.
    *
-   * @return the first numeric value
+   * @return the first integer value
    */
   public int getFirstNumericValue() {
     return Integer.parseInt(value.get(0).toString());
+  }
+
+  /**
+   * Gets a string representing the value.
+   *
+   * @return the string
+   */
+  public String toString() {
+    String s = "";
+    if (type != 1) {
+      int n = value.size();
+      if (n > 1)
+        s += "[";
+      for (int i = 0; i < n; i++) {
+        s += value.get(i).toString();
+        if (n > 1 && i + 1 < n && type != 2)
+          s += ",";
+      }
+      if (n > 1)
+        s += "]";
+    }
+    return s;
   }
 }
 

@@ -35,8 +35,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.easyinnova.tiff.model.IFD;
+import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffObject;
-import com.easyinnova.tiff.model.types.TagValue;
 import com.easyinnova.tiff.reader.TiffReader;
 
 /**

@@ -32,7 +32,6 @@
 package com.easyinnova.tiff.model;
 
 import com.easyinnova.tiff.model.types.Rational;
-import com.easyinnova.tiff.model.types.TagValue;
 
 
 /**
@@ -59,7 +58,7 @@ public class IFD {
   /** The tags. */
   public IfdTags metadata;
 
-  /** The Next ifd. */
+  /** The next ifd. */
   private IFD nextIFD;
 
   /** The id. */
@@ -150,14 +149,14 @@ public class IFD {
   public void checkImage(ValidationResult validation) {
     if (!metadata.containsTagId(262)) {
       validation.addError("Missing Photometric Interpretation");
-    } else if (metadata.get(262).value.getValue().size() != 1) {
+    } else if (metadata.get(262).getValue().size() != 1) {
       validation.addError("Invalid Photometric Interpretation");
     } else {
-      photometric = (int) metadata.get(262).value.getFirstNumericValue();
+      photometric = (int) metadata.get(262).getFirstNumericValue();
       switch (photometric) {
         case 0:
         case 1:
-          if (!metadata.containsTagId(258) || metadata.get(258).value.getFirstNumericValue() == 1) {
+          if (!metadata.containsTagId(258) || metadata.get(258).getFirstNumericValue() == 1) {
             type = ImageType.BILEVEL;
             CheckBilevelImage(validation);
           } else {
@@ -189,7 +188,7 @@ public class IFD {
     CheckCommonFields(validation);
 
     // Compression
-    int comp = metadata.get(259).value.getFirstNumericValue();
+    int comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 2 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -203,12 +202,12 @@ public class IFD {
     CheckCommonFields(validation);
 
     // Bits per Sample
-    int bps = metadata.get(258).value.getFirstNumericValue();
+    int bps = metadata.get(258).getFirstNumericValue();
     if (bps != 4 && bps != 8)
       validation.addError("Invalid Bits per Sample", bps);
 
     // Compression
-    int comp = metadata.get(259).value.getFirstNumericValue();
+    int comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -224,18 +223,18 @@ public class IFD {
     if (!metadata.containsTagId(320)) {
       validation.addError("Missing Color Map");
     } else {
-      int colormap = metadata.get(320).value.getFirstNumericValue();
+      int colormap = metadata.get(320).getFirstNumericValue();
       if (colormap <= 0)
         validation.addError("Color Map", colormap);
     }
 
     // Bits per Sample
-    int bps = metadata.get(258).value.getFirstNumericValue();
+    int bps = metadata.get(258).getFirstNumericValue();
     if (bps != 4 && bps != 8)
       validation.addError("Invalid Bits per Sample", bps);
 
     // Compression
-    int comp = metadata.get(259).value.getFirstNumericValue();
+    int comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -249,12 +248,12 @@ public class IFD {
     CheckCommonFields(validation);
 
     // Samples per Pixel
-    int samples = metadata.get(277).value.getFirstNumericValue();
+    int samples = metadata.get(277).getFirstNumericValue();
     if (samples < 3)
       validation.addError("Invalid Samples per Pixel", samples);
 
     // Compression
-    int comp = metadata.get(259).value.getFirstNumericValue();
+    int comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -272,7 +271,7 @@ public class IFD {
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).name);
     else {
-      int val = metadata.get(id).value.getFirstNumericValue();
+      int val = metadata.get(id).getFirstNumericValue();
       if (val <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -282,7 +281,7 @@ public class IFD {
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).name);
     else {
-      int val = metadata.get(id).value.getFirstNumericValue();
+      int val = metadata.get(id).getFirstNumericValue();
       if (val <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -292,7 +291,7 @@ public class IFD {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      int val = metadata.get(id).value.getFirstNumericValue();
+      int val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2 && val != 3)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -302,7 +301,7 @@ public class IFD {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      float val = ((Rational) metadata.get(id).value.getValue().get(0)).getFloatValue();
+      float val = ((Rational) metadata.get(id).getValue().get(0)).getFloatValue();
       if (val <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -312,7 +311,7 @@ public class IFD {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      float val = ((Rational) metadata.get(id).value.getValue().get(0)).getFloatValue();
+      float val = ((Rational) metadata.get(id).getValue().get(0)).getFloatValue();
       if (val <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -322,7 +321,7 @@ public class IFD {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      int val = metadata.get(id).value.getFirstNumericValue();
+      int val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -332,7 +331,7 @@ public class IFD {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      int val = metadata.get(id).value.getFirstNumericValue();
+      int val = metadata.get(id).getFirstNumericValue();
       if (val <= 0 || val > 8)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
     }
@@ -356,8 +355,8 @@ public class IFD {
 
     // Check pixel samples bits
     if (metadata.containsTagId(258) && metadata.containsTagId(277)) {
-      int spp = metadata.get(277).value.getFirstNumericValue();
-      int bps = metadata.get(258).value.getValue().size();
+      int spp = metadata.get(277).getFirstNumericValue();
+      int bps = metadata.get(258).getValue().size();
       if (spp != bps) {
         validation.addError("Sampes per Pixel and Bits per Sample count do not match");
         if (bps == 1) {
@@ -367,7 +366,7 @@ public class IFD {
       }
 
       if (metadata.containsTagId(338)) {
-        int ext = metadata.get(338).value.getValue().size();
+        int ext = metadata.get(338).getValue().size();
         if (ext + 3 != bps) {
           validation.addError("Incorrect Extra Samples Count", ext);
         } else if (ext > 0 && bps <= 3) {
@@ -376,7 +375,7 @@ public class IFD {
       }
 
       if (bps > 1) {
-        TagValue lbps = metadata.get(258).value;
+        TagValue lbps = metadata.get(258);
         if (lbps == null || lbps.getValue() == null) {
           validation.addError("Invalid Bits per Sample");
         } else {
@@ -402,13 +401,13 @@ public class IFD {
 
     // Strip offsets
     id = 273;
-    offset = metadata.get(id).value.getFirstNumericValue();
+    offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
 
     // Strip Byte Counts
     id = 279;
-    offset = metadata.get(id).value.getFirstNumericValue();
+    offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
 
@@ -418,7 +417,7 @@ public class IFD {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     }
     else {
-      offset = metadata.get(id).value.getFirstNumericValue();
+      offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
     }
@@ -434,13 +433,13 @@ public class IFD {
 
     // Tile Offsets
     id = 324;
-    offset = metadata.get(id).value.getFirstNumericValue();
+    offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
 
     // Tile Byte Counts
     id = 325;
-    offset = metadata.get(id).value.getFirstNumericValue();
+    offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
 
@@ -449,7 +448,7 @@ public class IFD {
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field for tiles " + TiffTags.getTag(id).name, offset);
     else {
-      offset = metadata.get(id).value.getFirstNumericValue();
+      offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
     }
@@ -459,7 +458,7 @@ public class IFD {
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field for tiles " + TiffTags.getTag(id).name, offset);
     else {
-      offset = metadata.get(id).value.getFirstNumericValue();
+      offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
     }
@@ -469,12 +468,12 @@ public class IFD {
    * Prints the tags.
    */
   public void printTags() {
-    for (IfdEntry ie : metadata.tags) {
+    for (TagValue ie : metadata.tags) {
       try {
-        String name = TiffTags.getTag(ie.id).name;
+        String name = TiffTags.getTag(ie.getId()).name;
         String val = ie.toString();
-        String type = TiffTags.tagTypes.get(ie.type);
-        System.out.println(name + "(" + ie.type + "->" + type + "): " + val);
+        String type = TiffTags.tagTypes.get(ie.getType());
+        System.out.println(name + "(" + ie.getType() + "->" + type + "): " + val);
       } catch (Exception ex) {
         System.out.println("Tag error");
       }
@@ -489,6 +488,6 @@ public class IFD {
    */
   public TagValue getMetadata(String name) {
     int id = TiffTags.getTagId(name);
-    return metadata.get(id).value;
+    return metadata.get(id);
   }
 }

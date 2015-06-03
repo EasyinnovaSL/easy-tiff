@@ -32,7 +32,7 @@ package com.easyinnova.tiff.reader;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
 import com.easyinnova.tiff.model.IFD;
-import com.easyinnova.tiff.model.IfdEntry;
+import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.ValidationResult;
 import com.easyinnova.tiff.model.types.Ascii;
@@ -48,7 +48,6 @@ import com.easyinnova.tiff.model.types.SRational;
 import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.Short;
 import com.easyinnova.tiff.model.types.SubIFD;
-import com.easyinnova.tiff.model.types.TagValue;
 import com.easyinnova.tiff.model.types.Undefined;
 
 import java.io.IOException;
@@ -286,9 +285,7 @@ public class TiffReader {
             else
               validation.addError("Duplicate tag", tagid);
           } else {
-            IfdEntry entry = new IfdEntry(tagid, tagType);
-            entry.setValue(tv);
-            ifd.metadata.addTag(entry);
+            ifd.metadata.addTag(tv);
           }
           try {
           } catch (Exception ex) {
@@ -337,7 +334,7 @@ public class TiffReader {
    */
   public TagValue getValue(int type, int n, int id, int beginOffset) {
     // Create TagValue object
-    TagValue tv = new TagValue();
+    TagValue tv = new TagValue(id, type);
 
     if (type != 7) {
       // Defined tags
