@@ -149,9 +149,9 @@ public class TiffWriter {
     ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
     for (int i = 0; i < stripOffsets.getCardinality(); i++) {
       stripOffsets2.add(data.position());
-      stripSizes2.add((int) stripSizes.getValue().get(i).getNumericValue());
-      for (int j = 0; j < stripSizes.getValue().get(i).getNumericValue(); j++) {
-        int v = data.get((int) stripOffsets.getValue().get(i).getNumericValue());
+      stripSizes2.add((int) stripSizes.getValue().get(i).toInt());
+      for (int j = 0; j < stripSizes.getValue().get(i).toInt(); j++) {
+        int v = data.get((int) stripOffsets.getValue().get(i).toInt());
         data.put((byte) v);
       }
     }
@@ -176,7 +176,7 @@ public class TiffWriter {
   public int writeTag(IfdEntry tag) {
     int totalSize = 0;
     for (int i = 0; i < totalSize; i++) {
-      int v = data.get(tag.getNumericValue() + i);
+      int v = data.get(tag.value.getFirstNumericValue() + i);
       data.put((byte) v);
     }
     return totalSize;

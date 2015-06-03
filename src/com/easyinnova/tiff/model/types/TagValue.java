@@ -33,7 +33,6 @@ package com.easyinnova.tiff.model.types;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * The Class TagValue.
  *
@@ -92,7 +91,7 @@ public class TagValue {
    * @return the first numeric value
    */
   public int getFirstNumericValue() {
-    return value.get(0).getNumericValue();
+    return Integer.parseInt(value.get(0).toString());
   }
 }
 

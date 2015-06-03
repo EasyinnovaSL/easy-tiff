@@ -35,8 +35,21 @@ import com.easyinnova.tiff.model.IFD;
 import com.easyinnova.tiff.model.IfdEntry;
 import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.ValidationResult;
+import com.easyinnova.tiff.model.types.Ascii;
+import com.easyinnova.tiff.model.types.Byte;
+import com.easyinnova.tiff.model.types.Double;
+import com.easyinnova.tiff.model.types.Float;
 import com.easyinnova.tiff.model.types.IccProfile;
+import com.easyinnova.tiff.model.types.Long;
+import com.easyinnova.tiff.model.types.Rational;
+import com.easyinnova.tiff.model.types.SByte;
+import com.easyinnova.tiff.model.types.SLong;
+import com.easyinnova.tiff.model.types.SRational;
+import com.easyinnova.tiff.model.types.SShort;
+import com.easyinnova.tiff.model.types.Short;
+import com.easyinnova.tiff.model.types.SubIFD;
 import com.easyinnova.tiff.model.types.TagValue;
+import com.easyinnova.tiff.model.types.Undefined;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -302,8 +315,7 @@ public class TiffReader {
         }
 
         // Validate ifd entries
-        ifd.validate();
-        validation.add(ifd.validation);
+        validation.add(ifd.validate());
       }
     } catch (Exception ex) {
       ifd = null;
@@ -335,6 +347,7 @@ public class TiffReader {
       int typeSize = 1;
       switch (type) {
         case 3:
+        case 7:
         case 8:
           typeSize = 2;
           break;
@@ -363,50 +376,50 @@ public class TiffReader {
         // Get N tag values
         switch (type) {
           case 1:
-            tv.add(new com.easyinnova.tiff.model.types.Byte((byte) data.get(offset)));
+            tv.add(new Byte((byte) data.get(offset)));
             break;
           case 2:
-            tv.add(new com.easyinnova.tiff.model.types.Ascii((byte) data.get(offset)));
+            tv.add(new Ascii((byte) data.get(offset)));
             break;
           case 6:
-            tv.add(new com.easyinnova.tiff.model.types.SByte((byte) data.get(offset)));
+            tv.add(new SByte((byte) data.get(offset)));
             break;
           case 7:
-            tv.add(new com.easyinnova.tiff.model.types.Undefined((byte) data.get(offset)));
+            tv.add(new Undefined((byte) data.get(offset)));
             break;
           case 3:
-            tv.add(new com.easyinnova.tiff.model.types.Short((char) data.getUshort(offset)));
+            tv.add(new Short((char) data.getUshort(offset)));
             break;
           case 8:
-            tv.add(new com.easyinnova.tiff.model.types.SShort((short) data.getShort(offset)));
+            tv.add(new SShort((short) data.getShort(offset)));
             break;
           case 4:
-            tv.add(new com.easyinnova.tiff.model.types.Long(data.getInt(offset)));
+            tv.add(new Long(data.getInt(offset)));
             break;
           case 9:
-            tv.add(new com.easyinnova.tiff.model.types.SLong(data.getInt(offset)));
+            tv.add(new SLong(data.getInt(offset)));
             break;
           case 5:
-            int num =
-                new com.easyinnova.tiff.model.types.Long(data.getInt(offset)).getNumericValue();
-            int den =
-                new com.easyinnova.tiff.model.types.Long(data.getInt(offset + 4)).getNumericValue();
-            tv.add(new com.easyinnova.tiff.model.types.Rational(num, den));
+            int num = new Long(data.getInt(offset)).toInt();
+            int den = new Long(data.getInt(offset + 4)).toInt();
+            tv.add(new Rational(num, den));
             break;
           case 10:
-            int snum = new com.easyinnova.tiff.model.types.SLong(data.getInt(offset)).getIntValue();
-            int sden =
-                new com.easyinnova.tiff.model.types.SLong(data.getInt(offset + 4)).getIntValue();
-            tv.add(new com.easyinnova.tiff.model.types.SRational(snum, sden));
+            int snum = new SLong(data.getInt(offset)).toInt();
+            int sden = new SLong(data.getInt(offset + 4)).toInt();
+            tv.add(new SRational(snum, sden));
             break;
           case 11:
-            tv.add(new com.easyinnova.tiff.model.types.Float(data.getFloat(offset)));
+            tv.add(new Float(data.getFloat(offset)));
             break;
           case 12:
-            tv.add(new com.easyinnova.tiff.model.types.Double(data.getDouble(offset)));
+            tv.add(new Double(data.getDouble(offset)));
             break;
           case 13:
-            tv.add(new com.easyinnova.tiff.model.types.Long(data.getLong(offset)));
+            int ifdOffset = data.getInt(offset);
+            IfdReader ifd = readIFD(ifdOffset, 0);
+            SubIFD subIfd = new SubIFD(ifd.getIfd());
+            tv.add(subIfd);
             break;
         }
         offset += typeSize;

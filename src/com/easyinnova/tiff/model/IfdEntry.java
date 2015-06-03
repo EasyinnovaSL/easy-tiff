@@ -47,9 +47,6 @@ public class IfdEntry {
   /** The value. */
   public TagValue value;
 
-  /** The Validation. */
-  public ValidationResult validation;
-
   /**
    * Instantiates a new tag.
    *
@@ -61,14 +58,15 @@ public class IfdEntry {
   public IfdEntry(int id, int type) {
     this.id = id;
     this.type = type;
-    validation = new ValidationResult();
   }
 
   /**
    * Validates that the tag type and cardinality have correct values.
    *
+   * @return the validation result
    */
-  public void validate() {
+  public ValidationResult validate() {
+    ValidationResult validation = new ValidationResult();
     TiffTags.getTiffTags();
     if (!TiffTags.tagMap.containsKey(id))
       validation.addError("Undefined tag id " + id);
@@ -95,6 +93,7 @@ public class IfdEntry {
         // TODO: Deal with formulas?
       }
     }
+    return validation;
   }
 
   /**
@@ -104,41 +103,19 @@ public class IfdEntry {
    */
   public String toString() {
     String s = "";
-    int n = value.getValue().size();
-    if (n > 1)
-      s += "[";
-    for (int i = 0; i < n; i++) {
-      s += value.getValue().get(i).toString();
-      if (n > 1 && i + 1 < n && type != 2)
-        s += ",";
-    }
-    if (n > 1)
-      s += "]";
-    return s;
-  }
-
-  /**
-   * Gets the int value.
-   *
-   * @return the int value
-   */
-  public int getNumericValue() {
-    int intval = 0;
-    try {
-      intval = (int) ((com.easyinnova.tiff.model.types.Long) value.getValue().get(0)).getValue();
-    } catch (Exception ex) {
-      try {
-        intval = (int) ((com.easyinnova.tiff.model.types.Short) value.getValue().get(0)).getValue();
-      } catch (Exception ex2) {
-        try {
-          intval =
-              (int) ((com.easyinnova.tiff.model.types.Byte) value.getValue().get(0)).getValue();
-        } catch (Exception ex3) {
-          throw ex3;
-        }
+    if (type != 1) {
+      int n = value.getValue().size();
+      if (n > 1)
+        s += "[";
+      for (int i = 0; i < n; i++) {
+        s += value.getValue().get(i).toString();
+        if (n > 1 && i + 1 < n && type != 2)
+          s += ",";
       }
+      if (n > 1)
+        s += "]";
     }
-    return intval;
+    return s;
   }
 
   /**
@@ -151,7 +128,7 @@ public class IfdEntry {
     odata.putShort((short) id);
     odata.putShort((short) type);
     odata.putInt((int) value.getValue().size());
-    odata.putInt(getNumericValue());
+    odata.putInt(value.getFirstNumericValue());
   }
 
   /**

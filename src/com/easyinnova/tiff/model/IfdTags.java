@@ -46,9 +46,6 @@ public class IfdTags {
   /** The Hash tags name. */
   public HashMap<String, IfdEntry> hashTagsName;
 
-  /** The validation. */
-  ValidationResult validation;
-
   /**
    * The tag order tolerance.<br>
    * 0: No tolerance. 10: Full tolerance (no matter if tags are not in ascending order)
@@ -62,7 +59,6 @@ public class IfdTags {
     tags = new ArrayList<IfdEntry>();
     hashTagsId = new HashMap<Integer, IfdEntry>();
     hashTagsName = new HashMap<String, IfdEntry>();
-    validation = new ValidationResult();
   }
 
   /**
@@ -84,13 +80,13 @@ public class IfdTags {
   /**
    * Validates the ifd entries.
    *
-   * @param validation the validation
+   * @return the validation result
    */
-  public void validate() {
+  public ValidationResult validate() {
+    ValidationResult validation = new ValidationResult();
     int prevTagId = 0;
     for (IfdEntry ie : tags) {
-      ie.validate();
-      validation.add(ie.validation);
+      validation.add(ie.validate());
       if (ie.id < prevTagId) {
         if (tagOrderTolerance > 0)
           validation.addWarning("Tags are not in ascending order");
@@ -99,6 +95,7 @@ public class IfdTags {
       }
       prevTagId = ie.id;
     }
+    return validation;
   }
 
   /**

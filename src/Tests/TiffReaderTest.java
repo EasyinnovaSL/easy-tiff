@@ -57,6 +57,7 @@ public class TiffReaderTest {
 
     tr = new TiffReader();
 
+    // Image 1
     result = tr.readFile("tests\\Small\\Grey_stripped.tif");
     assertEquals(0, result);
     assertEquals(true, tr.validation.correct);
@@ -85,6 +86,7 @@ public class TiffReaderTest {
     assertEquals(1, tv.getFirstNumericValue());
 
 
+    // Image 2
     result = tr.readFile("tests\\Organization\\Planar tile.tif");
     assertEquals(0, result);
     assertEquals(true, tr.validation.correct);
