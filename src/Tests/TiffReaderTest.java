@@ -58,30 +58,30 @@ public class TiffReaderTest {
     tr = new TiffReader();
 
     // Image 1
-    result = tr.readFile("tests\\Small\\Grey_stripped.tif");
+    result = tr.readFile("test\\resources\\Small\\Grey_stripped.tif");
     assertEquals(0, result);
     assertEquals(true, tr.validation.correct);
     to = tr.getModel();
     assertEquals(1, to.getIfdCount());
     ifd = to.getIfd(0);
 
-    tv = ifd.getMetadata("ImageWidth");
+    tv = ifd.getTag("ImageWidth");
     assertEquals(1, tv.getCardinality());
     assertEquals(999, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("ImageLength");
+    tv = ifd.getTag("ImageLength");
     assertEquals(1, tv.getCardinality());
     assertEquals(662, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("BitsPerSample");
+    tv = ifd.getTag("BitsPerSample");
     assertEquals(1, tv.getCardinality());
     assertEquals(8, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("PhotometricInterpretation");
+    tv = ifd.getTag("PhotometricInterpretation");
     assertEquals(1, tv.getCardinality());
     assertEquals(1, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("PlanarConfiguration");
+    tv = ifd.getTag("PlanarConfiguration");
     assertEquals(1, tv.getCardinality());
     assertEquals(1, tv.getFirstNumericValue());
 
@@ -94,31 +94,31 @@ public class TiffReaderTest {
     assertEquals(1, to.getIfdCount());
     ifd = to.getIfd(0);
 
-    tv = ifd.getMetadata("ImageWidth");
+    tv = ifd.getTag("ImageWidth");
     assertEquals(1, tv.getCardinality());
     assertEquals(2000, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("ImageLength");
+    tv = ifd.getTag("ImageLength");
     assertEquals(1, tv.getCardinality());
     assertEquals(1500, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("BitsPerSample");
+    tv = ifd.getTag("BitsPerSample");
     assertEquals(3, tv.getCardinality());
     assertEquals(8, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("SamplesPerPixel");
+    tv = ifd.getTag("SamplesPerPixel");
     assertEquals(1, tv.getCardinality());
     assertEquals(3, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("Compression");
+    tv = ifd.getTag("Compression");
     assertEquals(1, tv.getCardinality());
     assertEquals(1, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("PhotometricInterpretation");
+    tv = ifd.getTag("PhotometricInterpretation");
     assertEquals(1, tv.getCardinality());
     assertEquals(2, tv.getFirstNumericValue());
 
-    tv = ifd.getMetadata("PlanarConfiguration");
+    tv = ifd.getTag("PlanarConfiguration");
     assertEquals(1, tv.getCardinality());
     assertEquals(2, tv.getFirstNumericValue());
   }

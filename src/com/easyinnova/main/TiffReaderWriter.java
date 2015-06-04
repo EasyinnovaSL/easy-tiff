@@ -32,6 +32,7 @@ package com.easyinnova.main;
 
 import com.easyinnova.tiff.model.IFD;
 import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.reader.BaselineProfile;
 import com.easyinnova.tiff.reader.TiffReader;
 import com.easyinnova.tiff.writer.TiffWriter;
 
@@ -140,7 +141,9 @@ public class TiffReaderWriter {
             int index = 0;
             for (IFD ifd : to.getIfds()) {
               if (ifd != null) {
-                System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
+                BaselineProfile bp = new BaselineProfile();
+                bp.validateIfd(ifd);
+                System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
                 ifd.printTags();
               }
             }
@@ -151,7 +154,9 @@ public class TiffReaderWriter {
               System.out.println("IFDs: " + to.getIfdCount());
               int index = 0;
               for (IFD ifd : to.getIfds()) {
-                System.out.println("IFD " + index++ + " (" + ifd.type.toString() + ")");
+                BaselineProfile bp = new BaselineProfile();
+                bp.validateIfd(ifd);
+                System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
                 ifd.printTags();
               }
             }

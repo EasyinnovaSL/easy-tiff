@@ -104,7 +104,7 @@ public class TiffWriter {
    * @return the int
    */
   public int writeIFD(IFD ifd) {
-    int offset2 = writeMetadata(ifd.metadata);
+    int offset2 = writeMetadata(ifd.getMetadata());
     // data.putInt(ifd.offset);
     return offset2;
   }
@@ -116,7 +116,7 @@ public class TiffWriter {
    * @return the int
    */
   public int writeMetadata(IfdTags metadata) {
-    ArrayList<TagValue> tags = metadata.tags;
+    ArrayList<TagValue> tags = metadata.getTags();
     int offset = data.position();
     for (TagValue tag : tags) {
       if (tag.getId() == 273) {
@@ -142,8 +142,8 @@ public class TiffWriter {
    * @param odata the odata
    */
   private void writeStripData(IfdTags metadata) {
-    TagValue stripOffsets = metadata.hashTagsId.get(273);
-    TagValue stripSizes = metadata.hashTagsId.get(279);
+    TagValue stripOffsets = metadata.get(273);
+    TagValue stripSizes = metadata.get(279);
     ArrayList<Integer> stripOffsets2 = new ArrayList<Integer>();
     ArrayList<Integer> stripSizes2 = new ArrayList<Integer>();
     for (int i = 0; i < stripOffsets.getCardinality(); i++) {
