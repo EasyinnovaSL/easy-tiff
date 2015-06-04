@@ -32,8 +32,6 @@ package Tests;
 
 import org.junit.Test;
 
-import com.easyinnova.tiff.reader.TiffReader;
-
 /**
  * The Class Tests.
  */
@@ -44,12 +42,12 @@ public class Tests {
    */
   @Test
   public void ValidExamples() {
-    TiffReader tr;
-    int result;
-
-    tr = new TiffReader();
-
     /*
+     * TiffReader tr; int result;
+     * 
+     * tr = new TiffReader();
+     * 
+     * 
      * result = tr.readFile("tests\\Header\\Classic Intel.TIF"); assertEquals(0, result);
      * assertEquals(true, tr.validation.correct);
      * 
@@ -114,12 +112,12 @@ public class Tests {
    */
   @Test
   public void InvalidExamples() {
-    TiffReader tr;
-    int result;
-
-    tr = new TiffReader();
-
     /*
+     * TiffReader tr; int result;
+     * 
+     * tr = new TiffReader();
+     * 
+     * 
      * result = tr.readFile("tests\\Header\\Nonsense byteorder E.TIF"); assertEquals(0, result);
      * assertEquals(false, tr.validation.correct);
      * 

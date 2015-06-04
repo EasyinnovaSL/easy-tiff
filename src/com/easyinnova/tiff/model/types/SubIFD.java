@@ -30,23 +30,24 @@
  */
 package com.easyinnova.tiff.model.types;
 
+import com.easyinnova.tiff.model.IFD;
+
 /**
  * The Class SubIFD.
  */
 public class SubIFD extends abstractTiffType {
 
   /** The value. */
-  private long value;
+  private IFD value;
 
   /**
    * Instantiates a new long.
    *
    * @param value the value
    */
-  public SubIFD(long value) {
+  public SubIFD(IFD value) {
     super();
     this.value = value;
-    setTypeSize(4);
   }
 
   /**
@@ -54,7 +55,7 @@ public class SubIFD extends abstractTiffType {
    *
    * @return the value
    */
-  public long getValue() {
+  public IFD getValue() {
     return value;
   }
 
@@ -63,13 +64,13 @@ public class SubIFD extends abstractTiffType {
    *
    * @param value the new value
    */
-  public void setValue(long value) {
+  public void setValue(IFD value) {
     this.value = value;
   }
 
   @Override
   public String toString() {
-    return "->" + value;
+    return "SubIFD";
   }
 }
 

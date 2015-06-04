@@ -38,16 +38,13 @@ import java.util.HashMap;
  */
 public class IfdTags {
   /** Tag list. */
-  public ArrayList<IfdEntry> tags;
+  public ArrayList<TagValue> tags;
 
   /** The Hash tags id. */
-  public HashMap<Integer, IfdEntry> hashTagsId;
+  public HashMap<Integer, TagValue> hashTagsId;
 
   /** The Hash tags name. */
-  public HashMap<String, IfdEntry> hashTagsName;
-
-  /** The validation. */
-  ValidationResult validation;
+  public HashMap<String, TagValue> hashTagsName;
 
   /**
    * The tag order tolerance.<br>
@@ -59,10 +56,9 @@ public class IfdTags {
    * Instantiates a new ifd tags.
    */
   public IfdTags() {
-    tags = new ArrayList<IfdEntry>();
-    hashTagsId = new HashMap<Integer, IfdEntry>();
-    hashTagsName = new HashMap<String, IfdEntry>();
-    validation = new ValidationResult();
+    tags = new ArrayList<TagValue>();
+    hashTagsId = new HashMap<Integer, TagValue>();
+    hashTagsName = new HashMap<String, TagValue>();
   }
 
   /**
@@ -70,12 +66,12 @@ public class IfdTags {
    *
    * @param tag the tag
    */
-  public void addTag(IfdEntry tag) {
+  public void addTag(TagValue tag) {
     tags.add(tag);
-    if (!hashTagsId.containsKey(tag.id)) {
-      hashTagsId.put(tag.id, tag);
+    if (!hashTagsId.containsKey(tag.getId())) {
+      hashTagsId.put(tag.getId(), tag);
     }
-    Tag t = TiffTags.getTag(tag.id);
+    Tag t = TiffTags.getTag(tag.getId());
     if (t != null) {
       hashTagsName.put(t.name, tag);
     }
@@ -84,21 +80,48 @@ public class IfdTags {
   /**
    * Validates the ifd entries.
    *
-   * @param validation the validation
+   * @return the validation result
    */
-  public void validate() {
+  public ValidationResult validate() {
+    ValidationResult validation = new ValidationResult();
     int prevTagId = 0;
-    for (IfdEntry ie : tags) {
-      ie.validate();
-      validation.add(ie.validation);
-      if (ie.id < prevTagId) {
+    TiffTags.getTiffTags();
+    for (TagValue ie : tags) {
+      if (!TiffTags.tagMap.containsKey(ie.getId()))
+        validation.addError("Undefined tag id " + ie.getId());
+      else if (!TiffTags.tagTypes.containsKey(ie.getType()))
+        validation.addWarning("Unknown tag type " + ie.getType());
+      else {
+        Tag t = TiffTags.getTag(ie.getId());
+        String stype = TiffTags.tagTypes.get(ie.getType());
+        if (!t.validType(stype)) {
+          String stypes = "";
+          for (String tt : t.getType()) {
+            if (stypes.length() > 0)
+              stypes += ",";
+            stypes += tt;
+          }
+          validation.addError("Invalid type for tag " + ie.getId() + "[" + stypes + "]", stype);
+        }
+        try {
+          int card = Integer.parseInt(t.getCardinality());
+          if (card != ie.getCardinality())
+            validation.addError("Cardinality for tag " + ie.getId() + " must be " + card,
+                ie.getCardinality());
+        } catch (Exception e) {
+          // TODO: Deal with formulas?
+        }
+      }
+
+      if (ie.getId() < prevTagId) {
         if (tagOrderTolerance > 0)
           validation.addWarning("Tags are not in ascending order");
         else
           validation.addError("Tags are not in ascending order");
       }
-      prevTagId = ie.id;
+      prevTagId = ie.getId();
     }
+    return validation;
   }
 
   /**
@@ -117,7 +140,7 @@ public class IfdTags {
    * @param id the id
    * @return the IfdEntry
    */
-  public IfdEntry get(int id) {
+  public TagValue get(int id) {
     return hashTagsId.get(id);
   }
 }

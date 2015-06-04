@@ -30,8 +30,6 @@
  */
 package com.easyinnova.tiff.model.types;
 
-
-
 /**
  * The Class Long.
  */

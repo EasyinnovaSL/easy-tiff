@@ -30,8 +30,6 @@
  */
 package com.easyinnova.tiff.model.types;
 
-
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Ascii.
@@ -72,6 +70,9 @@ public class Ascii extends abstractTiffType {
 
   @Override
   public String toString() {
-    return "" + (char) value;
+    String s = "";
+    if (value > 0)
+      s += (char) value;
+    return s;
   }
 }

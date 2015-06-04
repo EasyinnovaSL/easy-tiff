@@ -30,7 +30,6 @@
  */
 package com.easyinnova.tiff.model.types;
 
-
 /**
  * The Class Rational.
  */
