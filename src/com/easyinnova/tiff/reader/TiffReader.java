@@ -17,13 +17,13 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the ï¿½ statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * ï¿½ 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author Vï¿½ctor Muï¿½oz Solï¿½
  * @version 1.0
  * @since 28/5/2015
  *
@@ -37,6 +37,7 @@ import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.ValidationResult;
 import com.easyinnova.tiff.model.types.IccProfile;
 import com.easyinnova.tiff.model.types.TagValue;
+import com.easyinnova.tiff.model.types.Long;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -200,8 +201,6 @@ public class TiffReader {
 
   /**
    * Parses the IFD data.
-   *
-   * @param tiffModel the tiff file
    */
   public void readIFDs() {
     try {
@@ -381,7 +380,7 @@ public class TiffReader {
             tv.add(new com.easyinnova.tiff.model.types.SShort((short) data.getShort(offset)));
             break;
           case 4:
-            tv.add(new com.easyinnova.tiff.model.types.Long(data.getInt(offset)));
+            tv.add(new Long(data.getInt(offset)));
             break;
           case 9:
             tv.add(new com.easyinnova.tiff.model.types.SLong(data.getInt(offset)));

@@ -37,10 +37,10 @@ package com.easyinnova.tiff.model.types;
 public class Rational extends abstractTiffType {
   
   /** The numerator. */
-  private int numerator;
+  private long numerator;
   
   /** The denominator. */
-  private int denominator;
+  private long denominator;
 
   /**
    * Instantiates a new rational.
@@ -48,7 +48,7 @@ public class Rational extends abstractTiffType {
    * @param numerator the numerator
    * @param denominator the denominator
    */
-  public Rational(int numerator,int denominator) {
+  public Rational(long numerator,long denominator) {
     super();
     this.numerator=numerator;
     this.denominator=denominator;
@@ -60,7 +60,7 @@ public class Rational extends abstractTiffType {
    *
    * @return the numerator
    */
-  public int getNumerator() {
+  public long getNumerator() {
     return numerator;
   }
 
@@ -78,7 +78,7 @@ public class Rational extends abstractTiffType {
    *
    * @return the denominator
    */
-  public int getDenominator() {
+  public long getDenominator() {
     return denominator;
   }
 

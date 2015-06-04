@@ -151,6 +151,7 @@ public class DataByteOrderInputStream extends FilterInputStream implements TiffD
   }
   
   public Long readLong() throws IOException {
+    
     int ch1 = in.read();
     int ch2 = in.read();
     int ch3 = in.read();
@@ -160,9 +161,9 @@ public class DataByteOrderInputStream extends FilterInputStream implements TiffD
     }
     short val;
     if(ByteOrder) {
-      val = (short)((ch1 << 8) + (ch2 << 0));
+      val = (short)((ch1 << 32) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
-      val = (short)((ch2 << 8) + (ch1 << 0));
+      val = (short)((ch4 << 32) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }         
     return new Long(val);
   }
