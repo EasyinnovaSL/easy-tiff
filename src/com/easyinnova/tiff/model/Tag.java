@@ -36,39 +36,39 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The Class Tag.
+ * Tag definition.
  */
 public class Tag {
   
   /** The id. */
-  protected Integer id;
+  private Integer id;
 
   /** The name. */
-  public String name = "";
+  private String name = "";
 
   /** The type. */
-  protected List<String> type;
+  private List<String> type;
 
   /** The cardinality. */
-  protected String cardinality = "";
+  private String cardinality = "";
 
   /** The default value. */
-  protected String defaultValue = "";
+  private String defaultValue = "";
   
   /** The ifd. */
-  protected String ifd = ""; 
+  private String ifd = "";
   
   /** The description. */
-  protected String description = "";
+  private String description = "";
   
   /** The source. */
-  protected String source = "";
+  private String source = "";
   
   /** The created. */
-  protected Date created;
+  private Date created;
   
   /** The modified. */
-  protected Date modified;
+  private Date modified;
   
   /**
    * Gets the id.
@@ -78,7 +78,6 @@ public class Tag {
   public Integer getId() {
     return id;
   }
-
   
   /**
    * Sets the id.
@@ -292,5 +291,4 @@ public class Tag {
       valid = true;
     return valid;
   }
-
 }

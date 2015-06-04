@@ -1,5 +1,5 @@
 /**
- * <h1>IFD.java</h1>
+ * <h1>SubIFD.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -18,7 +18,7 @@
  * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the � statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
  * © 2015 Easy Innova, SL
@@ -26,15 +26,19 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 14/5/2015
+ * @since 2/6/2015
  *
  */
-package com.easyinnova.tiff.model;
+package com.easyinnova.tiff.model.types;
+
+import com.easyinnova.tiff.model.IfdTags;
+import com.easyinnova.tiff.model.TagValue;
+import com.easyinnova.tiff.model.TiffTags;
 
 /**
- * The Class IFD.
+ * The Class SubIFD.
  */
-public class IFD {
+public class IFD extends abstractTiffType {
 
   /** The tags. */
   private IfdTags metadata;
@@ -42,14 +46,61 @@ public class IFD {
   /** The next ifd. */
   private IFD nextIFD;
 
+  /** Pointer to the parent ifd. */
+  private IFD parentIFD;
+
   /**
-   * Instantiates a new ifd.
-   *
-   * @param id the id
+   * Instantiates a new long.
    */
   public IFD() {
+    super();
     metadata = new IfdTags();
     nextIFD = null;
+  }
+
+  /**
+   * Sets the parent.
+   *
+   * @param parent the new parent
+   */
+  public void setParent(IFD parent) {
+    parentIFD = parent;
+  }
+
+  /**
+   * Gets the parent.
+   *
+   * @return the parent
+   */
+  public IFD getParent() {
+    return parentIFD;
+  }
+
+  /**
+   * Checks for parent.
+   *
+   * @return true, if successful
+   */
+  public boolean hasParent() {
+    return parentIFD != null;
+  }
+
+  /**
+   * Checks for sub IFDs.
+   *
+   * @return true, if successful
+   */
+  public boolean hasSubIFD() {
+    return metadata.containsTagId(13);
+  }
+
+  /**
+   * Sets the next ifd.
+   *
+   * @param ifd the new next ifd
+   */
+  public void setNextIFD(IFD ifd) {
+    nextIFD = ifd;
   }
 
   /**
@@ -106,7 +157,7 @@ public class IFD {
   public void printTags() {
     for (TagValue ie : metadata.getTags()) {
       try {
-        String name = TiffTags.getTag(ie.getId()).name;
+        String name = TiffTags.getTag(ie.getId()).getName();
         String val = ie.toString();
         String type = TiffTags.tagTypes.get(ie.getType());
         System.out.println(name + "(" + ie.getType() + "->" + type + "): " + val);
@@ -115,4 +166,21 @@ public class IFD {
       }
     }
   }
+
+  @Override
+  public String toString() {
+    if (this.hasParent())
+      return "SubIFD";
+    return "IFD";
+  }
+
+  /**
+   * Gets the next ifd.
+   *
+   * @return the next ifd
+   */
+  public IFD getNextIFD() {
+    return nextIFD;
+  }
 }
+

@@ -1,5 +1,5 @@
 /**
- * <h1>ValidationResult.java</h1> 
+ * <h1>ValidationResult.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 18/5/2015
  *
@@ -33,48 +34,48 @@ package com.easyinnova.tiff.model;
 import java.util.ArrayList;
 
 /**
- * The Class ValidationResult.
+ * Object that stores the results of the validation, errors and warnings.
  */
 public class ValidationResult {
 
   /** Errors List. */
-  public ArrayList<ValidationError> errors;
+  public ArrayList<ValidationEvent> errors;
 
   /** Warnings List. */
-  public ArrayList<ValidationError> warnings;
+  public ArrayList<ValidationEvent> warnings;
 
-  /** The Correct. */
+  /** Global correctness of the Tiff file. */
   public boolean correct;
 
   /**
-   * Instantiates a new validation result object.
+   * Default constructor.
    */
   public ValidationResult() {
-    errors = new ArrayList<ValidationError>();
-    warnings = new ArrayList<ValidationError>();
+    errors = new ArrayList<ValidationEvent>();
+    warnings = new ArrayList<ValidationEvent>();
     correct = true;
   }
 
   /**
-   * Adds the error.
+   * Adds an error.
    *
-   * @param desc description
-   * @param value the value
+   * @param desc error description
+   * @param value the value that caused the error
    */
   private void iaddError(String desc, String value) {
-    ValidationError ve = new ValidationError(desc, value);
+    ValidationEvent ve = new ValidationEvent(desc, value);
     errors.add(ve);
     correct = false;
   }
 
   /**
-   * Adds the warning.
+   * Adds a warning.
    *
-   * @param desc description
-   * @param value the value
+   * @param desc warning description
+   * @param value the value that caused the warning
    */
   private void iaddWarning(String desc, String value) {
-    ValidationError ve = new ValidationError(desc, value);
+    ValidationEvent ve = new ValidationEvent(desc, value);
     warnings.add(ve);
   }
 
@@ -82,7 +83,7 @@ public class ValidationResult {
    * Adds an error.
    *
    * @param desc Error description
-   * @param value Value
+   * @param value the integer value that caused the error
    */
   public void addError(String desc, int value) {
     iaddError(desc, "" + value);
@@ -92,7 +93,7 @@ public class ValidationResult {
    * Adds an error.
    *
    * @param desc Error description
-   * @param value Value
+   * @param value the float value that caused the error
    */
   public void addError(String desc, float value) {
     iaddError(desc, "" + value);
@@ -102,7 +103,7 @@ public class ValidationResult {
    * Adds an error.
    *
    * @param desc Error description
-   * @param value Value
+   * @param value the String that caused the error
    */
   public void addError(String desc, String value) {
     iaddError(desc, value);
@@ -118,7 +119,7 @@ public class ValidationResult {
   }
 
   /**
-   * Adds an warning.
+   * Adds a warning.
    *
    * @param desc Warning description
    */
@@ -130,7 +131,7 @@ public class ValidationResult {
    * Adds an warning.
    *
    * @param desc Warning description
-   * @param value the value
+   * @param value the String that caused the warning
    */
   public void addWarning(String desc, String value) {
     iaddWarning(desc, value);
@@ -140,7 +141,7 @@ public class ValidationResult {
    * Adds an warning.
    *
    * @param desc Warning description
-   * @param value the value
+   * @param value the integer value that caused the warning
    */
   public void addWarning(String desc, int value) {
     iaddWarning(desc, "" + value);
@@ -158,19 +159,19 @@ public class ValidationResult {
   }
 
   /**
-   * Prints the errors.
+   * Prints the errors to the console.
    */
   public void printErrors() {
-    for (ValidationError ve : errors) {
+    for (ValidationEvent ve : errors) {
       ve.print();
     }
   }
 
   /**
-   * Prints the warnings.
+   * Prints the warnings to the console.
    */
   public void printWarnings() {
-    for (ValidationError ve : warnings) {
+    for (ValidationEvent ve : warnings) {
       ve.printWarning();
     }
   }

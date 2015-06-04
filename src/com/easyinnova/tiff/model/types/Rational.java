@@ -1,5 +1,5 @@
 /**
- * <h1>Rational.java</h1> 
+ * <h1>Rational.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,8 +13,9 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
  * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
@@ -36,10 +37,10 @@ package com.easyinnova.tiff.model.types;
 public class Rational extends abstractTiffType {
   
   /** The numerator. */
-  private int numerator;
+  private Long numerator;
   
   /** The denominator. */
-  private int denominator;
+  private Long denominator;
 
   /**
    * Instantiates a new rational.
@@ -49,8 +50,8 @@ public class Rational extends abstractTiffType {
    */
   public Rational(int numerator,int denominator) {
     super();
-    this.numerator=numerator;
-    this.denominator=denominator;
+    this.numerator = new Long(numerator);
+    this.denominator = new Long(denominator);
     setTypeSize(8);
   }
 
@@ -60,7 +61,7 @@ public class Rational extends abstractTiffType {
    * @return the numerator
    */
   public int getNumerator() {
-    return numerator;
+    return (int) numerator.getValue();
   }
 
   /**
@@ -69,7 +70,7 @@ public class Rational extends abstractTiffType {
    * @param numerator the new numerator
    */
   public void setNumerator(int numerator) {
-    this.numerator = numerator;
+    this.numerator = new Long(numerator);
   }
 
   /**
@@ -78,7 +79,7 @@ public class Rational extends abstractTiffType {
    * @return the denominator
    */
   public int getDenominator() {
-    return denominator;
+    return (int) denominator.getValue();
   }
 
   /**
@@ -87,7 +88,7 @@ public class Rational extends abstractTiffType {
    * @param denominator the new denominator
    */
   public void setDenominator(int denominator) {
-    this.denominator = denominator;
+    this.denominator = new Long(denominator);
   }
 
   /**
@@ -96,11 +97,11 @@ public class Rational extends abstractTiffType {
    * @return the float value
    */
   public float getFloatValue() {
-    return (float) numerator / denominator;
+    return (float) numerator.getValue() / denominator.getValue();
   }
 
   @Override
   public String toString() {
-    return numerator + "/" + denominator;
+    return numerator.toString() + "/" + denominator.toString();
   }
 }

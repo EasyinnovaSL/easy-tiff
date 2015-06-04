@@ -1,5 +1,5 @@
 /**
- * <h1>SRational.java</h1> 
+ * <h1>SRational.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 28/5/2015
  *
@@ -36,21 +37,21 @@ package com.easyinnova.tiff.model.types;
 public class SRational extends abstractTiffType {
 
   /** The numerator. */
-  private int numerator;
+  private SLong numerator;
 
   /** The denominator. */
-  private int denominator;
+  private SLong denominator;
 
   /**
    * Instantiates a new rational.
    *
-   * @param numerator the numerator
-   * @param denominator the denominator
+   * @param numerator the SLONG numerator
+   * @param denominator the SLONG denominator
    */
   public SRational(int numerator, int denominator) {
     super();
-    this.numerator = numerator;
-    this.denominator = denominator;
+    this.numerator = new SLong(numerator);
+    this.denominator = new SLong(denominator);
     setTypeSize(8);
   }
 
@@ -60,7 +61,7 @@ public class SRational extends abstractTiffType {
    * @return the numerator
    */
   public int getNumerator() {
-    return numerator;
+    return numerator.getIntValue();
   }
 
   /**
@@ -69,7 +70,7 @@ public class SRational extends abstractTiffType {
    * @param numerator the new numerator
    */
   public void setNumerator(int numerator) {
-    this.numerator = numerator;
+    this.numerator = new SLong(numerator);
   }
 
   /**
@@ -78,7 +79,7 @@ public class SRational extends abstractTiffType {
    * @return the denominator
    */
   public int getDenominator() {
-    return denominator;
+    return denominator.getIntValue();
   }
 
   /**
@@ -87,12 +88,12 @@ public class SRational extends abstractTiffType {
    * @param denominator the new denominator
    */
   public void setDenominator(int denominator) {
-    this.denominator = denominator;
+    this.denominator = new SLong(denominator);
   }
 
   @Override
   public String toString() {
-    return numerator + "/" + denominator;
+    return numerator.toString() + "/" + denominator.toString();
   }
 }
 

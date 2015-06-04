@@ -1,5 +1,5 @@
 /**
- * <h1>BaselineProfile.java</h1> 
+ * <h1>BaselineProfile.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,65 +13,66 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 4/6/2015
  *
  */
 package com.easyinnova.tiff.reader;
 
-import com.easyinnova.tiff.model.IFD;
 import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.ValidationResult;
+import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.Rational;
 
 /**
- * The Class BaselineProfile.
+ * Checks if the Tiff file complies with the Baseline 6.0.
  */
 public class BaselineProfile {
 
   /**
-   * The Enum ImageType.
+   * Types of images.
    */
   public enum ImageType {
-    /** The bilevel. */
+    /** Bilevel (black and white). */
     BILEVEL,
-    /** The grayscale. */
+    /** Crayscale. */
     GRAYSCALE,
-    /** The palette. */
+    /** Palette-color. */
     PALETTE,
-    /** The rgb. */
+    /** RGB. */
     RGB,
-    /** The undefined. */
+    /** Undefined. */
     UNDEFINED
   };
 
-  /** The validation. */
+  /** The result of the check. */
   private ValidationResult validation;
 
-  /** The Type. */
+  /** The image yype. */
   private ImageType type;
 
-  /** The photometric. */
+  /** The photometric interpretation. */
   private int photometric;
 
-  /** Image in strips. */
+  /** Is image in strips. */
   private boolean strips = false;
 
-  /** Image in tiles. */
+  /** Is image in tiles. */
   private boolean tiles = false;
 
   /**
@@ -89,10 +90,9 @@ public class BaselineProfile {
   }
 
   /**
-   * Validates the IFD.
+   * Validates an IFD.
    *
-   * @param ifd the ifd
-   * @return the validation result
+   * @param ifd the image file descriptor
    */
   public void validateIfd(IFD ifd) {
     IfdTags metadata = ifd.getMetadata();
@@ -157,8 +157,6 @@ public class BaselineProfile {
 
   /**
    * Checks the color profile.
-   *
-   * @param validation the validation
    */
   private void CheckColorProfile() {
     // TODO: Everything
@@ -292,21 +290,21 @@ public class BaselineProfile {
     // Width
     id = 256;
     if (!metadata.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
+      validation.addError("Missing required field", TiffTags.getTag(id).getName());
     else {
       int val = metadata.get(id).getFirstNumericValue();
       if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // Height
     id = 257;
     if (!metadata.containsTagId(id))
-      validation.addError("Missing required field", TiffTags.getTag(id).name);
+      validation.addError("Missing required field", TiffTags.getTag(id).getName());
     else {
       int val = metadata.get(id).getFirstNumericValue();
       if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // Resolution Unit
@@ -316,7 +314,7 @@ public class BaselineProfile {
     } else {
       int val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2 && val != 3)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // XResolution
@@ -326,7 +324,7 @@ public class BaselineProfile {
     } else {
       float val = ((Rational) metadata.get(id).getValue().get(0)).getFloatValue();
       if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // YResolution
@@ -336,7 +334,7 @@ public class BaselineProfile {
     } else {
       float val = ((Rational) metadata.get(id).getValue().get(0)).getFloatValue();
       if (val <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // Planar Configuration
@@ -346,7 +344,7 @@ public class BaselineProfile {
     } else {
       int val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // Orientation
@@ -356,7 +354,7 @@ public class BaselineProfile {
     } else {
       int val = metadata.get(id).getFirstNumericValue();
       if (val <= 0 || val > 8)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, val);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
     // Check whether tiles or strips
@@ -426,13 +424,13 @@ public class BaselineProfile {
     id = 273;
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
-      validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+      validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Strip Byte Counts
     id = 279;
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
-      validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+      validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Rows per Strip
     id = 278;
@@ -441,7 +439,7 @@ public class BaselineProfile {
     } else {
       offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
     }
   }
 
@@ -457,32 +455,34 @@ public class BaselineProfile {
     id = 324;
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
-      validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+      validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Tile Byte Counts
     id = 325;
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
-      validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+      validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Tile Width
     id = 322;
     if (!metadata.containsTagId(id))
-      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).name, offset);
+      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName(),
+          offset);
     else {
       offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
     }
 
     // Tile Length
     id = 323;
     if (!metadata.containsTagId(id))
-      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).name, offset);
+      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName(),
+          offset);
     else {
       offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).name, offset);
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
     }
   }
 

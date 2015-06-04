@@ -1,5 +1,5 @@
 /**
- * <h1>TagValue.java</h1> 
+ * <h1>TagValue.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,8 +13,9 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
  * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
@@ -36,10 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Class TagValue contains an array of values.
- *
+ * IFD tag object containing a list of values of a given tag type.
  */
-public class TagValue {
+public class TagValue extends TiffObject {
 
   /** The tag identifier. */
   private int id;
@@ -54,22 +54,13 @@ public class TagValue {
    * Instantiates a new tag value.
    *
    * @param id tag id
-   * @param type tag type
+   * @param type tag type id
    */
   public TagValue(int id, int type) {
     this.id = id;
     this.type = type;
     value = new ArrayList<abstractTiffType>();
   }
-
-  /**
-   * Sets the value list.
-   *
-   * @param value the new list of values
-   */
-  public void setValue(List<abstractTiffType> value) {
-    this.value = value; 
-    }
   
   /**
    * Gets the list of values.
@@ -101,7 +92,7 @@ public class TagValue {
   /**
    * Gets the tag type.
    *
-   * @return the type
+   * @return the type id
    */
   public int getType() {
     return type;
@@ -145,6 +136,15 @@ public class TagValue {
         s += "]";
     }
     return s;
+  }
+
+  /**
+   * Gets the name of the tag.
+   *
+   * @return the name
+   */
+  public String getName() {
+    return TiffTags.getTag(id).getName();
   }
 }
 

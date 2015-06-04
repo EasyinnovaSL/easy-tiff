@@ -1,5 +1,5 @@
 /**
- * <h1>TiffReader.java</h1> 
+ * <h1>TiffReader.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 28/5/2015
  *
@@ -31,14 +32,14 @@
 package com.easyinnova.tiff.reader;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
-import com.easyinnova.tiff.model.IFD;
 import com.easyinnova.tiff.model.TagValue;
-import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.ValidationResult;
 import com.easyinnova.tiff.model.types.Ascii;
 import com.easyinnova.tiff.model.types.Byte;
 import com.easyinnova.tiff.model.types.Double;
 import com.easyinnova.tiff.model.types.Float;
+import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.IccProfile;
 import com.easyinnova.tiff.model.types.Long;
 import com.easyinnova.tiff.model.types.Rational;
@@ -47,7 +48,6 @@ import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
 import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.Short;
-import com.easyinnova.tiff.model.types.SubIFD;
 import com.easyinnova.tiff.model.types.Undefined;
 
 import java.io.IOException;
@@ -57,24 +57,24 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 
 /**
- * The Class TiffReader.
+ * Reads and parses a Tiff file, storing it in an internal model.
  */
 public class TiffReader {
 
   /** The model containing the Tiff data. */
-  TiffObject tiffModel;
+  TiffDocument tiffModel;
 
   /** The filename. */
   String filename;
 
-  /** The object to get data from the file. */
+  /** The stream to get data from the file. */
   TiffStreamIO data;
 
   /** The size in bytes of the tags' values field (=4 for Tiff, =8 for BigTiff). */
   int tagValueSize = 4;
 
   /** The result of the validation. */
-  public ValidationResult validation;
+  ValidationResult validation;
 
   /**
    * Tolerance to duplicate tags.<br>
@@ -95,6 +95,7 @@ public class TiffReader {
   int byteOrderErrorTolerance = 0;
 
   /**
+   * Default constructor.<br>
    * Instantiates a new tiff reader.
    */
   public TiffReader() {
@@ -103,11 +104,11 @@ public class TiffReader {
   }
 
   /**
-   * Gets the model.
+   * Gets the internal model of the Tiff file.
    *
    * @return the model
    */
-  public TiffObject getModel() {
+  public TiffDocument getModel() {
     return tiffModel;
   }
 
@@ -118,6 +119,15 @@ public class TiffReader {
    */
   public String getFilename() {
     return filename;
+  }
+
+  /**
+   * Gets the result of the validation.
+   *
+   * @return the validation result
+   */
+  public ValidationResult getValidation() {
+    return validation;
   }
 
   /**
@@ -136,7 +146,7 @@ public class TiffReader {
         data = new TiffStreamIO(null);
 
         try {
-          tiffModel = new TiffObject();
+          tiffModel = new TiffDocument();
           validation = new ValidationResult();
           data.load(filename);
           readHeader();
@@ -166,15 +176,15 @@ public class TiffReader {
   }
 
   /**
-   * Read header.
-   * 
-   * @throws Exception
+   * Reads the Tiff header.
+   *
+   * @throws Exception parsing error
    */
   private void readHeader() throws Exception {
     boolean correct = true;
     ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
     try {
-      // read the first two bytes, to know the byte ordering
+      // read the first two bytes, in order to know the byte ordering
       if (data.get(0) == 'I' && data.get(1) == 'I')
         byteOrder = ByteOrder.LITTLE_ENDIAN;
       else if (data.get(0) == 'M' && data.get(1) == 'M')
@@ -198,7 +208,7 @@ public class TiffReader {
     }
 
     if (correct) {
-      // set byte ordering
+      // set byte ordering to the stream
       data.order(byteOrder);
 
       try {
@@ -211,9 +221,7 @@ public class TiffReader {
   }
 
   /**
-   * Parses the IFD data.
-   *
-   * @param tiffModel the tiff file
+   * Read the IFDs contained in the Tiff file.
    */
   public void readIFDs() {
     try {
@@ -223,28 +231,24 @@ public class TiffReader {
       IfdReader ifd0 = readIFD(offset0);
       HashSet<Integer> usedOffsets = new HashSet<Integer>();
       usedOffsets.add(offset0);
-      if (ifd0 == null) {
+      if (ifd0.getIfd() == null) {
         validation.addError("Parsing error in first IFD");
       } else {
-        tiffModel.addIfd(ifd0.getIfd());
+        tiffModel.addIfd0(ifd0.getIfd());
 
         IfdReader current_ifd = ifd0;
 
         // Read next IFDs
         while (current_ifd.getNextIfdOffset() > 0) {
-          usedOffsets.add(current_ifd.getNextIfdOffset());
           if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
             // Circular reference
             validation.addError("IFD offset already used");
             break;
           } else {
-            current_ifd = readIFD(current_ifd.getNextIfdOffset());
-            if (current_ifd == null) {
-              validation.addError("Error in IFD " + tiffModel.getIfdCount());
-              break;
-            } else {
-              tiffModel.addIfd(current_ifd.getIfd());
-            }
+            usedOffsets.add(current_ifd.getNextIfdOffset());
+            IfdReader next_ifd = readIFD(current_ifd.getNextIfdOffset());
+            current_ifd.getIfd().setNextIFD(next_ifd.getIfd());
+            current_ifd = next_ifd;
           }
         }
       }
@@ -254,10 +258,10 @@ public class TiffReader {
   }
 
   /**
-   * Reads an ifd.
+   * Parses the image file descriptor data.
    *
-   * @param IFD_idx Position in file
-   * @return the ifd
+   * @param offset the file offset (in bytes) pointing to the IFD
+   * @return the ifd reading result
    */
   IfdReader readIFD(int offset) {
     IFD ifd = new IFD();
@@ -276,7 +280,7 @@ public class TiffReader {
           int tagid = data.getUshort(index);
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
-          TagValue tv = getValue(tagType, tagN, tagid, index + 8);
+          TagValue tv = getValue(tagType, tagN, tagid, index + 8, ifd);
           if (ifd.containsTagId(tagid)) {
             if (duplicateTagTolerance > 0)
               validation.addWarning("Duplicate tag", tagid);
@@ -324,15 +328,16 @@ public class TiffReader {
   }
 
   /**
-   * Gets the value of the tag field.<br>
+   * Gets the value of the given tag field.
    *
    * @param type the tag type
    * @param n the cardinality
    * @param id the tag id
-   * @param beginOffset the position of the tag value
+   * @param beginOffset the offset position of the tag value
+   * @param parentIFD the parent ifd
    * @return the tag value object
    */
-  public TagValue getValue(int type, int n, int id, int beginOffset) {
+  public TagValue getValue(int type, int n, int id, int beginOffset, IFD parentIFD) {
     // Create TagValue object
     TagValue tv = new TagValue(id, type);
 
@@ -415,7 +420,8 @@ public class TiffReader {
           case 13:
             int ifdOffset = data.getInt(offset);
             IfdReader ifd = readIFD(ifdOffset);
-            SubIFD subIfd = new SubIFD(ifd.getIfd());
+            IFD subIfd = ifd.getIfd();
+            subIfd.setParent(parentIFD);
             tv.add(subIfd);
             break;
         }

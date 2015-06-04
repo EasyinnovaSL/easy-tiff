@@ -1,5 +1,5 @@
 /**
- * <h1>TiffReaderWriter.java</h1> 
+ * <h1>TiffReaderWriter.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,25 +13,27 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 18/5/2015
  *
  */
 package com.easyinnova.main;
 
-import com.easyinnova.tiff.model.IFD;
+import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.reader.BaselineProfile;
 import com.easyinnova.tiff.reader.TiffReader;
 import com.easyinnova.tiff.writer.TiffWriter;
@@ -41,7 +43,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * The Class EasyTiff.
+ * The Main Class. <br>
+ * Reads the files specified in the args, processes them and displays the results
  */
 public class TiffReaderWriter {
 
@@ -110,12 +113,15 @@ public class TiffReaderWriter {
   }
 
   /**
-   * @param tiffFile
-   * @param result
+   * Report the results of the reading process to the console.
+   *
+   * @param tiffReader the tiff reader
+   * @param result the result
+   * @param output_file the output_file
    */
   private static void reportResults(TiffReader tiffReader, int result, String output_file) {
     String filename = tiffReader.getFilename();
-    TiffObject to = tiffReader.getModel();
+    TiffDocument to = tiffReader.getModel();
     if (output_file != null) {
       // TODO: Create xml file with report
     } else {
@@ -134,16 +140,18 @@ public class TiffReaderWriter {
           System.out.println("Incorrect magic number");
           break;
         case 0:
-          if (tiffReader.validation.correct) {
+          if (tiffReader.getValidation().correct) {
             // The file is correct
             System.out.println("Everything ok in file '" + filename + "'");
             System.out.println("IFDs: " + to.getIfdCount());
+            System.out.println("SubIFDs: " + to.getSubIfdCount());
+            
             int index = 0;
-            for (IFD ifd : to.getIfds()) {
-              if (ifd != null) {
-                BaselineProfile bp = new BaselineProfile();
-                bp.validateIfd(ifd);
-                System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
+            for (TiffObject o : to.getIfds()) {
+              IFD ifd = (IFD) o;
+              if (ifd !=
+              null) { BaselineProfile bp = new BaselineProfile(); bp.validateIfd(ifd);
+              System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
                 ifd.printTags();
               }
             }
@@ -152,17 +160,20 @@ public class TiffReaderWriter {
             System.out.println("Errors in file '" + filename + "'");
             if (to != null) {
               System.out.println("IFDs: " + to.getIfdCount());
+              System.out.println("SubIFDs: " + to.getSubIfdCount());
+              
               int index = 0;
-              for (IFD ifd : to.getIfds()) {
+              for (TiffObject o : to.getIfds()) {
+                IFD ifd = (IFD) o;
                 BaselineProfile bp = new BaselineProfile();
                 bp.validateIfd(ifd);
                 System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
                 ifd.printTags();
               }
             }
-            tiffReader.validation.printErrors();
+            tiffReader.getValidation().printErrors();
           }
-          tiffReader.validation.printWarnings();
+          tiffReader.getValidation().printWarnings();
           break;
         default:
           System.out.println("Unknown result (" + result + ") in file '" + filename + "'");
