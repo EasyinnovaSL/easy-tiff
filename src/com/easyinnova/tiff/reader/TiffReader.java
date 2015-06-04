@@ -283,7 +283,7 @@ public class TiffReader {
             else
               validation.addError("Duplicate tag", tagid);
           } else {
-            ifd.addMetadata(tv);
+            ifd.addTag(tv);
           }
           try {
           } catch (Exception ex) {
