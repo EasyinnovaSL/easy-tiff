@@ -212,14 +212,15 @@ public class TiffReader {
 
   /**
    * Parses the IFD data.
+   *
+   * @param tiffModel the tiff file
    */
   public void readIFDs() {
     try {
       // The pointer to the first IFD is located in bytes 4-7
       int offset0 = (int) data.getInt(4);
-      int id = 0;
 
-      IfdReader ifd0 = readIFD(offset0, id++);
+      IfdReader ifd0 = readIFD(offset0);
       HashSet<Integer> usedOffsets = new HashSet<Integer>();
       usedOffsets.add(offset0);
       if (ifd0 == null) {
@@ -237,7 +238,7 @@ public class TiffReader {
             validation.addError("IFD offset already used");
             break;
           } else {
-            current_ifd = readIFD(current_ifd.getNextIfdOffset(), id++);
+            current_ifd = readIFD(current_ifd.getNextIfdOffset());
             if (current_ifd == null) {
               validation.addError("Error in IFD " + tiffModel.getIfdCount());
               break;
@@ -258,8 +259,8 @@ public class TiffReader {
    * @param IFD_idx Position in file
    * @return the ifd
    */
-  IfdReader readIFD(int offset, int id) {
-    IFD ifd = new IFD(id);
+  IfdReader readIFD(int offset) {
+    IFD ifd = new IFD();
     int nextIfdOffset = 0;
     try {
       int index = offset;
@@ -267,7 +268,6 @@ public class TiffReader {
       if (directoryEntries < 0) {
         validation.addError("Incorrect number of IFD entries",
             directoryEntries);
-        ifd.correct = false;
       } else {
         index += 2;
 
@@ -277,15 +277,13 @@ public class TiffReader {
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
           TagValue tv = getValue(tagType, tagN, tagid, index + 8);
-          if (ifd.metadata.containsTagId(tagid)) {
+          if (ifd.containsTagId(tagid)) {
             if (duplicateTagTolerance > 0)
               validation.addWarning("Duplicate tag", tagid);
             else
               validation.addError("Duplicate tag", tagid);
           } else {
-            IfdEntry entry = new IfdEntry(tagid, tagType);
-            entry.setValue(tv);
-            ifd.metadata.addTag(entry);
+            ifd.addMetadata(tv);
           }
           try {
           } catch (Exception ex) {
@@ -312,8 +310,9 @@ public class TiffReader {
         }
 
         // Validate ifd entries
-        ifd.validate();
-        validation.add(ifd.validation);
+        BaselineProfile bp = new BaselineProfile();
+        bp.validateIfd(ifd);
+        validation.add(bp.getValidation());
       }
     } catch (Exception ex) {
       ifd = null;
@@ -335,7 +334,7 @@ public class TiffReader {
    */
   public TagValue getValue(int type, int n, int id, int beginOffset) {
     // Create TagValue object
-    TagValue tv = new TagValue();
+    TagValue tv = new TagValue(id, type);
 
     if (type != 7) {
       // Defined tags
@@ -345,6 +344,7 @@ public class TiffReader {
       int typeSize = 1;
       switch (type) {
         case 3:
+        case 7:
         case 8:
           typeSize = 2;
           break;
@@ -414,7 +414,7 @@ public class TiffReader {
             break;
           case 13:
             int ifdOffset = data.getInt(offset);
-            IfdReader ifd = readIFD(ifdOffset, 0);
+            IfdReader ifd = readIFD(ifdOffset);
             SubIFD subIfd = new SubIFD(ifd.getIfd());
             tv.add(subIfd);
             break;
@@ -499,4 +499,5 @@ public class TiffReader {
     return result;
   }
 }
+
 

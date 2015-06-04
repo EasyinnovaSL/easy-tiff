@@ -38,19 +38,13 @@ import java.util.HashMap;
  */
 public class IfdTags {
   /** Tag list. */
-  public ArrayList<TagValue> tags;
+  private ArrayList<TagValue> tags;
 
   /** The Hash tags id. */
-  public HashMap<Integer, TagValue> hashTagsId;
+  private HashMap<Integer, TagValue> hashTagsId;
 
   /** The Hash tags name. */
-  public HashMap<String, TagValue> hashTagsName;
-
-  /**
-   * The tag order tolerance.<br>
-   * 0: No tolerance. 10: Full tolerance (no matter if tags are not in ascending order)
-   * */
-  private int tagOrderTolerance = 10;
+  private HashMap<String, TagValue> hashTagsName;
 
   /**
    * Instantiates a new ifd tags.
@@ -78,53 +72,6 @@ public class IfdTags {
   }
 
   /**
-   * Validates the ifd entries.
-   *
-   * @return the validation result
-   */
-  public ValidationResult validate() {
-    ValidationResult validation = new ValidationResult();
-    int prevTagId = 0;
-    TiffTags.getTiffTags();
-    for (TagValue ie : tags) {
-      if (!TiffTags.tagMap.containsKey(ie.getId()))
-        validation.addError("Undefined tag id " + ie.getId());
-      else if (!TiffTags.tagTypes.containsKey(ie.getType()))
-        validation.addWarning("Unknown tag type " + ie.getType());
-      else {
-        Tag t = TiffTags.getTag(ie.getId());
-        String stype = TiffTags.tagTypes.get(ie.getType());
-        if (!t.validType(stype)) {
-          String stypes = "";
-          for (String tt : t.getType()) {
-            if (stypes.length() > 0)
-              stypes += ",";
-            stypes += tt;
-          }
-          validation.addError("Invalid type for tag " + ie.getId() + "[" + stypes + "]", stype);
-        }
-        try {
-          int card = Integer.parseInt(t.getCardinality());
-          if (card != ie.getCardinality())
-            validation.addError("Cardinality for tag " + ie.getId() + " must be " + card,
-                ie.getCardinality());
-        } catch (Exception e) {
-          // TODO: Deal with formulas?
-        }
-      }
-
-      if (ie.getId() < prevTagId) {
-        if (tagOrderTolerance > 0)
-          validation.addWarning("Tags are not in ascending order");
-        else
-          validation.addError("Tags are not in ascending order");
-      }
-      prevTagId = ie.getId();
-    }
-    return validation;
-  }
-
-  /**
    * Contains tag id.
    *
    * @param id the id
@@ -142,6 +89,15 @@ public class IfdTags {
    */
   public TagValue get(int id) {
     return hashTagsId.get(id);
+  }
+
+  /**
+   * Gets the tags.
+   *
+   * @return the tags
+   */
+  public ArrayList<TagValue> getTags() {
+    return tags;
   }
 }
 
