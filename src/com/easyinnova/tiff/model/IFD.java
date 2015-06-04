@@ -21,10 +21,10 @@
  * NB: for the � statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * � 2015 Easy Innova, SL
+ * © 2015 Easy Innova, SL
  * </p>
  *
- * @author V�ctor Mu�oz Sol�
+ * @author Víctor Muñoz Solà
  * @version 1.0
  * @since 14/5/2015
  *
@@ -73,21 +73,21 @@ public class IFD {
   }
 
   /**
+   * Adds the metadata.
+   *
+   * @param tv the tv
+   */
+  public void addTag(TagValue tv) {
+    metadata.addTag(tv);
+  }
+
+  /**
    * Gets the metadata.
    *
    * @return the metadata
    */
   public IfdTags getMetadata() {
     return metadata;
-  }
-
-  /**
-   * Adds the metadata.
-   *
-   * @param tv the tv
-   */
-  public void addMetadata(TagValue tv) {
-    metadata.addTag(tv);
   }
 
   /**
