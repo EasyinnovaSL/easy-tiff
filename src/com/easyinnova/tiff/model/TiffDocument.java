@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-
 /**
  * Modeling of the TIFF file with methods to access its IFDs and metadata.
  */
@@ -75,7 +74,10 @@ public class TiffDocument {
    * @return the ifd count
    */
   public int getIfdCount() {
-    return getMetadataList("IFD").size();
+    if (metadataContains("IFD"))
+      return getMetadataList("IFD").size();
+    else
+      return 0;
   }
 
   /**
@@ -84,7 +86,10 @@ public class TiffDocument {
    * @return the Subifd count
    */
   public int getSubIfdCount() {
-    return getMetadataList("SubIFDs").size();
+    if (metadataContains("SubIFDs"))
+      return getMetadataList("SubIFDs").size();
+    else
+      return 0;
   }
 
   /**
@@ -102,7 +107,10 @@ public class TiffDocument {
    * @return the ifds list
    */
   public List<TiffObject> getIfds() {
-    return getMetadataList("IFD");
+    if (metadataContains("IFD"))
+      return getMetadataList("IFD");
+    else
+      return new ArrayList<TiffObject>();
   }
 
   /**
@@ -111,7 +119,10 @@ public class TiffDocument {
    * @return the subifds list
    */
   public List<TiffObject> getSubIfds() {
-    return getMetadataList("SubIFDs");
+    if (metadataContains("SubIFDs"))
+      return getMetadataList("SubIFDs");
+    else
+      return new ArrayList<TiffObject>();
   }
 
   /**
@@ -132,7 +143,11 @@ public class TiffDocument {
    * @return image file d
    */
   public IFD getFirstIFD() {
-    return (IFD) getIfds().get(0);
+    List<TiffObject> l = getIfds();
+    if (l.size() > 0)
+      return (IFD) l.get(0);
+    else
+      return null;
   }
 
   /**
@@ -166,6 +181,18 @@ public class TiffDocument {
       return dictionary.get(name).get(0).toString();
     else
       return "";
+  }
+
+  /**
+   * Metadata contains.
+   *
+   * @param name the name
+   * @return true, if successful
+   */
+  public boolean metadataContains(String name) {
+    if (dictionary == null)
+      createMetadataDictionary();
+    return dictionary.containsKey(name);
   }
 
   /**

@@ -114,22 +114,22 @@ public class TiffWriter {
    */
   public int writeMetadata(IfdTags metadata) {
     ArrayList<TagValue> tags = metadata.getTags();
-    int offset = data.position();
+    // int offset = data.position();
     for (TagValue tag : tags) {
       if (tag.getId() == 273) {
         writeStripData(metadata);
       } else if (tag.getId() == 279) {
         // Nothing to do here, writeStripData does everything
       } else {
-        int size = writeTag(tag);
+        // int size = writeTag(tag);
         // tag.setIntValue(offset);
-        offset += size;
+        // offset += size;
       }
     }
     data.putShort((short) tags.size());
-    for (TagValue tag : tags) {
+    // for (TagValue tag : tags) {
       // tag.write(data);
-    }
+    // }
     return data.position();
   }
 
@@ -151,14 +151,14 @@ public class TiffWriter {
         data.put((byte) v);
       }
     }
-    int offsetStripOffsets = data.position();
-    for (int i = 0; i < stripOffsets2.size(); i++) {
-      data.putInt(stripOffsets2.get(i));
-    }
-    int offsetStripSizes = data.position();
-    for (int i = 0; i < stripSizes2.size(); i++) {
-      data.putInt(stripOffsets2.get(i));
-    }
+    // int offsetStripOffsets = data.position();
+    // for (int i = 0; i < stripOffsets2.size(); i++) {
+    // data.putInt(stripOffsets2.get(i));
+    // }
+    // int offsetStripSizes = data.position();
+    // for (int i = 0; i < stripSizes2.size(); i++) {
+    // data.putInt(stripOffsets2.get(i));
+    // }
     // metadata.hashTagsId.get(273).setIntValue(offsetStripOffsets);
     // metadata.hashTagsId.get(279).setIntValue(offsetStripSizes);
   }

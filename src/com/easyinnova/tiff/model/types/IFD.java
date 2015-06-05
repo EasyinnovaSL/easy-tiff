@@ -32,8 +32,12 @@
 package com.easyinnova.tiff.model.types;
 
 import com.easyinnova.tiff.model.IfdTags;
+import com.easyinnova.tiff.model.ImageStrips;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffTags;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The Class SubIFD.
@@ -49,6 +53,24 @@ public class IFD extends abstractTiffType {
   /** Pointer to the parent ifd. */
   private IFD parentIFD;
 
+  /** The image representation. */
+  private ImageRepresentation imageRepresentation;
+
+  /** The image strips. */
+  private ImageStrips imageStrips;
+
+  /**
+   * The Enum ImageRepresentation.
+   */
+  public enum ImageRepresentation {
+    /** The image is stored in strips. */
+    STRIPS,
+    /** The image is stored in tiles. */
+    TILES,
+    /** Undefined. */
+    UNDEFINED
+  }
+
   /**
    * Instantiates a new long.
    */
@@ -56,6 +78,7 @@ public class IFD extends abstractTiffType {
     super();
     metadata = new IfdTags();
     nextIFD = null;
+    imageRepresentation = ImageRepresentation.UNDEFINED;
   }
 
   /**
@@ -95,6 +118,21 @@ public class IFD extends abstractTiffType {
   }
 
   /**
+   * Gets sub ifds.
+   *
+   * @return the subifd list.
+   */
+  public List<IFD> getSubIFD() {
+    List<IFD> l = new ArrayList<IFD>();
+    if (hasSubIFD()) {
+      for (abstractTiffType o : metadata.get(13).getValue()) {
+        l.add((IFD) o);
+      }
+    }
+    return l;
+  }
+
+  /**
    * Sets the next ifd.
    *
    * @param ifd the new next ifd
@@ -120,7 +158,10 @@ public class IFD extends abstractTiffType {
    */
   public TagValue getTag(String name) {
     int id = TiffTags.getTagId(name);
-    return metadata.get(id);
+    if (metadata.containsTagId(id))
+      return metadata.get(id);
+    else
+      return null;
   }
 
   /**
@@ -181,6 +222,42 @@ public class IFD extends abstractTiffType {
    */
   public IFD getNextIFD() {
     return nextIFD;
+  }
+
+  /**
+   * Gets the image representation.
+   *
+   * @return the image representation
+   */
+  public ImageRepresentation getImageRepresentation() {
+    return imageRepresentation;
+  }
+
+  /**
+   * Gets the image in strips.
+   *
+   * @return the image strips object
+   */
+  public ImageStrips getImageStrips() {
+    return imageStrips;
+  }
+
+  /**
+   * Sets the image representation.
+   *
+   * @param imageRepresentation the new image representation
+   */
+  public void setImageRepresentation(ImageRepresentation imageRepresentation) {
+    this.imageRepresentation = imageRepresentation;
+  }
+
+  /**
+   * Sets the image strips.
+   *
+   * @param strips the new image strips
+   */
+  public void setImageStrips(ImageStrips strips) {
+    this.imageStrips = strips;
   }
 }
 

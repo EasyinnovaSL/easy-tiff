@@ -125,14 +125,14 @@ public class TagValue extends TiffObject {
     String s = "";
     if (type != 1) {
       int n = value.size();
-      if (n > 1)
+      if (n > 1 && type != 2)
         s += "[";
       for (int i = 0; i < n; i++) {
         s += value.get(i).toString();
         if (n > 1 && i + 1 < n && type != 2)
           s += ",";
       }
-      if (n > 1)
+      if (n > 1 && type != 2)
         s += "]";
     }
     return s;

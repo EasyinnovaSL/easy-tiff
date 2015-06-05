@@ -36,9 +36,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.easyinnova.tiff.model.ImageStrips;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.types.IFD;
+import com.easyinnova.tiff.model.types.IFD.ImageRepresentation;
 import com.easyinnova.tiff.reader.TiffReader;
 
 /**
@@ -70,10 +72,10 @@ public class TiffReaderTest {
   }
 
   /**
-   * Tests.
+   * Test 1.
    */
   @Test
-  public void test() {
+  public void Test1() {
     // Image 1
     result = tr.readFile("src\\test\\resources\\Small\\Grey_stripped.tif");
     assertEquals(0, result);
@@ -101,6 +103,15 @@ public class TiffReaderTest {
     tv = ifd.getTag("PlanarConfiguration");
     assertEquals(1, tv.getCardinality());
     assertEquals(1, tv.getFirstNumericValue());
+
+    assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
+    ImageStrips ims = ifd.getImageStrips();
+    int rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
+    int nrows = 0;
+    for (int i = 0; i < ims.getStrips().size(); i++) {
+      nrows += ims.getStrips().get(i).getLength() / rowLength;
+    }
+    assertEquals(nrows, ifd.getTag("ImageLength").getFirstNumericValue());
   }
 
   /**
@@ -143,6 +154,56 @@ public class TiffReaderTest {
     tv = ifd.getTag("PlanarConfiguration");
     assertEquals(1, tv.getCardinality());
     assertEquals(2, tv.getFirstNumericValue());
+  }
+
+  /**
+   * Test3.
+   */
+  @Test
+  public void Test3() {
+    // Image 3
+    result = tr.readFile("src\\test\\resources\\Small\\Bilevel.tif");
+    assertEquals(0, result);
+    assertEquals(true, tr.getValidation().correct);
+    to = tr.getModel();
+    assertEquals(1, to.getIfdCount());
+    ifd = (IFD) to.getFirstIFD();
+
+    assertEquals(0, to.getSubIfdCount());
+    assertEquals(1, to.getIfdAndSubIfdCount());
+    assertEquals(1, to.getIfdsAndSubIfds().size());
+
+    assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
+    ImageStrips ims = ifd.getImageStrips();
+    assertEquals(662, ims.getRowsPerStrip());
+    int rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
+    int nrows = 0;
+    for (int i = 0; i < ims.getStrips().size(); i++) {
+      nrows += ims.getStrips().get(i).getLength() / rowLength;
+    }
+    assertEquals(nrows, ifd.getTag("ImageLength").getFirstNumericValue());
+  }
+
+  /**
+   * Test4.
+   */
+  @Test
+  public void Test4() {
+    // Image 3
+    result = tr.readFile("src\\test\\resources\\Small\\Indexed.tif");
+    assertEquals(0, result);
+    assertEquals(true, tr.getValidation().correct);
+    to = tr.getModel();
+    assertEquals(1, to.getIfdCount());
+    ifd = (IFD) to.getFirstIFD();
+
+    assertEquals(8, ifd.getTag("BitsPerSample").getFirstNumericValue());
+    assertEquals(3 * (int) Math.pow(2, 8), ifd.getTag("ColorMap").getCardinality());
+
+    assertEquals(1, to.getMetadataList("BitsPerSample").size());
+    assertEquals("8", to.getMetadataSingleString("BitsPerSample"));
+    assertEquals(999, Integer.parseInt(to.getMetadataSingleString("ImageWidth")));
+    assertEquals("NIKON D7000", to.getMetadataSingleString("Model"));
   }
 }
 

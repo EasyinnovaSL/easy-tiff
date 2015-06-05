@@ -31,7 +31,14 @@
  */
 package com.easyinnova.tiff.reader;
 
+import com.easyinnova.tiff.model.ImageStrips;
+import com.easyinnova.tiff.model.Strip;
+import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.types.IFD;
+import com.easyinnova.tiff.model.types.IFD.ImageRepresentation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The object to store the result of an ifd parsing.
@@ -78,6 +85,55 @@ public class IfdReader {
    */
   public void setNextIfdOffset(int offset) {
     nextIfdOffset = offset;
+  }
+
+  /**
+   * Read image.
+   */
+  public void readImage() {
+    ImageRepresentation imageRepresentation = ImageRepresentation.UNDEFINED;
+    if (ifd.containsTagId(TiffTags.getTagId("StripOffsets"))
+        && ifd.containsTagId(TiffTags.getTagId("StripBYTECount"))) {
+      imageRepresentation = ImageRepresentation.STRIPS;
+      readStrips();
+    } else if (ifd.containsTagId(TiffTags.getTagId("TileOffsets"))
+        && ifd.containsTagId(TiffTags.getTagId("TileBYTECount"))) {
+      imageRepresentation = ImageRepresentation.TILES;
+      readTiles();
+    }
+    ifd.setImageRepresentation(imageRepresentation);
+  }
+
+  /**
+   * Read tiles.
+   */
+  private void readTiles() {
+    // TODO Auto-generated method stub
+
+  }
+
+  /**
+   * Read strips.
+   */
+  private void readStrips() {
+    ImageStrips imageStrips = new ImageStrips();
+    List<Strip> strips = new ArrayList<Strip>();
+    int rowLength =
+        ifd.getTag("StripBYTECount").getFirstNumericValue()
+            / ifd.getTag("RowsPerStrip").getFirstNumericValue();
+    for (int i = 0; i < ifd.getTag("StripOffsets").getValue().size(); i++) {
+      int so = ifd.getTag("StripOffsets").getValue().get(i).toInt();
+      int sbc = ifd.getTag("StripBYTECount").getValue().get(i).toInt();
+      Strip strip = new Strip();
+      strip.setOffset(so);
+      strip.setLength(sbc);
+      strip.setStripRows(sbc / rowLength);
+      strips.add(strip);
+    }
+    imageStrips.setStrips(strips);
+    imageStrips.setRowsPerStrip(ifd.getTag("RowsPerStrip").getFirstNumericValue());
+
+    ifd.setImageStrips(imageStrips);
   }
 }
 

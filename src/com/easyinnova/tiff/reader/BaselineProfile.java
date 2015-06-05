@@ -244,9 +244,9 @@ public class BaselineProfile {
     if (!metadata.containsTagId(320)) {
       validation.addError("Missing Color Map");
     } else {
-      int colormap = metadata.get(320).getFirstNumericValue();
-      if (colormap <= 0)
-        validation.addError("Color Map", colormap);
+      int n = metadata.get(320).getCardinality();
+      if (n != 3 * (int) Math.pow(2, metadata.get(258).getFirstNumericValue()))
+        validation.addError("Color Map Cardinality", metadata.get(320).getCardinality());
     }
 
     // Bits per Sample

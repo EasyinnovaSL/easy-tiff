@@ -101,7 +101,6 @@ public class TiffTags {
    * @return the singleton instance
    */
   public static synchronized TiffTags getTiffTags() {
-
     if (instance == null) {
       instance = new TiffTags();
     }
@@ -130,6 +129,10 @@ public class TiffTags {
    * @return the tag id
    */
   public static int getTagId(String name) {
+    if (instance == null)
+      getTiffTags();
+    if (!tagNames.containsKey(name))
+      return -1;
     return tagNames.get(name).getId();
   }
 }
