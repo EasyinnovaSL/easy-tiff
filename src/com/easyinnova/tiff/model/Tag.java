@@ -64,6 +64,9 @@ public class Tag {
   /** The source. */
   private String source = "";
   
+  /** The typedef. */
+  private String typedef = null;
+
   /** The created. */
   private Date created;
   
@@ -251,6 +254,15 @@ public class Tag {
   }
 
   /**
+   * Gets the typedef.
+   *
+   * @return the typedef
+   */
+  public String getTypedef() {
+    return typedef;
+  }
+
+  /**
    * Instantiates a new tag.
    *
    * @param id the id
@@ -258,10 +270,9 @@ public class Tag {
    * @param type the type
    * @param cardinality the cardinality
    * @param defaultValue the default value
-
+   * @param typedef the typedef
    */
-  public Tag(int id, String name, List<String>  type, String cardinality, String defaultValue) {
-    
+  public Tag(int id, String name, List<String>  type, String cardinality, String defaultValue, String typedef) {
     this.id = id;
     this.name = name;
     this.type = type;
@@ -274,7 +285,7 @@ public class Tag {
     Date date = new Date();
     this.created = date;
     this.modified= date;
-  
+    this.typedef = typedef;
   }
 
   /**
@@ -290,5 +301,14 @@ public class Tag {
     if (type == "LONG" && type.contains("UNDEFINED"))
       valid = true;
     return valid;
+  }
+
+  /**
+   * Checks for typedef.
+   *
+   * @return true, if successful
+   */
+  public boolean hasTypedef() {
+    return typedef != null;
   }
 }

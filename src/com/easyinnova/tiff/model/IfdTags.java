@@ -100,5 +100,10 @@ public class IfdTags {
   public ArrayList<TagValue> getTags() {
     return tags;
   }
+
+  @Override
+  public String toString() {
+    return hashTagsName.toString();
+  }
 }
 

@@ -123,7 +123,10 @@ public class TagValue extends TiffObject {
    */
   public String toString() {
     String s = "";
-    if (type != 1) {
+    boolean defined = TiffTags.hasTag(id) && TiffTags.getTag(id).hasTypedef();
+    if (defined) {
+      s = value.get(0).toString();
+    } else if (type != 1) {
       int n = value.size();
       if (n > 1 && type != 2)
         s += "[";
@@ -145,6 +148,30 @@ public class TagValue extends TiffObject {
    */
   public String getName() {
     return TiffTags.getTag(id).getName();
+  }
+
+  /**
+   * Gets the bytes.
+   *
+   * @param i the i
+   * @param j the j
+   * @return the bytes
+   */
+  public int getBytes(int i, int j) {
+    int result = 0;
+    for (int k = i; k < i + j; k++) {
+      result += value.get(k).toInt();
+      if (k + 1 < i + j)
+        result <<= 8;
+    }
+    return result;
+  }
+
+  /**
+   * Clears the list of values.
+   */
+  public void clear() {
+    value.clear();
   }
 }
 

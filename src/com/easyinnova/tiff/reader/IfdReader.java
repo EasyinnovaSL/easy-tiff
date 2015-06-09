@@ -32,8 +32,10 @@
 package com.easyinnova.tiff.reader;
 
 import com.easyinnova.tiff.model.ImageStrips;
+import com.easyinnova.tiff.model.ImageTiles;
 import com.easyinnova.tiff.model.Strip;
 import com.easyinnova.tiff.model.TiffTags;
+import com.easyinnova.tiff.model.Tile;
 import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.IFD.ImageRepresentation;
 
@@ -97,7 +99,7 @@ public class IfdReader {
       imageRepresentation = ImageRepresentation.STRIPS;
       readStrips();
     } else if (ifd.containsTagId(TiffTags.getTagId("TileOffsets"))
-        && ifd.containsTagId(TiffTags.getTagId("TileBYTECount"))) {
+        && ifd.containsTagId(TiffTags.getTagId("TileBYTECounts"))) {
       imageRepresentation = ImageRepresentation.TILES;
       readTiles();
     }
@@ -108,8 +110,43 @@ public class IfdReader {
    * Read tiles.
    */
   private void readTiles() {
-    // TODO Auto-generated method stub
+    ImageTiles imageTiles = new ImageTiles();
+    List<Tile> tiles = new ArrayList<Tile>();
+    int totalWidth = ifd.getTag("ImageWidth").getFirstNumericValue();
+    int totalLength = ifd.getTag("ImageLength").getFirstNumericValue();
+    int tilesWidth = ifd.getTag("TileWidth").getFirstNumericValue();
+    int tilesHeight = ifd.getTag("TileLength").getFirstNumericValue();
+    int actualWidth = 0;
+    int actualHeight = tilesHeight;
+    for (int i = 0; i < ifd.getTag("TileOffsets").getValue().size(); i++) {
+      int to = ifd.getTag("TileOffsets").getValue().get(i).toInt();
+      Tile tile = new Tile();
+      tile.setOffset(to);
+      tile.setWidth(tilesWidth);
+      tile.setHeight(tilesHeight);
+      int padX = 0;
+      int padY = 0;
+      boolean newLine = false;
+      actualWidth += tilesWidth;
+      if (actualWidth > totalWidth) {
+        padX = tilesWidth - actualWidth % totalWidth;
+        newLine = true;
+      }
+      if (actualHeight > totalLength) {
+        padY = tilesHeight - actualHeight % totalLength;
+      }
+      tile.setPadding(padX, padY);
+      if (newLine) {
+        actualHeight += tilesHeight;
+        actualWidth = 0;
+      }
+      tiles.add(tile);
+    }
+    imageTiles.setTiles(tiles);
 
+    imageTiles.setTileHeight(tilesHeight);
+    imageTiles.setTileWidth(tilesWidth);
+    ifd.setImageTiles(imageTiles);
   }
 
   /**

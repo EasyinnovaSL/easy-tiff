@@ -135,4 +135,14 @@ public class TiffTags {
       return -1;
     return tagNames.get(name).getId();
   }
+
+  /**
+   * Checks for tag.
+   *
+   * @param id the id
+   * @return true, if successful
+   */
+  public static boolean hasTag(int id) {
+    return tagMap.containsKey(id);
+  }
 }

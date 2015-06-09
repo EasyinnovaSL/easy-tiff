@@ -61,7 +61,7 @@ public class SRational extends abstractTiffType {
    * @return the numerator
    */
   public int getNumerator() {
-    return numerator.getIntValue();
+    return numerator.toInt();
   }
 
   /**
@@ -79,7 +79,7 @@ public class SRational extends abstractTiffType {
    * @return the denominator
    */
   public int getDenominator() {
-    return denominator.getIntValue();
+    return denominator.toInt();
   }
 
   /**

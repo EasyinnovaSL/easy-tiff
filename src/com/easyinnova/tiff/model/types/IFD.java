@@ -33,6 +33,7 @@ package com.easyinnova.tiff.model.types;
 
 import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.ImageStrips;
+import com.easyinnova.tiff.model.ImageTiles;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffTags;
 
@@ -59,6 +60,12 @@ public class IFD extends abstractTiffType {
   /** The image strips. */
   private ImageStrips imageStrips;
 
+  /** The image tiles. */
+  private ImageTiles imageTiles;
+
+  /** The is image. */
+  private boolean isImage;
+
   /**
    * The Enum ImageRepresentation.
    */
@@ -73,12 +80,15 @@ public class IFD extends abstractTiffType {
 
   /**
    * Instantiates a new long.
+   *
+   * @param isImage the is image
    */
-  public IFD() {
+  public IFD(boolean isImage) {
     super();
     metadata = new IfdTags();
     nextIFD = null;
     imageRepresentation = ImageRepresentation.UNDEFINED;
+    this.isImage = isImage;
   }
 
   /**
@@ -212,7 +222,9 @@ public class IFD extends abstractTiffType {
   public String toString() {
     if (this.hasParent())
       return "SubIFD";
-    return "IFD";
+    if (isImage)
+      return "IFD";
+    return metadata.toString();
   }
 
   /**
@@ -243,6 +255,15 @@ public class IFD extends abstractTiffType {
   }
 
   /**
+   * Gets the image tiles.
+   *
+   * @return the image tiles
+   */
+  public ImageTiles getImageTiles() {
+    return imageTiles;
+  }
+
+  /**
    * Sets the image representation.
    *
    * @param imageRepresentation the new image representation
@@ -258,6 +279,24 @@ public class IFD extends abstractTiffType {
    */
   public void setImageStrips(ImageStrips strips) {
     this.imageStrips = strips;
+  }
+
+  /**
+   * Sets the image tiles.
+   *
+   * @param imageTiles the new image tiles
+   */
+  public void setImageTiles(ImageTiles imageTiles) {
+    this.imageTiles = imageTiles;
+  }
+
+  /**
+   * Sets the checks if is image.
+   *
+   * @param b the new checks if is image
+   */
+  public void setIsImage(boolean b) {
+    isImage = b;
   }
 }
 

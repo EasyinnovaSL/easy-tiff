@@ -6,6 +6,7 @@
   ],
   "cardinality": "N",
   "defaultValue": "",
+  "typedef": "IccProfile",
   "ifd": "",
   "description": "",
   "source": "",

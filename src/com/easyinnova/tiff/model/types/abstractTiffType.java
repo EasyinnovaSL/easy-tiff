@@ -31,6 +31,7 @@
  */
 package com.easyinnova.tiff.model.types;
 
+import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffObject;
 
 /**
@@ -74,5 +75,33 @@ public class abstractTiffType extends TiffObject {
    */
   public int toInt() throws NumberFormatException {
     return Integer.parseInt(this.toString());
+  }
+
+  /**
+   * Read.
+   *
+   * @param tv the tv
+   */
+  public void read(TagValue tv) {
+  }
+
+  /**
+   * Checks if is ifd.
+   *
+   * @return true, if is ifd
+   */
+  public boolean isIFD() {
+    return false;
+  }
+
+  /**
+   * To uint.
+   *
+   * @return the char
+   */
+  public int toUint() {
+    if (toInt() < 0)
+      return toInt() + 256;
+    return toInt();
   }
 }

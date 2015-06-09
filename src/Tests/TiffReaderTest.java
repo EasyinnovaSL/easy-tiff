@@ -39,6 +39,7 @@ import org.junit.Test;
 import com.easyinnova.tiff.model.ImageStrips;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
+import com.easyinnova.tiff.model.Tile;
 import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.IFD.ImageRepresentation;
 import com.easyinnova.tiff.reader.TiffReader;
@@ -154,6 +155,20 @@ public class TiffReaderTest {
     tv = ifd.getTag("PlanarConfiguration");
     assertEquals(1, tv.getCardinality());
     assertEquals(2, tv.getFirstNumericValue());
+
+    assertEquals(ImageRepresentation.TILES, ifd.getImageRepresentation());
+    int tw = ifd.getImageTiles().getTileWidth();
+    int th = ifd.getImageTiles().getTileHeight();
+    assertEquals(256, tw);
+    assertEquals(256, th);
+    for (Tile t : ifd.getImageTiles().getTiles()) {
+      assertEquals(256, t.getWidth());
+      assertEquals(256, t.getHeight());
+    }
+    int ta = (ifd.getTag("ImageWidth").getFirstNumericValue() + tw - 1) / tw;
+    int td = (ifd.getTag("ImageLength").getFirstNumericValue() + th - 1) / tw;
+    assertEquals(ifd.getImageTiles().getTiles().size(), ta * td
+        * ifd.getTag("SamplesPerPixel").getFirstNumericValue());
   }
 
   /**
