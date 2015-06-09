@@ -93,7 +93,7 @@ public class TiffFileInputStreamTest {
   @Test
   public void ReadAscii() throws IOException {
     
-    TiffInputStream asci = new TiffInputStream(new File("src/test/resources/io/ascii.hex"));
+    TiffInputStream asci = new TiffInputStream(new File("src/test/resources/io/asciiTest.hex"));
     assertEquals("A",asci.readAscii().toString());
     assertEquals("s",asci.readAscii().toString());
     assertEquals("c",asci.readAscii().toString());
