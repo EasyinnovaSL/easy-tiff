@@ -93,6 +93,16 @@ public class ValidationResult {
    * Adds an error.
    *
    * @param desc Error description
+   * @param value the integer value that caused the error
+   */
+  public void addError(String desc, long value) {
+    iaddError(desc, "" + value);
+  }
+
+  /**
+   * Adds an error.
+   *
+   * @param desc Error description
    * @param value the float value that caused the error
    */
   public void addError(String desc, float value) {
@@ -135,6 +145,16 @@ public class ValidationResult {
    */
   public void addWarning(String desc, String value) {
     iaddWarning(desc, value);
+  }
+
+  /**
+   * Adds an warning.
+   *
+   * @param desc Warning description
+   * @param value the integer value that caused the warning
+   */
+  public void addWarning(String desc, long value) {
+    iaddWarning(desc, "" + value);
   }
 
   /**

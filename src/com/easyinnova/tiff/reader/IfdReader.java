@@ -112,20 +112,20 @@ public class IfdReader {
   private void readTiles() {
     ImageTiles imageTiles = new ImageTiles();
     List<Tile> tiles = new ArrayList<Tile>();
-    int totalWidth = ifd.getTag("ImageWidth").getFirstNumericValue();
-    int totalLength = ifd.getTag("ImageLength").getFirstNumericValue();
-    int tilesWidth = ifd.getTag("TileWidth").getFirstNumericValue();
-    int tilesHeight = ifd.getTag("TileLength").getFirstNumericValue();
+    long totalWidth = ifd.getTag("ImageWidth").getFirstNumericValue();
+    long totalLength = ifd.getTag("ImageLength").getFirstNumericValue();
+    long tilesWidth = ifd.getTag("TileWidth").getFirstNumericValue();
+    long tilesHeight = ifd.getTag("TileLength").getFirstNumericValue();
     int actualWidth = 0;
-    int actualHeight = tilesHeight;
+    long actualHeight = tilesHeight;
     for (int i = 0; i < ifd.getTag("TileOffsets").getValue().size(); i++) {
       int to = ifd.getTag("TileOffsets").getValue().get(i).toInt();
       Tile tile = new Tile();
       tile.setOffset(to);
-      tile.setWidth(tilesWidth);
-      tile.setHeight(tilesHeight);
-      int padX = 0;
-      int padY = 0;
+      tile.setWidth((int) tilesWidth);
+      tile.setHeight((int) tilesHeight);
+      long padX = 0;
+      long padY = 0;
       boolean newLine = false;
       actualWidth += tilesWidth;
       if (actualWidth > totalWidth) {
@@ -135,7 +135,7 @@ public class IfdReader {
       if (actualHeight > totalLength) {
         padY = tilesHeight - actualHeight % totalLength;
       }
-      tile.setPadding(padX, padY);
+      tile.setPadding((int) padX, (int) padY);
       if (newLine) {
         actualHeight += tilesHeight;
         actualWidth = 0;
@@ -144,8 +144,8 @@ public class IfdReader {
     }
     imageTiles.setTiles(tiles);
 
-    imageTiles.setTileHeight(tilesHeight);
-    imageTiles.setTileWidth(tilesWidth);
+    imageTiles.setTileHeight((int) tilesHeight);
+    imageTiles.setTileWidth((int) tilesWidth);
     ifd.setImageTiles(imageTiles);
   }
 
@@ -155,16 +155,18 @@ public class IfdReader {
   private void readStrips() {
     ImageStrips imageStrips = new ImageStrips();
     List<Strip> strips = new ArrayList<Strip>();
-    int rowLength =
+    long rowLength =
         ifd.getTag("StripBYTECount").getFirstNumericValue()
             / ifd.getTag("RowsPerStrip").getFirstNumericValue();
+    if (rowLength == 0)
+      rowLength = 1;
     for (int i = 0; i < ifd.getTag("StripOffsets").getValue().size(); i++) {
       int so = ifd.getTag("StripOffsets").getValue().get(i).toInt();
       int sbc = ifd.getTag("StripBYTECount").getValue().get(i).toInt();
       Strip strip = new Strip();
       strip.setOffset(so);
       strip.setLength(sbc);
-      strip.setStripRows(sbc / rowLength);
+      strip.setStripRows((int) (sbc / rowLength));
       strips.add(strip);
     }
     imageStrips.setStrips(strips);

@@ -46,7 +46,7 @@ import java.util.List;
 public class IFD extends abstractTiffType {
 
   /** The tags. */
-  private IfdTags metadata;
+  private IfdTags tags;
 
   /** The next ifd. */
   private IFD nextIFD;
@@ -85,7 +85,7 @@ public class IFD extends abstractTiffType {
    */
   public IFD(boolean isImage) {
     super();
-    metadata = new IfdTags();
+    tags = new IfdTags();
     nextIFD = null;
     imageRepresentation = ImageRepresentation.UNDEFINED;
     this.isImage = isImage;
@@ -124,7 +124,7 @@ public class IFD extends abstractTiffType {
    * @return true, if successful
    */
   public boolean hasSubIFD() {
-    return metadata.containsTagId(13);
+    return tags.containsTagId(13);
   }
 
   /**
@@ -135,7 +135,7 @@ public class IFD extends abstractTiffType {
   public List<IFD> getSubIFD() {
     List<IFD> l = new ArrayList<IFD>();
     if (hasSubIFD()) {
-      for (abstractTiffType o : metadata.get(13).getValue()) {
+      for (abstractTiffType o : tags.get(13).getValue()) {
         l.add((IFD) o);
       }
     }
@@ -168,8 +168,8 @@ public class IFD extends abstractTiffType {
    */
   public TagValue getTag(String name) {
     int id = TiffTags.getTagId(name);
-    if (metadata.containsTagId(id))
-      return metadata.get(id);
+    if (tags.containsTagId(id))
+      return tags.get(id);
     else
       return null;
   }
@@ -180,7 +180,7 @@ public class IFD extends abstractTiffType {
    * @param tv the tv
    */
   public void addTag(TagValue tv) {
-    metadata.addTag(tv);
+    tags.addTag(tv);
   }
 
   /**
@@ -189,7 +189,7 @@ public class IFD extends abstractTiffType {
    * @return the metadata
    */
   public IfdTags getMetadata() {
-    return metadata;
+    return tags;
   }
 
   /**
@@ -199,14 +199,14 @@ public class IFD extends abstractTiffType {
    * @return true, if successful
    */
   public boolean containsTagId(int tagid) {
-    return metadata.containsTagId(tagid);
+    return tags.containsTagId(tagid);
   }
 
   /**
    * Prints the tags.
    */
   public void printTags() {
-    for (TagValue ie : metadata.getTags()) {
+    for (TagValue ie : tags.getTags()) {
       try {
         String name = TiffTags.getTag(ie.getId()).getName();
         String val = ie.toString();
@@ -224,7 +224,7 @@ public class IFD extends abstractTiffType {
       return "SubIFD";
     if (isImage)
       return "IFD";
-    return metadata.toString();
+    return tags.toString();
   }
 
   /**

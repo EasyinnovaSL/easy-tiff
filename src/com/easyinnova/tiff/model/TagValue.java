@@ -112,8 +112,8 @@ public class TagValue extends TiffObject {
    *
    * @return the first integer value
    */
-  public int getFirstNumericValue() {
-    return Integer.parseInt(value.get(0).toString());
+  public long getFirstNumericValue() {
+    return Long.parseLong(value.get(0).toString());
   }
 
   /**
@@ -147,7 +147,10 @@ public class TagValue extends TiffObject {
    * @return the name
    */
   public String getName() {
-    return TiffTags.getTag(id).getName();
+    if (TiffTags.hasTag(id))
+      return TiffTags.getTag(id).getName();
+    else
+      return "" + id;
   }
 
   /**

@@ -49,14 +49,14 @@ public class TiffDocument {
   private IFD firstIFD;
 
   /** The metadata. */
-  private HashMap<String, List<TiffObject>> dictionary;
+  private HashMap<String, List<TiffObject>> metadata;
 
   /**
    * Instantiates a new tiff file.
    */
   public TiffDocument() {
     firstIFD = null;
-    dictionary = null;
+    metadata = null;
   }
 
   /**
@@ -175,10 +175,10 @@ public class TiffDocument {
    * @return the metadata single string
    */
   public String getMetadataSingleString(String name) {
-    if (dictionary == null)
+    if (metadata == null)
       createMetadataDictionary();
-    if (dictionary.containsKey(name))
-      return dictionary.get(name).get(0).toString();
+    if (metadata.containsKey(name))
+      return metadata.get(name).get(0).toString();
     else
       return "";
   }
@@ -190,9 +190,9 @@ public class TiffDocument {
    * @return true, if successful
    */
   public boolean metadataContains(String name) {
-    if (dictionary == null)
+    if (metadata == null)
       createMetadataDictionary();
-    return dictionary.containsKey(name);
+    return metadata.containsKey(name);
   }
 
   /**
@@ -202,10 +202,10 @@ public class TiffDocument {
    * @return the list of metadata that matches with the class name
    */
   public List<TiffObject> getMetadataList(String name) {
-    if (dictionary == null)
+    if (metadata == null)
       createMetadataDictionary();
-    if (dictionary.containsKey(name))
-      return dictionary.get(name);
+    if (metadata.containsKey(name))
+      return metadata.get(name);
     else
       return new ArrayList<TiffObject>();
   }
@@ -214,21 +214,31 @@ public class TiffDocument {
    * Creates the metadata dictionary.
    */
   private void createMetadataDictionary() {
-    dictionary = new HashMap<String, List<TiffObject>>();
-    String key = "IFD";
+    metadata = new HashMap<String, List<TiffObject>>();
     if (firstIFD != null) {
-      addMetadata(key, firstIFD);
-      for (TagValue tag : firstIFD.getMetadata().getTags()) {
-        addMetadata(tag.getName(), tag);
-      }
-      IFD currentIFD = firstIFD;
-      while (currentIFD.hasNextIFD()) {
-        addMetadata(key, currentIFD);
-        for (TagValue tag : currentIFD.getMetadata().getTags()) {
+      addMetadataFromIFD(firstIFD, "IFD");
+    }
+  }
+
+  /**
+   * Adds the metadata from ifd.
+   *
+   * @param ifd the ifd
+   * @param key the key
+   */
+  private void addMetadataFromIFD(IFD ifd, String key) {
+    addMetadata(key, ifd);
+    for (TagValue tag : ifd.getMetadata().getTags()) {
+      for (int i = 0; i < tag.getCardinality(); i++) {
+        if (tag.getValue().get(i).isIFD()) {
+          addMetadataFromIFD((IFD) tag.getValue().get(i), key);
+        } else {
           addMetadata(tag.getName(), tag);
         }
-        currentIFD = currentIFD.getNextIFD();
       }
+    }
+    if (ifd.hasNextIFD()) {
+      addMetadataFromIFD(ifd.getNextIFD(), key);
     }
   }
 
@@ -239,8 +249,20 @@ public class TiffDocument {
    * @param data the data
    */
   private void addMetadata(String key, TiffObject data) {
-    if (!dictionary.containsKey(key))
-      dictionary.put(key, new ArrayList<TiffObject>());
-    dictionary.get(key).add(data);
+    if (!metadata.containsKey(key))
+      metadata.put(key, new ArrayList<TiffObject>());
+    metadata.get(key).add(data);
+  }
+
+  /**
+   * Prints the metadata.
+   */
+  public void printMetadata() {
+    if (metadata == null)
+      createMetadataDictionary();
+    System.out.println("METADATA");
+    for (String name : metadata.keySet()) {
+      System.out.println(name + ": " + getMetadataSingleString(name));
+    }
   }
 }

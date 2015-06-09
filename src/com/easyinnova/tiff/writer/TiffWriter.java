@@ -172,7 +172,7 @@ public class TiffWriter {
   public int writeTag(TagValue tag) {
     int totalSize = 0;
     for (int i = 0; i < totalSize; i++) {
-      int v = data.get(tag.getFirstNumericValue() + i);
+      int v = data.get((int) tag.getFirstNumericValue() + i);
       data.put((byte) v);
     }
     return totalSize;

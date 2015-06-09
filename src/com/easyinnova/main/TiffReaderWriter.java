@@ -134,7 +134,10 @@ public class TiffReaderWriter {
           System.out.println("IO Exception in file '" + filename + "'");
           break;
         case -3:
-          System.out.println("Internal exception in file '" + filename + "'");
+          System.out.println("File '" + filename + "' is not a TIFF");
+          break;
+        case -4:
+          System.out.println("Header parsing exception in file '" + filename + "'");
           break;
         case -5:
           System.out.println("Incorrect magic number");
@@ -147,12 +150,15 @@ public class TiffReaderWriter {
             System.out.println("SubIFDs: " + to.getSubIfdCount());
             
             int index = 0;
+            to.printMetadata();
             for (TiffObject o : to.getIfds()) {
               IFD ifd = (IFD) o;
-              if (ifd !=
-              null) { BaselineProfile bp = new BaselineProfile(); bp.validateIfd(ifd);
-              System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
-                ifd.printTags();
+              if (ifd != null) {
+                BaselineProfile bp = new BaselineProfile();
+                bp.validateIfd(ifd);
+                String t = bp.getType().toString();
+                // System.out.println("IFD " + index++ + " (" + t + ")");
+                // ifd.printTags();
               }
             }
           } else {
@@ -163,12 +169,13 @@ public class TiffReaderWriter {
               System.out.println("SubIFDs: " + to.getSubIfdCount());
               
               int index = 0;
+              to.printMetadata();
               for (TiffObject o : to.getIfds()) {
                 IFD ifd = (IFD) o;
                 BaselineProfile bp = new BaselineProfile();
                 bp.validateIfd(ifd);
-                System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
-                ifd.printTags();
+                // System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
+                // ifd.printTags();
               }
             }
             tiffReader.getValidation().printErrors();

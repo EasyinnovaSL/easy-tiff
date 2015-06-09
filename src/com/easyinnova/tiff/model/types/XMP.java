@@ -36,4 +36,3 @@ package com.easyinnova.tiff.model.types;
 public class XMP extends XmlType {
 
 }
-

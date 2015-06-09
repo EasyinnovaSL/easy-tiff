@@ -209,7 +209,7 @@ public class BaselineProfile {
     CheckCommonFields(metadata);
 
     // Compression
-    int comp = metadata.get(259).getFirstNumericValue();
+    long comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 2 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -223,12 +223,12 @@ public class BaselineProfile {
     CheckCommonFields(metadata);
 
     // Bits per Sample
-    int bps = metadata.get(258).getFirstNumericValue();
+    long bps = metadata.get(258).getFirstNumericValue();
     if (bps != 4 && bps != 8)
       validation.addError("Invalid Bits per Sample", bps);
 
     // Compression
-    int comp = metadata.get(259).getFirstNumericValue();
+    long comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -250,12 +250,12 @@ public class BaselineProfile {
     }
 
     // Bits per Sample
-    int bps = metadata.get(258).getFirstNumericValue();
+    long bps = metadata.get(258).getFirstNumericValue();
     if (bps != 4 && bps != 8)
       validation.addError("Invalid Bits per Sample", bps);
 
     // Compression
-    int comp = metadata.get(259).getFirstNumericValue();
+    long comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -269,12 +269,12 @@ public class BaselineProfile {
     CheckCommonFields(metadata);
 
     // Samples per Pixel
-    int samples = metadata.get(277).getFirstNumericValue();
+    long samples = metadata.get(277).getFirstNumericValue();
     if (samples < 3)
       validation.addError("Invalid Samples per Pixel", samples);
 
     // Compression
-    int comp = metadata.get(259).getFirstNumericValue();
+    long comp = metadata.get(259).getFirstNumericValue();
     if (comp != 1 && comp != 32773)
       validation.addError("Invalid Compression", comp);
   }
@@ -292,7 +292,7 @@ public class BaselineProfile {
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).getName());
     else {
-      int val = metadata.get(id).getFirstNumericValue();
+      long val = metadata.get(id).getFirstNumericValue();
       if (val <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
@@ -302,7 +302,7 @@ public class BaselineProfile {
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).getName());
     else {
-      int val = metadata.get(id).getFirstNumericValue();
+      long val = metadata.get(id).getFirstNumericValue();
       if (val <= 0)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
@@ -312,7 +312,7 @@ public class BaselineProfile {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      int val = metadata.get(id).getFirstNumericValue();
+      long val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2 && val != 3)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
@@ -342,7 +342,7 @@ public class BaselineProfile {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      int val = metadata.get(id).getFirstNumericValue();
+      long val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
@@ -352,7 +352,7 @@ public class BaselineProfile {
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
-      int val = metadata.get(id).getFirstNumericValue();
+      long val = metadata.get(id).getFirstNumericValue();
       if (val <= 0 || val > 8)
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
@@ -376,7 +376,7 @@ public class BaselineProfile {
 
     // Check pixel samples bits
     if (metadata.containsTagId(258) && metadata.containsTagId(277)) {
-      int spp = metadata.get(277).getFirstNumericValue();
+      long spp = metadata.get(277).getFirstNumericValue();
       int bps = metadata.get(258).getValue().size();
       if (spp != bps) {
         validation.addError("Sampes per Pixel and Bits per Sample count do not match");
@@ -418,7 +418,8 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   private void CheckStrips(IfdTags metadata) {
-    int id, offset;
+    long offset;
+    int id;
 
     // Strip offsets
     id = 273;
@@ -449,7 +450,8 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   private void CheckTiles(IfdTags metadata) {
-    int id, offset;
+    long offset;
+    int id;
 
     // Tile Offsets
     id = 324;

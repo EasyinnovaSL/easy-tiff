@@ -107,7 +107,7 @@ public class TiffReaderTest {
 
     assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
     ImageStrips ims = ifd.getImageStrips();
-    int rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
+    long rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
     int nrows = 0;
     for (int i = 0; i < ims.getStrips().size(); i++) {
       nrows += ims.getStrips().get(i).getLength() / rowLength;
@@ -165,8 +165,8 @@ public class TiffReaderTest {
       assertEquals(256, t.getWidth());
       assertEquals(256, t.getHeight());
     }
-    int ta = (ifd.getTag("ImageWidth").getFirstNumericValue() + tw - 1) / tw;
-    int td = (ifd.getTag("ImageLength").getFirstNumericValue() + th - 1) / tw;
+    long ta = (ifd.getTag("ImageWidth").getFirstNumericValue() + tw - 1) / tw;
+    long td = (ifd.getTag("ImageLength").getFirstNumericValue() + th - 1) / tw;
     assertEquals(ifd.getImageTiles().getTiles().size(), ta * td
         * ifd.getTag("SamplesPerPixel").getFirstNumericValue());
   }
@@ -191,7 +191,7 @@ public class TiffReaderTest {
     assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
     ImageStrips ims = ifd.getImageStrips();
     assertEquals(662, ims.getRowsPerStrip());
-    int rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
+    long rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
     int nrows = 0;
     for (int i = 0; i < ims.getStrips().size(); i++) {
       nrows += ims.getStrips().get(i).getLength() / rowLength;

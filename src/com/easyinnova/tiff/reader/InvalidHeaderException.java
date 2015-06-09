@@ -1,5 +1,5 @@
 /**
- * <h1>ImageStrip.java</h1> 
+ * <h1>InvalidHeaderException.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,63 +25,26 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 5/6/2015
+ * @since 9/6/2015
  *
  */
-package com.easyinnova.tiff.model;
-
-import java.util.List;
+package com.easyinnova.tiff.reader;
 
 /**
- * The Class ImageStrip.
+ * The Class InvalidHeaderException.
  */
-public class ImageStrips {
-
-  /** The strip offsets. */
-  private List<Strip> strips;
-
-  /** The rows per strip. */
-  private long rowsPerStrip;
+public class InvalidHeaderException extends Exception {
 
   /**
-   * Default constructor.
-   */
-  public ImageStrips() {}
-
-  /**
-   * Sets the strips.
+   * Instantiates a new invalid header exception.
    *
-   * @param strips the new strips
+   * @param message the message
    */
-  public void setStrips(List<Strip> strips) {
-    this.strips = strips;
+  public InvalidHeaderException(String message) {
+    super(message);
   }
 
-  /**
-   * Sets the number of rows per strip.
-   *
-   * @param rowsPerStrip the rows per strip
-   */
-  public void setRowsPerStrip(long rowsPerStrip) {
-    this.rowsPerStrip = rowsPerStrip;
-  }
-
-  /**
-   * Gets the strips.
-   *
-   * @return the strips
-   */
-  public List<Strip> getStrips() {
-    return strips;
-  }
-
-  /**
-   * Gets the rows per strip.
-   *
-   * @return the rows per strip
-   */
-  public long getRowsPerStrip() {
-    return rowsPerStrip;
-  }
+  /** The Constant serialVersionUID. */
+  static final long serialVersionUID = 546546; // random
 }
 

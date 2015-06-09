@@ -207,8 +207,8 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    * @param offset the file position offset
    * @return the int
    */
-  public int getUInt(int offset) {
-    return data.getInt(offset) & 0xFFFFFFFF;
+  public long getUInt(int offset) {
+    return data.getInt(offset) & 0xFFFFFFFFL;
   }
 
   /**

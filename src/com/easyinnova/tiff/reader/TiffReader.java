@@ -157,8 +157,11 @@ public class TiffReader {
             // Incorrect tiff magic number
             result = -5;
           }
+        } catch (InvalidHeaderException ex) {
+          // Invalid header
+          result = -3;
         } catch (Exception ex) {
-          // Header error
+          // Header parse error
           result = -4;
         }
 
@@ -181,33 +184,39 @@ public class TiffReader {
   /**
    * Reads the Tiff header.
    *
+   * @throws InvalidHeaderException the invalid header exception
    * @throws Exception parsing error
    */
-  private void readHeader() throws Exception {
+  private void readHeader() throws InvalidHeaderException, Exception {
     boolean correct = true;
     ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
+    int c1 = 0;
+    int c2 = 0;
     try {
-      // read the first two bytes, in order to know the byte ordering
-      if (data.get(0) == 'I' && data.get(1) == 'I')
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      else if (data.get(0) == 'M' && data.get(1) == 'M')
-        byteOrder = ByteOrder.BIG_ENDIAN;
-      else if (byteOrderErrorTolerance > 0 && data.get(0) == 'i' && data.get(1) == 'i') {
-        validation.addWarning("Byte Order in lower case");
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      } else if (byteOrderErrorTolerance > 0 && data.get(0) == 'm' && data.get(1) == 'm') {
-        validation.addWarning("Byte Order in lower case");
-        byteOrder = ByteOrder.BIG_ENDIAN;
-      } else if (byteOrderErrorTolerance > 1) {
-        validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      } else {
-        correct = false;
-        throw new Exception("Invalid Byte Order " + data.get(0) + data.get(1));
-      }
+      c1 = data.get(0);
+      c2 = data.get(1);
     } catch (Exception ex) {
       correct = false;
       throw new Exception("Header format error");
+    }
+
+    // read the first two bytes, in order to know the byte ordering
+    if (c1 == 'I' && c2 == 'I')
+      byteOrder = ByteOrder.LITTLE_ENDIAN;
+    else if (c1 == 'M' && c2 == 'M')
+      byteOrder = ByteOrder.BIG_ENDIAN;
+    else if (byteOrderErrorTolerance > 0 && c1 == 'i' && c2 == 'i') {
+      validation.addWarning("Byte Order in lower case");
+      byteOrder = ByteOrder.LITTLE_ENDIAN;
+    } else if (byteOrderErrorTolerance > 0 && c1 == 'm' && c2 == 'm') {
+      validation.addWarning("Byte Order in lower case");
+      byteOrder = ByteOrder.BIG_ENDIAN;
+    } else if (byteOrderErrorTolerance > 1) {
+      validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
+      byteOrder = ByteOrder.LITTLE_ENDIAN;
+    } else {
+      correct = false;
+      throw new InvalidHeaderException("Invalid Byte Order " + data.get(0) + data.get(1));
     }
 
     if (correct) {
@@ -401,7 +410,7 @@ public class TiffReader {
           tv.add(new SShort((short) data.getShort(offset)));
           break;
         case 4:
-          tv.add(new Long(data.getInt(offset)));
+          tv.add(new Long(data.getUInt(offset)));
           break;
         case 9:
           tv.add(new SLong(data.getInt(offset)));
@@ -443,8 +452,8 @@ public class TiffReader {
               (abstractTiffType) Class.forName("com.easyinnova.tiff.model.types." + tagtype)
                   .getConstructor().newInstance();
           if (instanceOfMyClass.isIFD()) {
-            int ifdOffset = tv.getFirstNumericValue();
-            IfdReader ifd = readIFD(ifdOffset, false);
+            long ifdOffset = tv.getFirstNumericValue();
+            IfdReader ifd = readIFD((int) ifdOffset, false);
             IFD exifIfd = ifd.getIfd();
             tv.clear();
             tv.add(exifIfd);
