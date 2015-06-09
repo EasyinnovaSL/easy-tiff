@@ -41,11 +41,11 @@ public class Byte extends abstractTiffType {
   /**
    * Instantiates a new byte.
    *
-   * @param value the value
+   * @param ch the value
    */
-  public Byte(byte value) {
+  public Byte(int ch) {
     super();
-    this.value = value;
+    this.value = (byte) ch;
     setTypeSize(1);
   }
 
@@ -54,8 +54,8 @@ public class Byte extends abstractTiffType {
    *
    * @return the value
    */
-  public byte getValue() {
-    return value;
+  public int getValue() {
+    return (int) (value & (0xff)) ;
   }
 
   /**
@@ -69,6 +69,6 @@ public class Byte extends abstractTiffType {
 
   @Override
   public String toString() {
-    return "" + value;
+    return "" + (int) (value & 0xFF);
   }
 }

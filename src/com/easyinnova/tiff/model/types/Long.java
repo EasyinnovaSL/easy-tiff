@@ -36,14 +36,14 @@ package com.easyinnova.tiff.model.types;
 public class Long extends abstractTiffType {
 
   /** The value. */
-  private long value;
+  private int value;
   
   /**
    * Instantiates a new long.
    *
    * @param value the value
    */
-  public Long(long value) {
+  public Long(int value) {
     super();
     this.value=value;
     setTypeSize(4);
@@ -54,7 +54,7 @@ public class Long extends abstractTiffType {
    *
    * @return the value
    */
-  public long getValue() {
+  public int getValue() {
     return value;
   }
 
@@ -63,12 +63,12 @@ public class Long extends abstractTiffType {
    *
    * @param value the new value
    */
-  public void setValue(long value) {
+  public void setValue(int value) {
     this.value = value;
   }
 
   @Override
   public String toString() {
-    return "" + value;
+    return "" + ( ((long) value) & (0xffffffffl));
   }
 }

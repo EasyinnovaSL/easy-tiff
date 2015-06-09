@@ -41,11 +41,11 @@ public class SByte extends abstractTiffType {
   /**
    * Instantiates a new s byte.
    *
-   * @param value the value
+   * @param ch the value
    */
-  public SByte(byte value) {
+  public SByte(int ch) {
     super();
-    this.value=value;
+    this.value=(byte) ch ;
     setTypeSize(1);
   }
 
@@ -54,8 +54,8 @@ public class SByte extends abstractTiffType {
    *
    * @return the value
    */
-  public byte getValue() {
-    return value;
+  public int getValue() {
+    return (int) value;
   }
 
   /**

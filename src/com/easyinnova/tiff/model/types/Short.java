@@ -36,16 +36,16 @@ package com.easyinnova.tiff.model.types;
 public class Short extends abstractTiffType{
   
   /** The value. */
-  private char value;
+  private short value;
 
   /**
    * Instantiates a new short.
    *
-   * @param value the value
+   * @param val the value
    */
-  public Short(char value) {
+  public Short(int val) {
     super();
-    this.value=value;
+    this.value=(short) val;
     setTypeSize(2);
   }
 
@@ -54,8 +54,8 @@ public class Short extends abstractTiffType{
    *
    * @return the value
    */
-  public char getValue() {
-    return value;
+  public int getValue() {
+    return (int) (value & 0xffff);
   }
 
   /**
@@ -63,12 +63,12 @@ public class Short extends abstractTiffType{
    *
    * @param value the new value
    */
-  public void setValue(char value) {
+  public void setValue(short value) {
     this.value = value;
   }
 
   @Override
   public String toString() {
-    return "" + (int) value;
+    return "" + (int) (value & 0xffff);
   }
 }

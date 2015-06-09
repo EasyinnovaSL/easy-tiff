@@ -53,7 +53,7 @@ public class SLong extends abstractTiffType {
    *
    * @return the value
    */
-  public long getValue() {
+  public int getValue() {
     return value;
   }
 
@@ -64,18 +64,6 @@ public class SLong extends abstractTiffType {
    */
   public void setValue(int value) {
     this.value = value;
-  }
-
-  /**
-   * Gets the int value.
-   *
-   * @return the int value
-   */
-  public int getIntValue() {
-    int v = (int) value;
-    if (v > Math.pow(2, 32))
-      v = v - (int) Math.pow(2, 32);
-    return v;
   }
 
   @Override
