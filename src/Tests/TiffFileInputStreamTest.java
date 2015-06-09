@@ -252,6 +252,7 @@ public class TiffFileInputStreamTest {
      assertEquals("NaN",stream.readFloat().toString());
      assertEquals("NaN",stream.readFloat().toString());
      assertEquals("NaN",stream.readFloat().toString());
+     
      stream.close();
      
    }
