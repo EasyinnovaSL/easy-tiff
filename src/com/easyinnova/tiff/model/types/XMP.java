@@ -30,9 +30,46 @@
  */
 package com.easyinnova.tiff.model.types;
 
+import com.easyinnova.tiff.model.Metadata;
+
+import javax.xml.stream.XMLStreamReader;
+
 /**
  * The Class XMP.
  */
 public class XMP extends XmlType {
+  /**
+   * Creates the metadata.
+   *
+   * @return the hash map
+   */
+  @Override
+  public Metadata createMetadata() {
+    Metadata metadata = new Metadata();
+    try {
+    while (xmlModel.hasNext()) {
+      int eventType = xmlModel.next();
+      switch (eventType) {
+        case XMLStreamReader.START_ELEMENT:
+            String elementName = xmlModel.getLocalName();
+            eventType = xmlModel.next();
+            String elementData = xmlModel.getText();
+            if (elementName.trim().length() > 0 && elementData.trim().length() > 0) {
+              Text txt = new Text(elementData);
+              metadata.add(elementName, txt);
+            }
+            break;
+        default:
+          break;
+      }
+    }
+    } catch (Exception ex) {
+    }
+    return metadata;
+  }
 
+  @Override
+  public boolean containsMetadata() {
+    return true;
+  }
 }

@@ -267,6 +267,11 @@ public class TiffReader {
     } catch (Exception ex) {
       validation.addError("IFD parsing error");
     }
+
+    try {
+      tiffModel.createMetadataDictionary();
+    } catch (Exception ex) {
+    }
   }
 
   /**
@@ -455,6 +460,7 @@ public class TiffReader {
             long ifdOffset = tv.getFirstNumericValue();
             IfdReader ifd = readIFD((int) ifdOffset, false);
             IFD exifIfd = ifd.getIfd();
+            exifIfd.setIsIFD(true);
             tv.clear();
             tv.add(exifIfd);
           } else {

@@ -1,5 +1,5 @@
 /**
- * <h1>ExifIFD.java</h1> 
+ * <h1>Text.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,28 +25,50 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 9/6/2015
+ * @since 10/6/2015
  *
  */
 package com.easyinnova.tiff.model.types;
 
-
 /**
- * The Class ExifIFD.
+ * The Class Text.
  */
-public class ExifIFD extends IFD {
+public class Text extends abstractTiffType {
+  /** The value. */
+  private String value;
 
   /**
-   * Instantiates a new exif ifd.
+   * Instantiates a new byte.
+   *
+   * @param value the value
    */
-  public ExifIFD() {
-    super(false);
-    super.setIsIFD(true);
+  public Text(String value) {
+    super();
+    this.value = value;
+    setTypeSize(1);
+  }
+
+  /**
+   * Gets the value.
+   *
+   * @return the value
+   */
+  public String getValue() {
+    return value;
+  }
+
+  /**
+   * Sets the value.
+   *
+   * @param value the new value
+   */
+  public void setValue(String value) {
+    this.value = value;
   }
 
   @Override
   public String toString() {
-    return super.getMetadata().toString();
+    return value;
   }
 }
 

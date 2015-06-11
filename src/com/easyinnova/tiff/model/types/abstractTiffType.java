@@ -31,9 +31,11 @@
  */
 package com.easyinnova.tiff.model.types;
 
+import com.easyinnova.tiff.model.Metadata;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffObject;
 
+// TODO: Auto-generated Javadoc
 /**
  * The generic class abstractTiffType.
  */
@@ -42,11 +44,15 @@ public class abstractTiffType extends TiffObject {
   /** The tag size in bytes. */
   private int typeSize;
 
+  /** The is ifd. */
+  private boolean isIFD;
+
   /**
    * Instantiates a new abstract tiff type.
    */
   public abstractTiffType() {
     typeSize = 0; // Undefined
+    isIFD = false;
   }
 
   /**
@@ -91,7 +97,7 @@ public class abstractTiffType extends TiffObject {
    * @return true, if is ifd
    */
   public boolean isIFD() {
-    return false;
+    return isIFD;
   }
 
   /**
@@ -103,5 +109,32 @@ public class abstractTiffType extends TiffObject {
     if (toInt() < 0)
       return toInt() + 256;
     return toInt();
+  }
+
+  /**
+   * Sets the checks if is ifd.
+   *
+   * @param b the new checks if is ifd
+   */
+  protected void setIsIFD(boolean b) {
+    isIFD = b;
+  }
+
+  /**
+   * Contains metadata.
+   *
+   * @return true, if successful
+   */
+  public boolean containsMetadata() {
+    return false;
+  }
+
+  /**
+   * Creates the metadata.
+   *
+   * @return the hash map
+   */
+  public Metadata createMetadata() {
+    return new Metadata();
   }
 }

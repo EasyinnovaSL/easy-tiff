@@ -298,5 +298,14 @@ public class IFD extends abstractTiffType {
   public void setIsImage(boolean b) {
     isImage = b;
   }
+
+  /**
+   * Sets the checks if is ifd.
+   *
+   * @param b the new checks if is ifd
+   */
+  public void setIsIFD(boolean b) {
+    super.setIsIFD(b);
+  }
 }
 

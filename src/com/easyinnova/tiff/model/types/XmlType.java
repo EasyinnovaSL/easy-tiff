@@ -46,7 +46,7 @@ public class XmlType extends abstractTiffType {
   private String xml;
 
   /** The xml model. */
-  private XMLStreamReader xmlModel;
+  protected XMLStreamReader xmlModel;
 
   /**
    * Default constructor.
