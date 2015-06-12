@@ -181,12 +181,10 @@ public class TiffReaderTest {
     assertEquals(0, result);
     assertEquals(true, tr.getValidation().correct);
     to = tr.getModel();
-    assertEquals(1, to.getIfdCount());
+    assertEquals(1, to.getIfdImagesCount());
     ifd = (IFD) to.getFirstIFD();
 
     assertEquals(0, to.getSubIfdCount());
-    assertEquals(1, to.getIfdAndSubIfdCount());
-    assertEquals(1, to.getIfdsAndSubIfds().size());
 
     assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
     ImageStrips ims = ifd.getImageStrips();
@@ -209,7 +207,7 @@ public class TiffReaderTest {
     assertEquals(0, result);
     assertEquals(true, tr.getValidation().correct);
     to = tr.getModel();
-    assertEquals(1, to.getIfdCount());
+    assertEquals(1, to.getIfdImagesCount());
     ifd = (IFD) to.getFirstIFD();
 
     assertEquals(8, ifd.getTag("BitsPerSample").getFirstNumericValue());

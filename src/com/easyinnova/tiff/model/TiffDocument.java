@@ -74,8 +74,28 @@ public class TiffDocument {
    * @return the ifd count
    */
   public int getIfdCount() {
-    if (metadata.contains("IFD"))
+    if (metadata.contains("IFD")) {
       return getMetadataList("IFD").size();
+    } else
+      return 0;
+  }
+
+  /**
+   * Gets the images count.
+   *
+   * @return the ifd count
+   */
+  public int getIfdImagesCount() {
+    if (metadata.contains("IFD")) {
+      List<TiffObject> l = getMetadataList("IFD");
+      int n = 0;
+      for (TiffObject to : l) {
+        IFD ifd = (IFD) to;
+        if (ifd.isImage())
+          n++;
+      }
+      return n;
+    }
     else
       return 0;
   }
@@ -244,7 +264,10 @@ public class TiffDocument {
       createMetadataDictionary();
     System.out.println("METADATA");
     for (String name : metadata.keySet()) {
-      System.out.println(name + "(x" + getMetadataList(name).size() + ")" + ": "
+      String mult = "";
+      if (getMetadataList(name).size() > 1)
+        mult = "(x" + getMetadataList(name).size() + ")";
+      System.out.println(name + mult + ": "
           + getMetadataSingleString(name));
     }
   }

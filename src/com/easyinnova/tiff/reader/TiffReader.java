@@ -239,28 +239,31 @@ public class TiffReader {
     try {
       // The pointer to the first IFD is located in bytes 4-7
       int offset0 = (int) data.getInt(4);
-
-      IfdReader ifd0 = readIFD(offset0, true);
-      HashSet<Integer> usedOffsets = new HashSet<Integer>();
-      usedOffsets.add(offset0);
-      if (ifd0.getIfd() == null) {
-        validation.addError("Parsing error in first IFD");
+      if (offset0 == 0) {
+        validation.addError("There is no first IFD");
       } else {
-        tiffModel.addIfd0(ifd0.getIfd());
+        IfdReader ifd0 = readIFD(offset0, true);
+        HashSet<Integer> usedOffsets = new HashSet<Integer>();
+        usedOffsets.add(offset0);
+        if (ifd0.getIfd() == null) {
+          validation.addError("Parsing error in first IFD");
+        } else {
+          tiffModel.addIfd0(ifd0.getIfd());
 
-        IfdReader current_ifd = ifd0;
+          IfdReader current_ifd = ifd0;
 
-        // Read next IFDs
-        while (current_ifd.getNextIfdOffset() > 0) {
-          if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
-            // Circular reference
-            validation.addError("IFD offset already used");
-            break;
-          } else {
-            usedOffsets.add(current_ifd.getNextIfdOffset());
-            IfdReader next_ifd = readIFD(current_ifd.getNextIfdOffset(), true);
-            current_ifd.getIfd().setNextIFD(next_ifd.getIfd());
-            current_ifd = next_ifd;
+          // Read next IFDs
+          while (current_ifd.getNextIfdOffset() > 0) {
+            if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
+              // Circular reference
+              validation.addError("IFD offset already used");
+              break;
+            } else {
+              usedOffsets.add(current_ifd.getNextIfdOffset());
+              IfdReader next_ifd = readIFD(current_ifd.getNextIfdOffset(), true);
+              current_ifd.getIfd().setNextIFD(next_ifd.getIfd());
+              current_ifd = next_ifd;
+            }
           }
         }
       }
@@ -458,11 +461,15 @@ public class TiffReader {
                   .getConstructor().newInstance();
           if (instanceOfMyClass.isIFD()) {
             long ifdOffset = tv.getFirstNumericValue();
-            IfdReader ifd = readIFD((int) ifdOffset, false);
-            IFD exifIfd = ifd.getIfd();
-            exifIfd.setIsIFD(true);
-            tv.clear();
-            tv.add(exifIfd);
+            try {
+              IfdReader ifd = readIFD((int) ifdOffset, false);
+              IFD exifIfd = ifd.getIfd();
+              exifIfd.setIsIFD(true);
+              tv.clear();
+              tv.add(exifIfd);
+            } catch (Exception ex) {
+              validation.addError("Parse error in Exif");
+            }
           } else {
             instanceOfMyClass.read(tv);
           }
@@ -474,7 +481,6 @@ public class TiffReader {
             | InvocationTargetException e) {
           e.printStackTrace();
         }
-
       }
     }
 

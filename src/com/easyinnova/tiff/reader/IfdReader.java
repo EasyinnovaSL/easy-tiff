@@ -155,9 +155,12 @@ public class IfdReader {
   private void readStrips() {
     ImageStrips imageStrips = new ImageStrips();
     List<Strip> strips = new ArrayList<Strip>();
-    long rowLength =
-        ifd.getTag("StripBYTECount").getFirstNumericValue()
-            / ifd.getTag("RowsPerStrip").getFirstNumericValue();
+    long tsbc = ifd.getTag("StripBYTECount").getFirstNumericValue();
+    long rps = 0;
+    if (!ifd.containsTagId(TiffTags.getTagId("RowsPerStrip")))
+      rps = 1;
+    else rps = ifd.getTag("RowsPerStrip").getFirstNumericValue();
+    long rowLength = tsbc / rps;
     if (rowLength == 0)
       rowLength = 1;
     for (int i = 0; i < ifd.getTag("StripOffsets").getValue().size(); i++) {
@@ -170,7 +173,7 @@ public class IfdReader {
       strips.add(strip);
     }
     imageStrips.setStrips(strips);
-    imageStrips.setRowsPerStrip(ifd.getTag("RowsPerStrip").getFirstNumericValue());
+    imageStrips.setRowsPerStrip(rps);
 
     ifd.setImageStrips(imageStrips);
   }

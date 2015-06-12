@@ -38,7 +38,9 @@ import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.ValidationResult;
 import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.Rational;
+import com.easyinnova.tiff.model.types.abstractTiffType;
 
+// TODO: Auto-generated Javadoc
 /**
  * Checks if the Tiff file complies with the Baseline 6.0.
  */
@@ -54,8 +56,16 @@ public class BaselineProfile {
     GRAYSCALE,
     /** Palette-color. */
     PALETTE,
+    /** The transparency mask. */
+    TRANSPARENCY_MASK,
     /** RGB. */
     RGB,
+    /** CMYK. */
+    CMYK,
+    /** YCbCr. */
+    YCbCr,
+    /** CIELab. */
+    CIELab,
     /** Undefined. */
     UNDEFINED
   };
@@ -81,6 +91,9 @@ public class BaselineProfile {
    * */
   private int tagOrderTolerance = 10;
 
+  /** The rows per strip tolerance. */
+  private int rowsPerStripTolerance = 1;
+
   /**
    * Instantiates a new baseline profile.
    */
@@ -98,28 +111,24 @@ public class BaselineProfile {
     IfdTags metadata = ifd.getMetadata();
 
     // Validate tags
-    validation.add(validateMetadata(metadata));
+    validateMetadata(metadata);
 
     // Validate image
     checkImage(metadata);
-
-    // Checks the color data
-    CheckColorProfile();
   }
 
   /**
    * Validates the ifd entries.
    *
    * @param metadata the metadata
-   * @return the validation result
    */
-  public ValidationResult validateMetadata(IfdTags metadata) {
-    ValidationResult validation = new ValidationResult();
+  public void validateMetadata(IfdTags metadata) {
     int prevTagId = 0;
     TiffTags.getTiffTags();
     for (TagValue ie : metadata.getTags()) {
-      if (!TiffTags.tagMap.containsKey(ie.getId()))
-        validation.addError("Undefined tag id " + ie.getId());
+      if (!TiffTags.tagMap.containsKey(ie.getId())) {
+        validation.addWarning("Undefined tag id " + ie.getId());
+      }
       else if (!TiffTags.tagTypes.containsKey(ie.getType()))
         validation.addWarning("Unknown tag type " + ie.getType());
       else {
@@ -132,12 +141,14 @@ public class BaselineProfile {
               stypes += ",";
             stypes += tt;
           }
-          validation.addError("Invalid type for tag " + ie.getId() + "[" + stypes + "]", stype);
+          validation.addError("Invalid type for tag " + TiffTags.getTag(ie.getId()).getName() + "["
+              + stypes + "]", stype);
         }
         try {
           int card = Integer.parseInt(t.getCardinality());
           if (card != ie.getCardinality())
-            validation.addError("Cardinality for tag " + ie.getId() + " must be " + card,
+            validation.addError("Cardinality for tag " + TiffTags.getTag(ie.getId()).getName()
+                + " must be " + card,
                 ie.getCardinality());
         } catch (Exception e) {
           // TODO: Deal with formulas?
@@ -152,14 +163,6 @@ public class BaselineProfile {
       }
       prevTagId = ie.getId();
     }
-    return validation;
-  }
-
-  /**
-   * Checks the color profile.
-   */
-  private void CheckColorProfile() {
-    // TODO: Everything
   }
 
   /**
@@ -168,16 +171,20 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   public void checkImage(IfdTags metadata) {
-    if (!metadata.containsTagId(262)) {
+    CheckCommonFields(metadata);
+
+    if (!metadata.containsTagId(TiffTags.getTagId("PhotometricInterpretation"))) {
       validation.addError("Missing Photometric Interpretation");
-    } else if (metadata.get(262).getValue().size() != 1) {
+    } else if (metadata.get(TiffTags.getTagId("PhotometricInterpretation")).getValue().size() != 1) {
       validation.addError("Invalid Photometric Interpretation");
     } else {
-      photometric = (int) metadata.get(262).getFirstNumericValue();
+      photometric =
+          (int) metadata.get(TiffTags.getTagId("PhotometricInterpretation")).getFirstNumericValue();
       switch (photometric) {
         case 0:
         case 1:
-          if (!metadata.containsTagId(258) || metadata.get(258).getFirstNumericValue() == 1) {
+          if (!metadata.containsTagId(TiffTags.getTagId("BitsPerSample"))
+              || metadata.get(TiffTags.getTagId("BitsPerSample")).getFirstNumericValue() == 1) {
             type = ImageType.BILEVEL;
             CheckBilevelImage(metadata);
           } else {
@@ -193,8 +200,26 @@ public class BaselineProfile {
           type = ImageType.PALETTE;
           CheckPalleteImage(metadata);
           break;
+        case 4:
+          type = ImageType.TRANSPARENCY_MASK;
+          CheckTransparencyMask(metadata);
+          break;
+        case 5:
+          type = ImageType.CMYK;
+          CheckCMYK(metadata);
+          break;
+        case 6:
+          type = ImageType.YCbCr;
+          CheckYCbCr(metadata);
+          break;
+        case 8:
+        case 9:
+        case 10:
+          type = ImageType.CIELab;
+          CheckCIELab(metadata);
+          break;
         default:
-          validation.addError("Invalid Photometric Interpretation", photometric);
+          validation.addWarning("Unknown Photometric Interpretation", photometric);
           break;
       }
     }
@@ -206,11 +231,10 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   private void CheckBilevelImage(IfdTags metadata) {
-    CheckCommonFields(metadata);
-
     // Compression
-    long comp = metadata.get(259).getFirstNumericValue();
-    if (comp != 1 && comp != 2 && comp != 32773)
+    long comp = metadata.get(TiffTags.getTagId("Compression")).getFirstNumericValue();
+    // if (comp != 1 && comp != 2 && comp != 32773)
+    if (comp < 1)
       validation.addError("Invalid Compression", comp);
   }
 
@@ -220,16 +244,16 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   private void CheckGrayscaleImage(IfdTags metadata) {
-    CheckCommonFields(metadata);
-
     // Bits per Sample
-    long bps = metadata.get(258).getFirstNumericValue();
-    if (bps != 4 && bps != 8)
+    long bps = metadata.get(TiffTags.getTagId("BitsPerSample")).getFirstNumericValue();
+    // if (bps != 4 && bps != 8)
+    if (bps < 1)
       validation.addError("Invalid Bits per Sample", bps);
 
     // Compression
-    long comp = metadata.get(259).getFirstNumericValue();
-    if (comp != 1 && comp != 32773)
+    long comp = metadata.get(TiffTags.getTagId("Compression")).getFirstNumericValue();
+    // if (comp != 1 && comp != 32773)
+    if (comp < 1)
       validation.addError("Invalid Compression", comp);
   }
 
@@ -239,25 +263,135 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   private void CheckPalleteImage(IfdTags metadata) {
-    CheckCommonFields(metadata);
-
-    if (!metadata.containsTagId(320)) {
+    // Color Map
+    if (!metadata.containsTagId(TiffTags.getTagId("ColorMap"))) {
       validation.addError("Missing Color Map");
     } else {
-      int n = metadata.get(320).getCardinality();
-      if (n != 3 * (int) Math.pow(2, metadata.get(258).getFirstNumericValue()))
+      int n = metadata.get(TiffTags.getTagId("ColorMap")).getCardinality();
+      if (n != 3 * (int) Math.pow(2, metadata.get(TiffTags.getTagId("BitsPerSample"))
+          .getFirstNumericValue()))
         validation.addError("Color Map Cardinality", metadata.get(320).getCardinality());
     }
 
     // Bits per Sample
-    long bps = metadata.get(258).getFirstNumericValue();
+    long bps = metadata.get(TiffTags.getTagId("BitsPerSample")).getFirstNumericValue();
     if (bps != 4 && bps != 8)
       validation.addError("Invalid Bits per Sample", bps);
 
     // Compression
-    long comp = metadata.get(259).getFirstNumericValue();
-    if (comp != 1 && comp != 32773)
+    long comp = metadata.get(TiffTags.getTagId("Compression")).getFirstNumericValue();
+    // if (comp != 1 && comp != 32773)
+    if (comp < 1)
       validation.addError("Invalid Compression", comp);
+  }
+
+  /**
+   * Check transparency mask.
+   *
+   * @param metadata the metadata
+   */
+  private void CheckTransparencyMask(IfdTags metadata) {
+    // Samples per pixel
+    if (!metadata.containsTagId(TiffTags.getTagId("SamplesPerPixel"))) {
+      validation.addError("Missing Samples Per Pixel");
+    } else {
+      long spp = metadata.get(TiffTags.getTagId("SamplesPerPixel")).getFirstNumericValue();
+      if (spp != 1) {
+        validation.addError("Invalid Samples Per Pixel", spp);
+      }
+    }
+
+    // BitsPerSample
+    if (!metadata.containsTagId(TiffTags.getTagId("BitsPerSample"))) {
+      validation.addError("Missing BitsPerSample");
+    } else {
+      long bps = metadata.get(TiffTags.getTagId("BitsPerSample")).getFirstNumericValue();
+      if (bps != 1) {
+        validation.addError("Invalid BitsPerSample", bps);
+      }
+    }
+  }
+
+  /**
+   * Check CMYK.
+   *
+   * @param metadata the metadata
+   */
+  private void CheckCMYK(IfdTags metadata) {
+    // Samples per pixel
+    if (!metadata.containsTagId(TiffTags.getTagId("SamplesPerPixel"))) {
+      validation.addError("Missing Samples Per Pixel");
+    }
+
+    // BitsPerSample
+    if (!metadata.containsTagId(TiffTags.getTagId("BitsPerSample"))) {
+      validation.addError("Missing BitsPerSample");
+    }
+  }
+
+  /**
+   * Check YCbCr.
+   *
+   * @param metadata the metadata
+   */
+  private void CheckYCbCr(IfdTags metadata) {
+    // Samples per pixel
+    if (!metadata.containsTagId(TiffTags.getTagId("SamplesPerPixel"))) {
+      validation.addError("Missing Samples Per Pixel");
+    } else {
+      long spp = metadata.get(TiffTags.getTagId("SamplesPerPixel")).getFirstNumericValue();
+      if (spp != 3) {
+        validation.addError("Invalid Samples Per Pixel", spp);
+      }
+    }
+
+    // BitsPerSample
+    if (!metadata.containsTagId(TiffTags.getTagId("BitsPerSample"))) {
+      validation.addError("Missing BitsPerSample");
+    } else {
+      for (abstractTiffType vi : metadata.get(TiffTags.getTagId("BitsPerSample")).getValue()) {
+        if (vi.toInt() != 8) {
+          validation.addError("Invalid BitsPerSample", vi.toInt());
+          break;
+        }
+      }
+    }
+
+    // Compression
+    // long comp = metadata.get(TiffTags.getTagId("Compression")).getFirstNumericValue();
+    // if (comp != 1 && comp != 5 && comp != 6)
+    // validation.addError("Invalid Compression", comp);
+
+    // if (!metadata.containsTagId(TiffTags.getTagId("ReferenceBlackWhite")))
+    // validation.addError("Missing ReferenceBlackWhite");
+
+    // if (!metadata.containsTagId(TiffTags.getTagId("YCbCrCoefficients")))
+    // validation.addError("Missing YCbCr Coefficients");
+
+    // if (!metadata.containsTagId(TiffTags.getTagId("YCbCrSubSampling")))
+    // validation.addError("Missing YCbCr SubSampling");
+
+    // if (!metadata.containsTagId(TiffTags.getTagId("YCbCrPositioning")))
+    // validation.addError("Missing YCbCr Positioning");
+  }
+
+  /**
+   * Check CIELab.
+   *
+   * @param metadata the metadata
+   */
+  private void CheckCIELab(IfdTags metadata) {
+    // BitsPerSample
+    if (!metadata.containsTagId(TiffTags.getTagId("BitsPerSample"))) {
+      validation.addError("Missing BitsPerSample");
+    } else {
+      for (abstractTiffType vi : metadata.get(TiffTags.getTagId("BitsPerSample")).getValue()) {
+        if (vi.toInt() != 8) {
+          validation.addError("Invalid BitsPerSample", vi.toInt());
+          break;
+        }
+      }
+    }
   }
 
   /**
@@ -266,16 +400,15 @@ public class BaselineProfile {
    * @param metadata the metadata
    */
   private void CheckRGBImage(IfdTags metadata) {
-    CheckCommonFields(metadata);
-
     // Samples per Pixel
-    long samples = metadata.get(277).getFirstNumericValue();
+    long samples = metadata.get(TiffTags.getTagId("SamplesPerPixel")).getFirstNumericValue();
     if (samples < 3)
       validation.addError("Invalid Samples per Pixel", samples);
 
     // Compression
-    long comp = metadata.get(259).getFirstNumericValue();
-    if (comp != 1 && comp != 32773)
+    long comp = metadata.get(TiffTags.getTagId("Compression")).getFirstNumericValue();
+    // if (comp != 1 && comp != 32773)
+    if (comp < 1)
       validation.addError("Invalid Compression", comp);
   }
 
@@ -288,7 +421,7 @@ public class BaselineProfile {
     int id;
 
     // Width
-    id = 256;
+    id = TiffTags.getTagId("ImageWidth");
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).getName());
     else {
@@ -298,7 +431,7 @@ public class BaselineProfile {
     }
 
     // Height
-    id = 257;
+    id = TiffTags.getTagId("ImageLength");
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).getName());
     else {
@@ -308,7 +441,7 @@ public class BaselineProfile {
     }
 
     // Resolution Unit
-    id = 296;
+    id = TiffTags.getTagId("ResolutionUnit");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
@@ -318,7 +451,7 @@ public class BaselineProfile {
     }
 
     // XResolution
-    id = 282;
+    id = TiffTags.getTagId("XResolution");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
@@ -328,7 +461,7 @@ public class BaselineProfile {
     }
 
     // YResolution
-    id = 283;
+    id = TiffTags.getTagId("YResolution");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
@@ -338,7 +471,7 @@ public class BaselineProfile {
     }
 
     // Planar Configuration
-    id = 284;
+    id = TiffTags.getTagId("PlanarConfiguration");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
@@ -348,7 +481,7 @@ public class BaselineProfile {
     }
 
     // Orientation
-    id = 274;
+    id = TiffTags.getTagId("Orientation");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
     } else {
@@ -360,9 +493,11 @@ public class BaselineProfile {
     // Check whether tiles or strips
     strips = false;
     tiles = false;
-    if (metadata.containsTagId(273) && metadata.containsTagId(279))
+    if (metadata.containsTagId(TiffTags.getTagId("StripOffsets"))
+        && metadata.containsTagId(TiffTags.getTagId("StripBYTECount")))
       strips = true;
-    if (metadata.containsTagId(325) && metadata.containsTagId(324))
+    if (metadata.containsTagId(TiffTags.getTagId("TileBYTECounts"))
+        && metadata.containsTagId(TiffTags.getTagId("TileOffsets")))
       tiles = true;
     if (!strips && !tiles)
       validation.addError("Missing image organization tags");
@@ -375,9 +510,10 @@ public class BaselineProfile {
     }
 
     // Check pixel samples bits
-    if (metadata.containsTagId(258) && metadata.containsTagId(277)) {
-      long spp = metadata.get(277).getFirstNumericValue();
-      int bps = metadata.get(258).getValue().size();
+    if (metadata.containsTagId(TiffTags.getTagId("BitsPerSample"))
+        && metadata.containsTagId(TiffTags.getTagId("SampesPerPixel"))) {
+      long spp = metadata.get(TiffTags.getTagId("SamplesPerPixel")).getFirstNumericValue();
+      int bps = metadata.get(TiffTags.getTagId("BitsPerSample")).getValue().size();
       if (spp != bps) {
         validation.addError("Sampes per Pixel and Bits per Sample count do not match");
         if (bps == 1) {
@@ -386,8 +522,8 @@ public class BaselineProfile {
         }
       }
 
-      if (metadata.containsTagId(338)) {
-        int ext = metadata.get(338).getValue().size();
+      if (metadata.containsTagId(TiffTags.getTagId("ExtraSamples"))) {
+        int ext = metadata.get(TiffTags.getTagId("ExtraSamples")).getValue().size();
         if (ext + 3 != bps) {
           validation.addError("Incorrect Extra Samples Count", ext);
         } else if (ext > 0 && bps <= 3) {
@@ -396,7 +532,7 @@ public class BaselineProfile {
       }
 
       if (bps > 1) {
-        TagValue lbps = metadata.get(258);
+        TagValue lbps = metadata.get(TiffTags.getTagId("BitsPerSample"));
         if (lbps == null || lbps.getValue() == null) {
           validation.addError("Invalid Bits per Sample");
         } else {
@@ -422,21 +558,24 @@ public class BaselineProfile {
     int id;
 
     // Strip offsets
-    id = 273;
+    id = TiffTags.getTagId("StripOffsets");
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Strip Byte Counts
-    id = 279;
+    id = TiffTags.getTagId("StripBYTECount");
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Rows per Strip
-    id = 278;
+    id = TiffTags.getTagId("RowsPerStrip");
     if (!metadata.containsTagId(id)) {
-      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+      if (rowsPerStripTolerance > 0)
+        validation.addWarning("Missing required field", TiffTags.getTag(id).getName());
+      else
+        validation.addError("Missing required field", TiffTags.getTag(id).getName());
     } else {
       offset = metadata.get(id).getFirstNumericValue();
       if (offset <= 0)
@@ -454,19 +593,19 @@ public class BaselineProfile {
     int id;
 
     // Tile Offsets
-    id = 324;
+    id = TiffTags.getTagId("TileOffsets");
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Tile Byte Counts
-    id = 325;
+    id = TiffTags.getTagId("TileBYTECounts");
     offset = metadata.get(id).getFirstNumericValue();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Tile Width
-    id = 322;
+    id = TiffTags.getTagId("TileWidth");
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName(),
           offset);
@@ -477,7 +616,7 @@ public class BaselineProfile {
     }
 
     // Tile Length
-    id = 323;
+    id = TiffTags.getTagId("TileLength");
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName(),
           offset);
