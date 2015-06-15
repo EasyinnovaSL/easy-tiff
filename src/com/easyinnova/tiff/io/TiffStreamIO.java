@@ -47,7 +47,6 @@ import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TiffStreamReader.
  */

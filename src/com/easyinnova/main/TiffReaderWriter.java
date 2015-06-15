@@ -133,15 +133,6 @@ public class TiffReaderWriter {
         case -2:
           System.out.println("IO Exception in file '" + filename + "'");
           break;
-        case -3:
-          System.out.println("File '" + filename + "' is not a TIFF");
-          break;
-        case -4:
-          System.out.println("Header parsing exception in file '" + filename + "'");
-          break;
-        case -5:
-          System.out.println("Incorrect magic number");
-          break;
         case 0:
           if (tiffReader.getValidation().correct) {
             // The file is correct

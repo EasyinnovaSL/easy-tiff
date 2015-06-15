@@ -40,7 +40,6 @@ import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.Rational;
 import com.easyinnova.tiff.model.types.abstractTiffType;
 
-// TODO: Auto-generated Javadoc
 /**
  * Checks if the Tiff file complies with the Baseline 6.0.
  */
@@ -560,14 +559,20 @@ public class BaselineProfile {
     // Strip offsets
     id = TiffTags.getTagId("StripOffsets");
     offset = metadata.get(id).getFirstNumericValue();
+    int nso = metadata.get(id).getCardinality();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Strip Byte Counts
     id = TiffTags.getTagId("StripBYTECount");
     offset = metadata.get(id).getFirstNumericValue();
+    int nsc = metadata.get(id).getCardinality();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
+
+    if (nso != nsc) {
+      validation.addError("Inconsistent strip lengths");
+    }
 
     // Rows per Strip
     id = TiffTags.getTagId("RowsPerStrip");
@@ -595,14 +600,20 @@ public class BaselineProfile {
     // Tile Offsets
     id = TiffTags.getTagId("TileOffsets");
     offset = metadata.get(id).getFirstNumericValue();
+    int no = metadata.get(id).getCardinality();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
     // Tile Byte Counts
     id = TiffTags.getTagId("TileBYTECounts");
     offset = metadata.get(id).getFirstNumericValue();
+    int nc = metadata.get(id).getCardinality();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
+
+    if (no != nc) {
+      validation.addError("Inconsistent tile lengths");
+    }
 
     // Tile Width
     id = TiffTags.getTagId("TileWidth");
