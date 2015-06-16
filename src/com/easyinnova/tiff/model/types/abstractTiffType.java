@@ -1,5 +1,5 @@
 /**
- * <h1>abstractTiffTag.java</h1> 
+ * <h1>abstractTiffTag.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,8 +13,9 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
  * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
@@ -30,23 +31,32 @@
  */
 package com.easyinnova.tiff.model.types;
 
-/**
- * The Class abstractTiffTag.
- */
-public class abstractTiffType {
+import com.easyinnova.tiff.model.Metadata;
+import com.easyinnova.tiff.model.TagValue;
+import com.easyinnova.tiff.model.TiffObject;
 
-  /** The tag size. */
+// TODO: Auto-generated Javadoc
+/**
+ * The generic class abstractTiffType.
+ */
+public class abstractTiffType extends TiffObject {
+
+  /** The tag size in bytes. */
   private int typeSize;
+
+  /** The is ifd. */
+  private boolean isIFD;
 
   /**
    * Instantiates a new abstract tiff type.
    */
   public abstractTiffType() {
     typeSize = 0; // Undefined
+    isIFD = false;
   }
 
   /**
-   * Sets the type size.
+   * Sets the type size in bytes.
    *
    * @param size the new type size
    */
@@ -55,7 +65,7 @@ public class abstractTiffType {
   }
 
   /**
-   * Gets the type size.
+   * Gets the type size in bytes.
    *
    * @return the type size
    */
@@ -64,12 +74,67 @@ public class abstractTiffType {
   }
 
   /**
-   * To int.
+   * Convert the value to an integer.
    *
    * @return the int
-   * @throws NumberFormatException the number format exception
+   * @throws NumberFormatException Number format exception
    */
   public int toInt() throws NumberFormatException {
     return Integer.parseInt(this.toString());
+  }
+
+  /**
+   * Read.
+   *
+   * @param tv the tv
+   */
+  public void read(TagValue tv) {
+  }
+
+  /**
+   * Checks if is ifd.
+   *
+   * @return true, if is ifd
+   */
+  public boolean isIFD() {
+    return isIFD;
+  }
+
+  /**
+   * To uint.
+   *
+   * @return the char
+   */
+  public int toUint() {
+    if (toInt() < 0)
+      return toInt() + 256;
+    return toInt();
+  }
+
+  /**
+   * Sets the checks if is ifd.
+   *
+   * @param b the new checks if is ifd
+   */
+  protected void setIsIFD(boolean b) {
+    isIFD = b;
+  }
+
+  /**
+   * Contains metadata.
+   *
+   * @return true, if successful
+   */
+  public boolean containsMetadata() {
+    return false;
+  }
+
+  /**
+   * Creates the metadata.
+   *
+   * @return the hash map
+   */
+  public Metadata createMetadata() {
+    return new Metadata();
   }
 }

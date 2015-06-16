@@ -1,5 +1,5 @@
 /**
- * <h1>TiffReader.java</h1> 
+ * <h1>TiffReader.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the � statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * � 2015 Easy Innova, SL
+ * © 2015 Easy Innova, SL
  * </p>
  *
- * @author V�ctor Mu�oz Sol�
+ * @author Víctor Muñoz Solà
  * @version 1.0
  * @since 28/5/2015
  *
@@ -31,15 +32,16 @@
 package com.easyinnova.tiff.reader;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
-import com.easyinnova.tiff.model.IFD;
+import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
-import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.model.TiffDocument;
+import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.ValidationResult;
 import com.easyinnova.tiff.model.types.Ascii;
 import com.easyinnova.tiff.model.types.Byte;
 import com.easyinnova.tiff.model.types.Double;
 import com.easyinnova.tiff.model.types.Float;
-import com.easyinnova.tiff.model.types.IccProfile;
+import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.Long;
 import com.easyinnova.tiff.model.types.Rational;
 import com.easyinnova.tiff.model.types.SByte;
@@ -47,34 +49,35 @@ import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
 import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.Short;
-import com.easyinnova.tiff.model.types.SubIFD;
 import com.easyinnova.tiff.model.types.Undefined;
+import com.easyinnova.tiff.model.types.abstractTiffType;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
 
 /**
- * The Class TiffReader.
+ * Reads and parses a Tiff file, storing it in an internal model.
  */
 public class TiffReader {
 
   /** The model containing the Tiff data. */
-  TiffObject tiffModel;
+  TiffDocument tiffModel;
 
   /** The filename. */
   String filename;
 
-  /** The object to get data from the file. */
+  /** The stream to get data from the file. */
   TiffStreamIO data;
 
   /** The size in bytes of the tags' values field (=4 for Tiff, =8 for BigTiff). */
   int tagValueSize = 4;
 
   /** The result of the validation. */
-  public ValidationResult validation;
+  ValidationResult validation;
 
   /**
    * Tolerance to duplicate tags.<br>
@@ -95,6 +98,7 @@ public class TiffReader {
   int byteOrderErrorTolerance = 0;
 
   /**
+   * Default constructor.<br>
    * Instantiates a new tiff reader.
    */
   public TiffReader() {
@@ -103,11 +107,11 @@ public class TiffReader {
   }
 
   /**
-   * Gets the model.
+   * Gets the internal model of the Tiff file.
    *
    * @return the model
    */
-  public TiffObject getModel() {
+  public TiffDocument getModel() {
     return tiffModel;
   }
 
@@ -118,6 +122,15 @@ public class TiffReader {
    */
   public String getFilename() {
     return filename;
+  }
+
+  /**
+   * Gets the result of the validation.
+   *
+   * @return the validation result
+   */
+  public ValidationResult getValidation() {
+    return validation;
   }
 
   /**
@@ -136,7 +149,7 @@ public class TiffReader {
         data = new TiffStreamIO(null);
 
         try {
-          tiffModel = new TiffObject();
+          tiffModel = new TiffDocument();
           validation = new ValidationResult();
           data.load(filename);
           readHeader();
@@ -144,8 +157,11 @@ public class TiffReader {
             // Incorrect tiff magic number
             result = -5;
           }
+        } catch (InvalidHeaderException ex) {
+          // Invalid header
+          result = -3;
         } catch (Exception ex) {
-          // Header error
+          // Header parse error
           result = -4;
         }
 
@@ -166,39 +182,45 @@ public class TiffReader {
   }
 
   /**
-   * Read header.
-   * 
-   * @throws Exception
+   * Reads the Tiff header.
+   *
+   * @throws InvalidHeaderException the invalid header exception
+   * @throws Exception parsing error
    */
-  private void readHeader() throws Exception {
+  private void readHeader() throws InvalidHeaderException, Exception {
     boolean correct = true;
     ByteOrder byteOrder = ByteOrder.LITTLE_ENDIAN;
+    int c1 = 0;
+    int c2 = 0;
     try {
-      // read the first two bytes, to know the byte ordering
-      if (data.get(0) == 'I' && data.get(1) == 'I')
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      else if (data.get(0) == 'M' && data.get(1) == 'M')
-        byteOrder = ByteOrder.BIG_ENDIAN;
-      else if (byteOrderErrorTolerance > 0 && data.get(0) == 'i' && data.get(1) == 'i') {
-        validation.addWarning("Byte Order in lower case");
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      } else if (byteOrderErrorTolerance > 0 && data.get(0) == 'm' && data.get(1) == 'm') {
-        validation.addWarning("Byte Order in lower case");
-        byteOrder = ByteOrder.BIG_ENDIAN;
-      } else if (byteOrderErrorTolerance > 1) {
-        validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
-        byteOrder = ByteOrder.LITTLE_ENDIAN;
-      } else {
-        correct = false;
-        throw new Exception("Invalid Byte Order " + data.get(0) + data.get(1));
-      }
+      c1 = data.get(0);
+      c2 = data.get(1);
     } catch (Exception ex) {
       correct = false;
       throw new Exception("Header format error");
     }
 
+    // read the first two bytes, in order to know the byte ordering
+    if (c1 == 'I' && c2 == 'I')
+      byteOrder = ByteOrder.LITTLE_ENDIAN;
+    else if (c1 == 'M' && c2 == 'M')
+      byteOrder = ByteOrder.BIG_ENDIAN;
+    else if (byteOrderErrorTolerance > 0 && c1 == 'i' && c2 == 'i') {
+      validation.addWarning("Byte Order in lower case");
+      byteOrder = ByteOrder.LITTLE_ENDIAN;
+    } else if (byteOrderErrorTolerance > 0 && c1 == 'm' && c2 == 'm') {
+      validation.addWarning("Byte Order in lower case");
+      byteOrder = ByteOrder.BIG_ENDIAN;
+    } else if (byteOrderErrorTolerance > 1) {
+      validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
+      byteOrder = ByteOrder.LITTLE_ENDIAN;
+    } else {
+      correct = false;
+      throw new InvalidHeaderException("Invalid Byte Order " + data.get(0) + data.get(1));
+    }
+
     if (correct) {
-      // set byte ordering
+      // set byte ordering to the stream
       data.order(byteOrder);
 
       try {
@@ -211,39 +233,36 @@ public class TiffReader {
   }
 
   /**
-   * Parses the IFD data.
-   *
-   * @param tiffModel the tiff file
+   * Read the IFDs contained in the Tiff file.
    */
   public void readIFDs() {
     try {
       // The pointer to the first IFD is located in bytes 4-7
       int offset0 = (int) data.getInt(4);
-
-      IfdReader ifd0 = readIFD(offset0);
-      HashSet<Integer> usedOffsets = new HashSet<Integer>();
-      usedOffsets.add(offset0);
-      if (ifd0 == null) {
-        validation.addError("Parsing error in first IFD");
+      if (offset0 == 0) {
+        validation.addError("There is no first IFD");
       } else {
-        tiffModel.addIfd(ifd0.getIfd());
+        IfdReader ifd0 = readIFD(offset0, true);
+        HashSet<Integer> usedOffsets = new HashSet<Integer>();
+        usedOffsets.add(offset0);
+        if (ifd0.getIfd() == null) {
+          validation.addError("Parsing error in first IFD");
+        } else {
+          tiffModel.addIfd0(ifd0.getIfd());
 
-        IfdReader current_ifd = ifd0;
+          IfdReader current_ifd = ifd0;
 
-        // Read next IFDs
-        while (current_ifd.getNextIfdOffset() > 0) {
-          usedOffsets.add(current_ifd.getNextIfdOffset());
-          if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
-            // Circular reference
-            validation.addError("IFD offset already used");
-            break;
-          } else {
-            current_ifd = readIFD(current_ifd.getNextIfdOffset());
-            if (current_ifd == null) {
-              validation.addError("Error in IFD " + tiffModel.getIfdCount());
+          // Read next IFDs
+          while (current_ifd.getNextIfdOffset() > 0) {
+            if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
+              // Circular reference
+              validation.addError("IFD offset already used");
               break;
             } else {
-              tiffModel.addIfd(current_ifd.getIfd());
+              usedOffsets.add(current_ifd.getNextIfdOffset());
+              IfdReader next_ifd = readIFD(current_ifd.getNextIfdOffset(), true);
+              current_ifd.getIfd().setNextIFD(next_ifd.getIfd());
+              current_ifd = next_ifd;
             }
           }
         }
@@ -251,16 +270,22 @@ public class TiffReader {
     } catch (Exception ex) {
       validation.addError("IFD parsing error");
     }
+
+    try {
+      tiffModel.createMetadataDictionary();
+    } catch (Exception ex) {
+    }
   }
 
   /**
-   * Reads an ifd.
+   * Parses the image file descriptor data.
    *
-   * @param IFD_idx Position in file
-   * @return the ifd
+   * @param offset the file offset (in bytes) pointing to the IFD
+   * @param isImage the is image
+   * @return the ifd reading result
    */
-  IfdReader readIFD(int offset) {
-    IFD ifd = new IFD();
+  IfdReader readIFD(int offset, boolean isImage) {
+    IFD ifd = new IFD(isImage);
     int nextIfdOffset = 0;
     try {
       int index = offset;
@@ -276,7 +301,7 @@ public class TiffReader {
           int tagid = data.getUshort(index);
           int tagType = data.getShort(index + 2);
           int tagN = data.getInt(index + 4);
-          TagValue tv = getValue(tagType, tagN, tagid, index + 8);
+          TagValue tv = getValue(tagType, tagN, tagid, index + 8, ifd);
           if (ifd.containsTagId(tagid)) {
             if (duplicateTagTolerance > 0)
               validation.addWarning("Duplicate tag", tagid);
@@ -310,9 +335,11 @@ public class TiffReader {
         }
 
         // Validate ifd entries
-        BaselineProfile bp = new BaselineProfile();
-        bp.validateIfd(ifd);
-        validation.add(bp.getValidation());
+        if (isImage) {
+          BaselineProfile bp = new BaselineProfile();
+          bp.validateIfd(ifd);
+          validation.add(bp.getValidation());
+        }
       }
     } catch (Exception ex) {
       ifd = null;
@@ -320,111 +347,140 @@ public class TiffReader {
     IfdReader ir = new IfdReader();
     ir.setIfd(ifd);
     ir.setNextIfdOffset(nextIfdOffset);
+    ir.readImage();
     return ir;
   }
 
   /**
-   * Gets the value of the tag field.<br>
+   * Gets the value of the given tag field.
    *
    * @param type the tag type
    * @param n the cardinality
    * @param id the tag id
-   * @param beginOffset the position of the tag value
+   * @param beginOffset the offset position of the tag value
+   * @param parentIFD the parent ifd
    * @return the tag value object
    */
-  public TagValue getValue(int type, int n, int id, int beginOffset) {
+  public TagValue getValue(int type, int n, int id, int beginOffset, IFD parentIFD) {
     // Create TagValue object
     TagValue tv = new TagValue(id, type);
 
-    if (type != 7) {
-      // Defined tags
-      int offset = beginOffset;
-      
-      // Get type Size
-      int typeSize = 1;
+    // Defined tags
+    int offset = beginOffset;
+
+    // Get type Size
+    int typeSize = 1;
+    switch (type) {
+      case 3:
+      case 8:
+        typeSize = 2;
+        break;
+      case 4:
+      case 9:
+      case 11:
+      case 13:
+        typeSize = 4;
+        break;
+      case 5:
+      case 10:
+      case 12:
+        typeSize = 8;
+        break;
+      default:
+        typeSize = 1;
+        break;
+    }
+
+    // Check if the tag value fits in the directory entry value field, and get offset if not
+    if (typeSize * n > tagValueSize) {
+      offset = data.getInt(offset);
+    }
+
+    for (int i = 0; i < n; i++) {
+      // Get N tag values
       switch (type) {
-        case 3:
+        case 1:
+          tv.add(new Byte((byte) data.get(offset)));
+          break;
+        case 2:
+          tv.add(new Ascii((byte) data.get(offset)));
+          break;
+        case 6:
+          tv.add(new SByte((byte) data.get(offset)));
+          break;
         case 7:
+          tv.add(new Undefined((byte) data.get(offset)));
+          break;
+        case 3:
+          tv.add(new Short((char) data.getUshort(offset)));
+          break;
         case 8:
-          typeSize = 2;
+          tv.add(new SShort((short) data.getShort(offset)));
           break;
         case 4:
+          tv.add(new Long(data.getUInt(offset)));
+          break;
         case 9:
-        case 11:
-        case 13:
-          typeSize = 4;
+          tv.add(new SLong(data.getInt(offset)));
           break;
         case 5:
+          int num = new Long(data.getInt(offset)).toInt();
+          int den = new Long(data.getInt(offset + 4)).toInt();
+          tv.add(new Rational(num, den));
+          break;
         case 10:
+          int snum = new SLong(data.getInt(offset)).toInt();
+          int sden = new SLong(data.getInt(offset + 4)).toInt();
+          tv.add(new SRational(snum, sden));
+          break;
+        case 11:
+          tv.add(new Float(data.getFloat(offset)));
+          break;
         case 12:
-          typeSize = 8;
+          tv.add(new Double(data.getDouble(offset)));
           break;
-        default:
-          typeSize = 1;
+        case 13:
+          int ifdOffset = data.getInt(offset);
+          IfdReader ifd = readIFD(ifdOffset, true);
+          IFD subIfd = ifd.getIfd();
+          subIfd.setParent(parentIFD);
+          tv.add(subIfd);
           break;
       }
+      offset += typeSize;
+    }
 
-      // Check if the tag value fits in the directory entry value field, and get offset if not
-      if (typeSize * n > tagValueSize) {
-        offset = data.getInt(offset);
-      }
+    if (TiffTags.hasTag(id)) {
+      Tag t = TiffTags.getTag(id);
+      if (t.hasTypedef()) {
+        String tagtype = t.getTypedef();
 
-      for (int i = 0; i < n; i++) {
-        // Get N tag values
-        switch (type) {
-          case 1:
-            tv.add(new Byte((byte) data.get(offset)));
-            break;
-          case 2:
-            tv.add(new Ascii((byte) data.get(offset)));
-            break;
-          case 6:
-            tv.add(new SByte((byte) data.get(offset)));
-            break;
-          case 7:
-            tv.add(new Undefined((byte) data.get(offset)));
-            break;
-          case 3:
-            tv.add(new Short((char) data.getUshort(offset)));
-            break;
-          case 8:
-            tv.add(new SShort((short) data.getShort(offset)));
-            break;
-          case 4:
-            tv.add(new Long(data.getInt(offset)));
-            break;
-          case 9:
-            tv.add(new SLong(data.getInt(offset)));
-            break;
-          case 5:
-            int num = new Long(data.getInt(offset)).toInt();
-            int den = new Long(data.getInt(offset + 4)).toInt();
-            tv.add(new Rational(num, den));
-            break;
-          case 10:
-            int snum = new SLong(data.getInt(offset)).toInt();
-            int sden = new SLong(data.getInt(offset + 4)).toInt();
-            tv.add(new SRational(snum, sden));
-            break;
-          case 11:
-            tv.add(new Float(data.getFloat(offset)));
-            break;
-          case 12:
-            tv.add(new Double(data.getDouble(offset)));
-            break;
-          case 13:
-            int ifdOffset = data.getInt(offset);
-            IfdReader ifd = readIFD(ifdOffset);
-            SubIFD subIfd = new SubIFD(ifd.getIfd());
-            tv.add(subIfd);
-            break;
+        try {
+          abstractTiffType instanceOfMyClass =
+              (abstractTiffType) Class.forName("com.easyinnova.tiff.model.types." + tagtype)
+                  .getConstructor().newInstance();
+          if (instanceOfMyClass.isIFD()) {
+            long ifdOffset = tv.getFirstNumericValue();
+            try {
+              IfdReader ifd = readIFD((int) ifdOffset, false);
+              IFD exifIfd = ifd.getIfd();
+              exifIfd.setIsIFD(true);
+              tv.clear();
+              tv.add(exifIfd);
+            } catch (Exception ex) {
+              validation.addError("Parse error in Exif");
+            }
+          } else {
+            instanceOfMyClass.read(tv);
+          }
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+        } catch (NoSuchMethodException | SecurityException e) {
+          e.printStackTrace();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+            | InvocationTargetException e) {
+          e.printStackTrace();
         }
-        offset += typeSize;
-      }
-    } else {
-      if (id == 34675) {
-        // ICC Profile
-        tv.add(new IccProfile(data.getInt(beginOffset), n, data));
       }
     }
 

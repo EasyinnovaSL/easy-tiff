@@ -4,6 +4,7 @@
   "type": [
     "LONG"
   ],
+  "typedef": "ExifIFD",
   "cardinality": "1",
   "defaultValue": "",
   "ifd": "",

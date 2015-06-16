@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>ImageTiles.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,50 +25,84 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 5/6/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.tiff.model;
+
+import java.util.List;
 
 /**
- * The Class Double.
+ * The Class ImageTiles.
  */
-public class Double extends abstractTiffType {
-  /** The value. */
-  private double value;
+public class ImageTiles {
+
+  /** The tiles offsets. */
+  private List<Tile> tiles;
+
+  /** The tile width. */
+  private int tileWidth;
+
+  /** The tile height. */
+  private int tileHeight;
 
   /**
-   * Instantiates a new short.
-   *
-   * @param value the value
+   * Default constructor.
    */
-  public Double(double value) {
-    super();
-    this.value = value;
-    setTypeSize(8);
+  public ImageTiles() {}
+
+  /**
+   * Gets the tiles.
+   *
+   * @return the tiles
+   */
+  public List<Tile> getTiles() {
+    return tiles;
   }
 
   /**
-   * Gets the value.
+   * Sets the tiles.
    *
-   * @return the value
+   * @param tiles the new tiles
    */
-  public double getValue() {
-    return value;
+  public void setTiles(List<Tile> tiles) {
+    this.tiles = tiles;
   }
 
   /**
-   * Sets the value.
+   * Sets the tile width.
    *
-   * @param value the new value
+   * @param width the new tile width
    */
-  public void setValue(double value) {
-    this.value = value;
+  public void setTileWidth(int width) {
+    tileWidth = width;
   }
 
-  @Override
-  public String toString() {
-    return "" + value;
+  /**
+   * Sets the tile height.
+   *
+   * @param height the new tile height
+   */
+  public void setTileHeight(int height) {
+    tileHeight = height;
+  }
+
+  /**
+   * Gets the tile width.
+   *
+   * @return the tile width
+   */
+  public int getTileWidth() {
+    return tileWidth;
+  }
+
+  /**
+   * Gets the tile height.
+   *
+   * @return the tile height
+   */
+  public int getTileHeight() {
+    return tileHeight;
   }
 }
 

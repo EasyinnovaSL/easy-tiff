@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>IccProfileCreator.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,50 +25,64 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 8/6/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.tiff.model;
 
+// TODO: Auto-generated Javadoc
 /**
- * The Class Double.
+ * The Class IccProfileCreator.
  */
-public class Double extends abstractTiffType {
-  /** The value. */
-  private double value;
+public class IccProfileCreator {
+
+  /** The signature. */
+  private int signature;
+
+  /** The creator. */
+  private String creator;
+
+  /** The description. */
+  private String description;
 
   /**
-   * Instantiates a new short.
+   * Instantiates a new icc profile creator.
    *
-   * @param value the value
+   * @param signature the signature
+   * @param creator the creator
+   * @param description the description
    */
-  public Double(double value) {
-    super();
-    this.value = value;
-    setTypeSize(8);
+  public IccProfileCreator(int signature, String creator, String description) {
+    this.signature = signature;
+    this.creator = creator;
+    this.description = description;
   }
 
   /**
-   * Gets the value.
+   * Gets the creator.
    *
-   * @return the value
+   * @return the creator
    */
-  public double getValue() {
-    return value;
+  public String getCreator() {
+    return creator;
   }
 
   /**
-   * Sets the value.
+   * Gets the description.
    *
-   * @param value the new value
+   * @return the description
    */
-  public void setValue(double value) {
-    this.value = value;
+  public String getDescription() {
+    return description;
   }
 
-  @Override
-  public String toString() {
-    return "" + value;
+  /**
+   * Gets the signature.
+   *
+   * @return the signature
+   */
+  public int getSignature() {
+    return signature;
   }
 }
 

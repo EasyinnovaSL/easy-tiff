@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>XMP.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,50 +25,51 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 9/6/2015
  *
  */
 package com.easyinnova.tiff.model.types;
 
+import com.easyinnova.tiff.model.Metadata;
+
+import javax.xml.stream.XMLStreamReader;
+
 /**
- * The Class Double.
+ * The Class XMP.
  */
-public class Double extends abstractTiffType {
-  /** The value. */
-  private double value;
-
+public class XMP extends XmlType {
   /**
-   * Instantiates a new short.
+   * Creates the metadata.
    *
-   * @param value the value
+   * @return the hash map
    */
-  public Double(double value) {
-    super();
-    this.value = value;
-    setTypeSize(8);
-  }
-
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public double getValue() {
-    return value;
-  }
-
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(double value) {
-    this.value = value;
+  @Override
+  public Metadata createMetadata() {
+    Metadata metadata = new Metadata();
+    try {
+    while (xmlModel.hasNext()) {
+      int eventType = xmlModel.next();
+      switch (eventType) {
+        case XMLStreamReader.START_ELEMENT:
+            String elementName = xmlModel.getLocalName();
+            eventType = xmlModel.next();
+            String elementData = xmlModel.getText();
+            if (elementName.trim().length() > 0 && elementData.trim().length() > 0) {
+              Text txt = new Text(elementData);
+              metadata.add(elementName, txt);
+            }
+            break;
+        default:
+          break;
+      }
+    }
+    } catch (Exception ex) {
+    }
+    return metadata;
   }
 
   @Override
-  public String toString() {
-    return "" + value;
+  public boolean containsMetadata() {
+    return true;
   }
 }
-

@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>ImageStrip.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,50 +25,63 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 5/6/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.tiff.model;
+
+import java.util.List;
 
 /**
- * The Class Double.
+ * The Class ImageStrip.
  */
-public class Double extends abstractTiffType {
-  /** The value. */
-  private double value;
+public class ImageStrips {
+
+  /** The strip offsets. */
+  private List<Strip> strips;
+
+  /** The rows per strip. */
+  private long rowsPerStrip;
 
   /**
-   * Instantiates a new short.
-   *
-   * @param value the value
+   * Default constructor.
    */
-  public Double(double value) {
-    super();
-    this.value = value;
-    setTypeSize(8);
+  public ImageStrips() {}
+
+  /**
+   * Sets the strips.
+   *
+   * @param strips the new strips
+   */
+  public void setStrips(List<Strip> strips) {
+    this.strips = strips;
   }
 
   /**
-   * Gets the value.
+   * Sets the number of rows per strip.
    *
-   * @return the value
+   * @param rowsPerStrip the rows per strip
    */
-  public double getValue() {
-    return value;
+  public void setRowsPerStrip(long rowsPerStrip) {
+    this.rowsPerStrip = rowsPerStrip;
   }
 
   /**
-   * Sets the value.
+   * Gets the strips.
    *
-   * @param value the new value
+   * @return the strips
    */
-  public void setValue(double value) {
-    this.value = value;
+  public List<Strip> getStrips() {
+    return strips;
   }
 
-  @Override
-  public String toString() {
-    return "" + value;
+  /**
+   * Gets the rows per strip.
+   *
+   * @return the rows per strip
+   */
+  public long getRowsPerStrip() {
+    return rowsPerStrip;
   }
 }
 

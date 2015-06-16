@@ -1,5 +1,5 @@
 /**
- * <h1>ValidationError.java</h1> 
+ * <h1>ValidationError.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 18/5/2015
  *
@@ -31,31 +32,31 @@
 package com.easyinnova.tiff.model;
 
 /**
- * The Class ValidationError.
+ * The object that contains an error in the validation of a Tiff file.
  */
-public class ValidationError {
+public class ValidationEvent {
 
-  /** The Description. */
+  /** The error description. */
   public String description;
 
-  /** The Value. */
+  /** The value that has thrown the error. */
   public String value;
 
   /**
-   * Instantiates a new validation error.
+   * Default constructor.
    */
-  public ValidationError() {
+  public ValidationEvent() {
     description = "";
     value = null;
   }
 
   /**
-   * Instantiates a new validation error.
+   * Parameterized constructor.
    *
-   * @param desc the desc
-   * @param value the value
+   * @param desc error description
+   * @param value the value that caused the error
    */
-  public ValidationError(String desc, String value) {
+  public ValidationEvent(String desc, String value) {
     this.description = desc;
     this.value = value;
   }
@@ -71,7 +72,7 @@ public class ValidationError {
   }
 
   /**
-   * Prints the warning.
+   * Prints the warning in the console.
    */
   public void printWarning() {
     System.out.print("Warning: ");

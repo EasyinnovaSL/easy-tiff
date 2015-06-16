@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>InvalidHeaderException.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,50 +25,26 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 9/6/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.tiff.reader;
 
 /**
- * The Class Double.
+ * The Class InvalidHeaderException.
  */
-public class Double extends abstractTiffType {
-  /** The value. */
-  private double value;
+public class InvalidHeaderException extends Exception {
 
   /**
-   * Instantiates a new short.
+   * Instantiates a new invalid header exception.
    *
-   * @param value the value
+   * @param message the message
    */
-  public Double(double value) {
-    super();
-    this.value = value;
-    setTypeSize(8);
+  public InvalidHeaderException(String message) {
+    super(message);
   }
 
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public double getValue() {
-    return value;
-  }
-
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(double value) {
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return "" + value;
-  }
+  /** The Constant serialVersionUID. */
+  static final long serialVersionUID = 546546; // random
 }
 

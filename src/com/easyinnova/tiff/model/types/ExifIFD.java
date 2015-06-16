@@ -1,5 +1,5 @@
 /**
- * <h1>SubIFD.java</h1> 
+ * <h1>ExifIFD.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -17,60 +17,36 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
- * @since 2/6/2015
+ * @since 9/6/2015
  *
  */
 package com.easyinnova.tiff.model.types;
 
-import com.easyinnova.tiff.model.IFD;
 
 /**
- * The Class SubIFD.
+ * The Class ExifIFD.
  */
-public class SubIFD extends abstractTiffType {
-
-  /** The value. */
-  private IFD value;
+public class ExifIFD extends IFD {
 
   /**
-   * Instantiates a new long.
-   *
-   * @param value the value
+   * Instantiates a new exif ifd.
    */
-  public SubIFD(IFD value) {
-    super();
-    this.value = value;
-  }
-
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public IFD getValue() {
-    return value;
-  }
-
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(IFD value) {
-    this.value = value;
+  public ExifIFD() {
+    super(false);
+    super.setIsIFD(true);
   }
 
   @Override
   public String toString() {
-    return "SubIFD";
+    return super.getMetadata().toString();
   }
 }
 

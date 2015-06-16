@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>Strip.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,50 +25,82 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 5/6/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.tiff.model;
 
 /**
- * The Class Double.
+ * The Class Strip.
  */
-public class Double extends abstractTiffType {
-  /** The value. */
-  private double value;
+public class Strip {
+
+  /** The offset. */
+  private int offset;
+
+  /** The length. */
+  private int length;
+
+  /** The rows. */
+  private int rows;
 
   /**
-   * Instantiates a new short.
-   *
-   * @param value the value
+   * Default constructor.
    */
-  public Double(double value) {
-    super();
-    this.value = value;
-    setTypeSize(8);
+  public Strip() {}
+
+  /**
+   * Gets the offset.
+   *
+   * @return the offset
+   */
+  public int getOffset() {
+    return offset;
   }
 
   /**
-   * Gets the value.
+   * Gets the length.
    *
-   * @return the value
+   * @return the length
    */
-  public double getValue() {
-    return value;
+  public int getLength() {
+    return length;
   }
 
   /**
-   * Sets the value.
+   * Gets the strip rows.
    *
-   * @param value the new value
+   * @return the strip rows
    */
-  public void setValue(double value) {
-    this.value = value;
+  public int getStripRows() {
+    return rows;
   }
 
-  @Override
-  public String toString() {
-    return "" + value;
+  /**
+   * Sets the offset.
+   *
+   * @param offset the new offset
+   */
+  public void setOffset(int offset) {
+    this.offset = offset;
+  }
+
+  /**
+   * Sets the length.
+   *
+   * @param length the new length
+   */
+  public void setLength(int length) {
+    this.length = length;
+  }
+
+  /**
+   * Sets the strip rows.
+   *
+   * @param rows the new strip rows
+   */
+  public void setStripRows(int rows) {
+    this.rows = rows;
   }
 }
 

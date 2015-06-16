@@ -1,5 +1,5 @@
 /**
- * <h1>TiffWriter.java</h1> 
+ * <h1>TiffWriter.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 28/5/2015
  *
@@ -31,10 +32,10 @@
 package com.easyinnova.tiff.writer;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
-import com.easyinnova.tiff.model.IFD;
 import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.TagValue;
-import com.easyinnova.tiff.model.TiffObject;
+import com.easyinnova.tiff.model.TiffDocument;
+import com.easyinnova.tiff.model.types.IFD;
 
 import java.util.ArrayList;
 
@@ -44,18 +45,16 @@ import java.util.ArrayList;
 public class TiffWriter {
 
   /** The model. */
-  TiffObject model;
+  TiffDocument model;
 
   /** The odata. */
   TiffStreamIO data;
 
   /**
    * Instantiates a new tiff writer.
-   *
-   * @param data the data
    */
   public TiffWriter() {
-    model = new TiffObject();
+    model = new TiffDocument();
   }
 
   /**
@@ -63,7 +62,7 @@ public class TiffWriter {
    *
    * @param model the model
    */
-  public void SetModel(TiffObject model) {
+  public void SetModel(TiffDocument model) {
     this.model = model;
   }
 
@@ -71,7 +70,7 @@ public class TiffWriter {
    * Write.
    *
    * @param filename the filename
-   * @throws Exception
+   * @throws Exception the exception
    */
   public void write(String filename) throws Exception {
     data = new TiffStreamIO(null);
@@ -87,12 +86,10 @@ public class TiffWriter {
 
   /**
    * Write.
-   *
-   * @param odata the odata
    */
   public void writeTiff() {
     for (int i = model.getIfds().size() - 1; i >= 0; i--) {
-      IFD ifd = model.getIfds().get(i);
+      IFD ifd = (IFD) model.getIfds().get(i);
       writeIFD(ifd);
     }
   }
@@ -117,29 +114,29 @@ public class TiffWriter {
    */
   public int writeMetadata(IfdTags metadata) {
     ArrayList<TagValue> tags = metadata.getTags();
-    int offset = data.position();
+    // int offset = data.position();
     for (TagValue tag : tags) {
       if (tag.getId() == 273) {
         writeStripData(metadata);
       } else if (tag.getId() == 279) {
         // Nothing to do here, writeStripData does everything
       } else {
-        int size = writeTag(tag);
+        // int size = writeTag(tag);
         // tag.setIntValue(offset);
-        offset += size;
+        // offset += size;
       }
     }
     data.putShort((short) tags.size());
-    for (TagValue tag : tags) {
+    // for (TagValue tag : tags) {
       // tag.write(data);
-    }
+    // }
     return data.position();
   }
 
   /**
    * Write strip data.
    *
-   * @param odata the odata
+   * @param metadata the metadata
    */
   private void writeStripData(IfdTags metadata) {
     TagValue stripOffsets = metadata.get(273);
@@ -154,14 +151,14 @@ public class TiffWriter {
         data.put((byte) v);
       }
     }
-    int offsetStripOffsets = data.position();
-    for (int i = 0; i < stripOffsets2.size(); i++) {
-      data.putInt(stripOffsets2.get(i));
-    }
-    int offsetStripSizes = data.position();
-    for (int i = 0; i < stripSizes2.size(); i++) {
-      data.putInt(stripOffsets2.get(i));
-    }
+    // int offsetStripOffsets = data.position();
+    // for (int i = 0; i < stripOffsets2.size(); i++) {
+    // data.putInt(stripOffsets2.get(i));
+    // }
+    // int offsetStripSizes = data.position();
+    // for (int i = 0; i < stripSizes2.size(); i++) {
+    // data.putInt(stripOffsets2.get(i));
+    // }
     // metadata.hashTagsId.get(273).setIntValue(offsetStripOffsets);
     // metadata.hashTagsId.get(279).setIntValue(offsetStripSizes);
   }
@@ -175,7 +172,7 @@ public class TiffWriter {
   public int writeTag(TagValue tag) {
     int totalSize = 0;
     for (int i = 0; i < totalSize; i++) {
-      int v = data.get(tag.getFirstNumericValue() + i);
+      int v = data.get((int) tag.getFirstNumericValue() + i);
       data.put((byte) v);
     }
     return totalSize;

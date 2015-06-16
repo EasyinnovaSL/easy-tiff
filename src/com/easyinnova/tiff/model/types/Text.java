@@ -1,5 +1,5 @@
 /**
- * <h1>Double.java</h1> 
+ * <h1>Text.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,27 +25,27 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 29/5/2015
+ * @since 10/6/2015
  *
  */
 package com.easyinnova.tiff.model.types;
 
 /**
- * The Class Double.
+ * The Class Text.
  */
-public class Double extends abstractTiffType {
+public class Text extends abstractTiffType {
   /** The value. */
-  private double value;
+  private String value;
 
   /**
-   * Instantiates a new short.
+   * Instantiates a new byte.
    *
    * @param value the value
    */
-  public Double(double value) {
+  public Text(String value) {
     super();
     this.value = value;
-    setTypeSize(8);
+    setTypeSize(1);
   }
 
   /**
@@ -53,7 +53,7 @@ public class Double extends abstractTiffType {
    *
    * @return the value
    */
-  public double getValue() {
+  public String getValue() {
     return value;
   }
 
@@ -62,13 +62,13 @@ public class Double extends abstractTiffType {
    *
    * @param value the new value
    */
-  public void setValue(double value) {
+  public void setValue(String value) {
     this.value = value;
   }
 
   @Override
   public String toString() {
-    return "" + value;
+    return value;
   }
 }
 

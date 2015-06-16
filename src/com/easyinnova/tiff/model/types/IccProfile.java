@@ -17,13 +17,13 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 25/5/2015
  *
@@ -31,8 +31,12 @@
 package com.easyinnova.tiff.model.types;
 
 import com.easyinnova.tiff.io.TiffStreamIO;
+import com.easyinnova.tiff.model.IccProfileCreator;
+import com.easyinnova.tiff.model.IccProfileCreators;
+import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.ValidationResult;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class IccProfile.
  */
@@ -46,6 +50,20 @@ public class IccProfile extends abstractTiffType {
 
   /** The validation result. */
   public ValidationResult validation;
+
+  /** The version. */
+  private String version;
+
+  /** The version. */
+  private IccProfileCreator creator;
+
+  /**
+   * Default Constructor.
+   */
+  public IccProfile() {
+    version = null;
+    creator = null;
+  }
 
   /**
    * Instantiates a new icc profile.
@@ -86,13 +104,71 @@ public class IccProfile extends abstractTiffType {
     }
   }
 
+  /**
+   * Gets the version.
+   *
+   * @return the version
+   */
+  public String getVersion() {
+    return version;
+  }
+
+  /**
+   * Gets the creator.
+   *
+   * @return the creator
+   */
+  public IccProfileCreator getCreator() {
+    return creator;
+  }
+
   @Override
   public String toString() {
     String s = "";
-    for (IccTag tag : tags.tags) {
-      s += "[" + tag.signature + "->" + tag.offset + "]";
-    }
+    // for (IccTag tag : tags.tags)
+    // s += "[" + tag.signature + "->" + tag.offset + "]";
+    String scr = "Unknown creator";
+    if (creator != null)
+      scr = creator.getCreator();
+    s = "[" + scr + ", " + version + "]";
     return s;
+  }
+
+  /**
+   * Read version.
+   *
+   * @param tv the tv
+   */
+  private void readVersion(TagValue tv) {
+    int maj = tv.getBytes(8, 1); // Major version
+    int min = (tv.getBytes(9, 1) & 0xF0) >> 4; // Minor version (in the first 4 bits of the byte)
+    // int z1 = tv.getBytes(10, 1);
+    // int z2 = tv.getBytes(11, 1);
+    version = maj + "." + min;
+  }
+
+  /**
+   * Read creator.
+   *
+   * @param tv the tv
+   */
+  private void readCreator(TagValue tv) {
+    int creatorSignature = tv.getBytes(4, 4);
+    creator = IccProfileCreators.getIccProfile(creatorSignature);
+  }
+
+  /**
+   * Reads the desired values of the ICCProfile.
+   * 
+   * @param tv the TagValue containing the array of bytes of the ICCProfile
+   */
+  @Override
+  public void read(TagValue tv) {
+    readVersion(tv);
+    readCreator(tv);
+
+    tv.clear();
+    tv.add(this);
   }
 }
 

@@ -36,39 +36,42 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The Class Tag.
+ * Tag definition.
  */
 public class Tag {
   
   /** The id. */
-  protected Integer id;
+  private Integer id;
 
   /** The name. */
-  public String name = "";
+  private String name = "";
 
   /** The type. */
-  protected List<String> type;
+  private List<String> type;
 
   /** The cardinality. */
-  protected String cardinality = "";
+  private String cardinality = "";
 
   /** The default value. */
-  protected String defaultValue = "";
+  private String defaultValue = "";
   
   /** The ifd. */
-  protected String ifd = ""; 
+  private String ifd = "";
   
   /** The description. */
-  protected String description = "";
+  private String description = "";
   
   /** The source. */
-  protected String source = "";
+  private String source = "";
   
+  /** The typedef. */
+  private String typedef = null;
+
   /** The created. */
-  protected Date created;
+  private Date created;
   
   /** The modified. */
-  protected Date modified;
+  private Date modified;
   
   /**
    * Gets the id.
@@ -78,7 +81,6 @@ public class Tag {
   public Integer getId() {
     return id;
   }
-
   
   /**
    * Sets the id.
@@ -252,6 +254,15 @@ public class Tag {
   }
 
   /**
+   * Gets the typedef.
+   *
+   * @return the typedef
+   */
+  public String getTypedef() {
+    return typedef;
+  }
+
+  /**
    * Instantiates a new tag.
    *
    * @param id the id
@@ -259,10 +270,9 @@ public class Tag {
    * @param type the type
    * @param cardinality the cardinality
    * @param defaultValue the default value
-
+   * @param typedef the typedef
    */
-  public Tag(int id, String name, List<String>  type, String cardinality, String defaultValue) {
-    
+  public Tag(int id, String name, List<String>  type, String cardinality, String defaultValue, String typedef) {
     this.id = id;
     this.name = name;
     this.type = type;
@@ -275,7 +285,7 @@ public class Tag {
     Date date = new Date();
     this.created = date;
     this.modified= date;
-  
+    this.typedef = typedef;
   }
 
   /**
@@ -293,4 +303,12 @@ public class Tag {
     return valid;
   }
 
+  /**
+   * Checks for typedef.
+   *
+   * @return true, if successful
+   */
+  public boolean hasTypedef() {
+    return typedef != null;
+  }
 }

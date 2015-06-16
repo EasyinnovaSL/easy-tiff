@@ -1,5 +1,5 @@
 /**
- * <h1>TiffStreamReader.java</h1> 
+ * <h1>TiffStreamReader.java</h1>
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -13,17 +13,18 @@
  * </p>
  * <p>
  * You should have received a copy of the GNU General Public License and the Mozilla Public License
- * along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at
- * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
+ * along with this program. If not, see <a
+ * href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a> and at <a
+ * href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
- * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+ * NB: for the Â© statement, include Easy Innova SL or other company/Person contributing the code.
  * </p>
  * <p>
- * © 2015 Easy Innova, SL
+ * Â© 2015 Easy Innova, SL
  * </p>
  *
- * @author Víctor Muñoz Solà
+ * @author VÃ­ctor MuÃ±oz SolÃ 
  * @version 1.0
  * @since 22/5/2015
  *
@@ -55,7 +56,7 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
   /**
    * Instantiates a new tiff stream io.
    *
-   * @param in the in
+   * @param in the inpu stream
    */
   public TiffStreamIO(InputStream in) {
     super(in);
@@ -80,7 +81,7 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    * Read.
    *
    * @param filename the filename
-   * @throws Exception
+   * @throws Exception the exception
    */
   public void load(String filename) throws Exception {
     this.filename = filename;
@@ -148,7 +149,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    * Puts a byte.
    *
    * @param val the val
-   * @return the int
    */
   public void put(byte val) {
     data.put(val);
@@ -158,7 +158,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    * Puts a short (2 bytes).
    *
    * @param val the val
-   * @return the int
    */
   public void putShort(short val) {
     data.putShort(val);
@@ -168,7 +167,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    * Puts a int (4 bytes).
    *
    * @param val the val
-   * @return the int
    */
   public void putInt(int val) {
     data.putInt(val);
@@ -209,8 +207,8 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    * @param offset the file position offset
    * @return the int
    */
-  public int getUInt(int offset) {
-    return data.getInt(offset) & 0xFFFFFFFF;
+  public long getUInt(int offset) {
+    return data.getInt(offset) & 0xFFFFFFFFL;
   }
 
   /**
