@@ -47,10 +47,10 @@ public class XMP extends XmlType {
   public Metadata createMetadata() {
     Metadata metadata = new Metadata();
     try {
-    while (xmlModel.hasNext()) {
-      int eventType = xmlModel.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
+      while (xmlModel.hasNext()) {
+        int eventType = xmlModel.next();
+        switch (eventType) {
+          case XMLStreamReader.START_ELEMENT:
             String elementName = xmlModel.getLocalName();
             eventType = xmlModel.next();
             String elementData = xmlModel.getText();
@@ -59,10 +59,10 @@ public class XMP extends XmlType {
               metadata.add(elementName, txt);
             }
             break;
-        default:
-          break;
+          default:
+            break;
+        }
       }
-    }
     } catch (Exception ex) {
     }
     return metadata;
