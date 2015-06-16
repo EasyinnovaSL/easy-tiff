@@ -17,13 +17,25 @@
  * <a href="http://mozilla.org/MPL/2.0">http://mozilla.org/MPL/2.0</a> .
  * </p>
  * <p>
+<<<<<<< HEAD
  * NB: for the © statement, include Easy Innova SL or other company/Person contributing the code.
+=======
+ * NB: for the � statement, include Easy Innova SL or other company/Person contributing the code.
+>>>>>>> refs/heads/tiffinputstream
  * </p>
  * <p>
+<<<<<<< HEAD
  * © 2015 Easy Innova, SL
+=======
+ * � 2015 Easy Innova, SL
+>>>>>>> refs/heads/tiffinputstream
  * </p>
  *
+<<<<<<< HEAD
  * @author Víctor Muñoz Solà
+=======
+ * @author V�ctor Mu�oz Sol�
+>>>>>>> refs/heads/tiffinputstream
  * @version 1.0
  * @since 29/5/2015
  *
@@ -71,5 +83,6 @@ public class Float extends abstractTiffType {
   public String toString() {
     return "" + value;
   }
+
 }
 

@@ -62,7 +62,6 @@ public interface TiffDataIntput {
   /**
    * Read byte.
    *
-   * @param n the n
    * @return the byte
    * @throws IOException Signals that an I/O exception has occurred.
    */
@@ -72,7 +71,6 @@ public interface TiffDataIntput {
   /**
    * Read ascii.
    *
-   * @param n the n
    * @return the ascii
    * @throws IOException Signals that an I/O exception has occurred.
    */

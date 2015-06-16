@@ -42,11 +42,11 @@ public class Ascii extends abstractTiffType {
   /**
    * Instantiates a new ascii.
    *
-   * @param value the value
+   * @param ch the value
    */
-  public Ascii(byte value) {
+  public Ascii(int ch) {
     super();
-    this.value = value;
+    this.value = (byte) ch;
     setTypeSize(1);
   }
 
@@ -55,8 +55,8 @@ public class Ascii extends abstractTiffType {
    *
    * @return the value
    */
-  public byte getValue() {
-    return value;
+  public int getValue() {
+    return (int) value;
   }
 
   /**

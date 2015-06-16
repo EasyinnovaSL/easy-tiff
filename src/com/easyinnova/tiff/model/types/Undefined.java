@@ -40,11 +40,11 @@ public class Undefined extends abstractTiffType{
   /**
    * Instantiates a new s byte.
    *
-   * @param value the value
+   * @param ch the value
    */
-  public Undefined(byte value) {
+  public Undefined(int ch) {
     super();
-    this.value=value;
+    this.value=(byte) ch;
     setTypeSize(1);
   }
 
