@@ -30,13 +30,12 @@
  */
 package com.easyinnova.tiff.model.types;
 
-import com.easyinnova.tiff.io.TiffStreamIO;
+import com.easyinnova.tiff.io.TiffInputStream;
 import com.easyinnova.tiff.model.IccProfileCreator;
 import com.easyinnova.tiff.model.IccProfileCreators;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.ValidationResult;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class IccProfile.
  */
@@ -46,7 +45,7 @@ public class IccProfile extends abstractTiffType {
   public IccTags tags;
 
   /** The data. */
-  TiffStreamIO data;
+  TiffInputStream data;
 
   /** The validation result. */
   public ValidationResult validation;
@@ -72,7 +71,7 @@ public class IccProfile extends abstractTiffType {
    * @param size the size in bytes of the embedded ICC Profile
    * @param data the data
    */
-  public IccProfile(int offset, int size, TiffStreamIO data) {
+  public IccProfile(int offset, int size, TiffInputStream data) {
     this.data = data;
     validation = new ValidationResult();
     setTypeSize(size);
@@ -87,20 +86,23 @@ public class IccProfile extends abstractTiffType {
    * @param size the size
    */
   private void readIccProfile(int offset, int size) {
-    int iccsize = data.getInt(offset);
-    if (iccsize != size)
-      validation.addError("ICC Profile size does not match");
+    try {
+      int iccsize = data.readLong(offset).toInt();
+      if (iccsize != size)
+        validation.addError("ICC Profile size does not match");
 
-    int index = offset + 128;
-    int tagCount = data.getInt(index);
+      int index = offset + 128;
+      int tagCount = data.readLong(index).toInt();
 
-    for (int i = 0; i < tagCount; i++) {
-      int signature = data.getInt(index);
-      int tagOffset = data.getInt(index + 4);
-      int tagSize = data.getInt(index + 8);
-      IccTag tag = new IccTag(signature, tagOffset, tagSize);
-      tags.addTag(tag);
-      index += 12;
+      for (int i = 0; i < tagCount; i++) {
+        int signature = data.readLong(index).toInt();
+        int tagOffset = data.readLong(index + 4).toInt();
+        int tagSize = data.readLong(index + 8).toInt();
+        IccTag tag = new IccTag(signature, tagOffset, tagSize);
+        tags.addTag(tag);
+        index += 12;
+      }
+    } catch (Exception ex) {
     }
   }
 

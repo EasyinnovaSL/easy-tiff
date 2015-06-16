@@ -93,6 +93,9 @@ public class BaselineProfile {
   /** The rows per strip tolerance. */
   private int rowsPerStripTolerance = 1;
 
+  /** The ifd. */
+  private IFD ifd;
+
   /**
    * Instantiates a new baseline profile.
    */
@@ -107,24 +110,22 @@ public class BaselineProfile {
    * @param ifd the image file descriptor
    */
   public void validateIfd(IFD ifd) {
-    IfdTags metadata = ifd.getMetadata();
+    this.ifd = ifd;
 
     // Validate tags
-    validateMetadata(metadata);
+    validateMetadata();
 
     // Validate image
-    checkImage(metadata);
+    checkImage();
   }
 
   /**
    * Validates the ifd entries.
-   *
-   * @param metadata the metadata
    */
-  public void validateMetadata(IfdTags metadata) {
+  public void validateMetadata() {
     int prevTagId = 0;
     TiffTags.getTiffTags();
-    for (TagValue ie : metadata.getTags()) {
+    for (TagValue ie : ifd.getMetadata().getTags()) {
       if (!TiffTags.tagMap.containsKey(ie.getId())) {
         validation.addWarning("Undefined tag id " + ie.getId());
       }
@@ -166,10 +167,10 @@ public class BaselineProfile {
 
   /**
    * Check image.
-   *
-   * @param metadata the metadata
    */
-  public void checkImage(IfdTags metadata) {
+  public void checkImage() {
+    IfdTags metadata = ifd.getMetadata();
+
     CheckCommonFields(metadata);
 
     if (!metadata.containsTagId(TiffTags.getTagId("PhotometricInterpretation"))) {
@@ -269,7 +270,7 @@ public class BaselineProfile {
       int n = metadata.get(TiffTags.getTagId("ColorMap")).getCardinality();
       if (n != 3 * (int) Math.pow(2, metadata.get(TiffTags.getTagId("BitsPerSample"))
           .getFirstNumericValue()))
-        validation.addError("Color Map Cardinality", metadata.get(320).getCardinality());
+        validation.addError("Incorrect Color Map Cardinality", metadata.get(320).getCardinality());
     }
 
     // Bits per Sample
@@ -490,22 +491,16 @@ public class BaselineProfile {
     }
 
     // Check whether tiles or strips
-    strips = false;
-    tiles = false;
-    if (metadata.containsTagId(TiffTags.getTagId("StripOffsets"))
-        && metadata.containsTagId(TiffTags.getTagId("StripBYTECount")))
-      strips = true;
-    if (metadata.containsTagId(TiffTags.getTagId("TileBYTECounts"))
-        && metadata.containsTagId(TiffTags.getTagId("TileOffsets")))
-      tiles = true;
+    strips = ifd.hasStrips();
+    tiles = ifd.hasTiles();
     if (!strips && !tiles)
       validation.addError("Missing image organization tags");
     else if (strips && tiles)
       validation.addError("Image in both strips and tiles");
     else if (strips) {
-      CheckStrips(metadata);
+      CheckStrips();
     } else if (tiles) {
-      CheckTiles(metadata);
+      CheckTiles();
     }
 
     // Check pixel samples bits
@@ -549,12 +544,11 @@ public class BaselineProfile {
 
   /**
    * Check strips.
-   *
-   * @param metadata the metadata
    */
-  private void CheckStrips(IfdTags metadata) {
+  private void CheckStrips() {
     long offset;
     int id;
+    IfdTags metadata = ifd.getMetadata();
 
     // Strip offsets
     id = TiffTags.getTagId("StripOffsets");
@@ -590,12 +584,11 @@ public class BaselineProfile {
 
   /**
    * Check tiles.
-   *
-   * @param metadata the metadata
    */
-  private void CheckTiles(IfdTags metadata) {
+  private void CheckTiles() {
     long offset;
     int id;
+    IfdTags metadata = ifd.getMetadata();
 
     // Tile Offsets
     id = TiffTags.getTagId("TileOffsets");
@@ -616,25 +609,43 @@ public class BaselineProfile {
     }
 
     // Tile Width
+    long tileWidth = 0;
     id = TiffTags.getTagId("TileWidth");
     if (!metadata.containsTagId(id))
-      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName(),
-          offset);
+      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName());
     else {
-      offset = metadata.get(id).getFirstNumericValue();
-      if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
+      tileWidth = metadata.get(id).getFirstNumericValue();
+      if (tileWidth <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), tileWidth);
     }
 
     // Tile Length
     id = TiffTags.getTagId("TileLength");
+    long tileLength = 0;
     if (!metadata.containsTagId(id))
-      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName(),
-          offset);
+      validation.addError("Missing required field for tiles " + TiffTags.getTag(id).getName());
     else {
-      offset = metadata.get(id).getFirstNumericValue();
-      if (offset <= 0)
-        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
+      tileLength = metadata.get(id).getFirstNumericValue();
+      if (tileLength <= 0)
+        validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), tileLength);
+    }
+
+    long tilesPerImage =
+        ((metadata.get(TiffTags.getTagId("ImageWidth")).getFirstNumericValue() + tileWidth - 1) / tileWidth)
+            * ((metadata.get(TiffTags.getTagId("ImageLength")).getFirstNumericValue() + tileLength - 1) / tileLength);
+
+    // Check Plannar Configuration
+    id = TiffTags.getTagId("PlanarConfiguration");
+    int idspp = TiffTags.getTagId("SamplesPerPixel");
+    if (metadata.containsTagId(id) && metadata.containsTagId(idspp)) {
+      long planar = metadata.get(id).getFirstNumericValue();
+      long spp = metadata.get(idspp).getFirstNumericValue();
+      if (planar == 2) {
+        long spp_tpi = spp * tilesPerImage;
+        if (ifd.getImageTiles().getTiles().size() < spp_tpi) {
+          validation.addError("Insufficient tiles");
+        }
+      }
     }
   }
 

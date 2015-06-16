@@ -1,10 +1,6 @@
 package Tests;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,9 +9,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.easyinnova.tiff.io.TiffInputStream;
-import com.easyinnova.tiff.io.TiffInputStream;
-import com.easyinnova.tiff.model.types.*;
-import com.easyinnova.tiff.model.types.Long;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteOrder;
 
 /**
  * The Class TiffFileInputStreamTest.
@@ -135,12 +132,12 @@ public class TiffFileInputStreamTest {
   public void readShort() throws IOException {
     
     TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/ShortTest.hex"));
-    stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
     assertEquals("32767",stream.readShort().toString());
     assertEquals("32768",stream.readShort().toString());
     assertEquals("0",stream.readShort().toString());
     assertEquals("65535",stream.readShort().toString());
-    stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
     stream.seek(0);
     assertEquals("65407",stream.readShort().toString());
     assertEquals("128",stream.readShort().toString());
@@ -158,12 +155,12 @@ public class TiffFileInputStreamTest {
   public void readSShort() throws IOException {
     
     TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/ShortTest.hex"));
-    stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
     assertEquals("32767",stream.readSShort().toString());
     assertEquals("-32768",stream.readSShort().toString());
     assertEquals("0",stream.readSShort().toString());
     assertEquals("-1",stream.readSShort().toString());
-    stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
     stream.seek(0);
     assertEquals("-129",stream.readSShort().toString());
     assertEquals("128",stream.readSShort().toString());
@@ -181,12 +178,12 @@ public class TiffFileInputStreamTest {
   public void readLong() throws IOException {
     
     TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/LongTest.hex"));
-    stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
     assertEquals("2147483647",stream.readLong().toString());
     assertEquals("2147483648",stream.readLong().toString());
     assertEquals("0",stream.readLong().toString());
     assertEquals("4294967295",stream.readLong().toString());
-    stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
     stream.seek(0);
     assertEquals("4294967167",stream.readLong().toString());
     assertEquals("128",stream.readLong().toString());
@@ -205,12 +202,12 @@ public class TiffFileInputStreamTest {
  public void readSSLong() throws IOException {
     
     TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/LongTest.hex"));
-    stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
     assertEquals("2147483647",stream.readSLong().toString());
     assertEquals("-2147483648",stream.readSLong().toString());
     assertEquals("0",stream.readSLong().toString());
     assertEquals("-1",stream.readSLong().toString());
-    stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
     stream.seek(0);
     assertEquals("-129",stream.readSLong().toString());
     assertEquals("128",stream.readSLong().toString());
@@ -229,7 +226,7 @@ public class TiffFileInputStreamTest {
   public void readFloat() throws IOException {
      
      TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/FloatTest.hex"));
-     stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
      assertEquals("0.0",stream.readFloat().toString());
      assertEquals("-0.0",stream.readFloat().toString());
      assertEquals("Infinity",stream.readFloat().toString());
@@ -240,7 +237,7 @@ public class TiffFileInputStreamTest {
      assertEquals("NaN",stream.readFloat().toString());
      assertEquals("-1.1754942E-38",stream.readFloat().toString());
      assertEquals("1.1754942E-38",stream.readFloat().toString());
-     stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
      stream.seek(0);
      assertEquals("0.0",stream.readFloat().toString());
      assertEquals("1.794E-43",stream.readFloat().toString());
@@ -266,7 +263,7 @@ public class TiffFileInputStreamTest {
    public void readDouble() throws IOException {
       
       TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/DoubleTest.hex"));
-      stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
       assertEquals("0.0",stream.readDouble().toString());
       assertEquals("-0.0",stream.readDouble().toString());
       assertEquals("Infinity",stream.readDouble().toString());
@@ -277,7 +274,7 @@ public class TiffFileInputStreamTest {
       assertEquals("NaN",stream.readDouble().toString());
       assertEquals("-2.225073858507201E-308",stream.readDouble().toString());
       assertEquals("2.225073858507201E-308",stream.readDouble().toString());
-      stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       stream.seek(0);
       assertEquals("0.0",stream.readDouble().toString());
       assertEquals("6.32E-322",stream.readDouble().toString());
@@ -302,7 +299,7 @@ public class TiffFileInputStreamTest {
    public void readRacional() throws IOException {
       
       TiffInputStream stream = new TiffInputStream(new File("src/test/resources/io/DoubleTest.hex"));
-      stream.setByteOrder(TiffInputStream.BIG_ENDIAN);
+    stream.setByteOrder(ByteOrder.BIG_ENDIAN);
       assertEquals("0.0",stream.readDouble().toString());
       assertEquals("-0.0",stream.readDouble().toString());
       assertEquals("Infinity",stream.readDouble().toString());
@@ -313,7 +310,7 @@ public class TiffFileInputStreamTest {
       assertEquals("NaN",stream.readDouble().toString());
       assertEquals("-2.225073858507201E-308",stream.readDouble().toString());
       assertEquals("2.225073858507201E-308",stream.readDouble().toString());
-      stream.setByteOrder(TiffInputStream.LITTLE_ENDIAN);
+    stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       stream.seek(0);
       assertEquals("0.0",stream.readDouble().toString());
       assertEquals("6.32E-322",stream.readDouble().toString());

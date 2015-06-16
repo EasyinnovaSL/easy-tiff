@@ -32,11 +32,16 @@
 package com.easyinnova.tiff.io;
 
 import com.easyinnova.tiff.model.types.Ascii;
+import com.easyinnova.tiff.model.types.Byte;
+import com.easyinnova.tiff.model.types.Double;
+import com.easyinnova.tiff.model.types.Float;
+import com.easyinnova.tiff.model.types.Long;
 import com.easyinnova.tiff.model.types.Rational;
 import com.easyinnova.tiff.model.types.SByte;
 import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
 import com.easyinnova.tiff.model.types.SShort;
+import com.easyinnova.tiff.model.types.Short;
 import com.easyinnova.tiff.model.types.Undefined;
 
 import java.io.FilterInputStream;
@@ -49,7 +54,10 @@ import java.nio.channels.FileChannel;
 
 /**
  * The Class TiffStreamReader.
+ * 
+ * @deprecated use {TiffInputStream} instead.
  */
+@Deprecated
 public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
 
   /**
@@ -262,16 +270,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
   /*
    * (non-Javadoc)
    * 
-   * @see com.easyinnova.tiff.io.TiffDataIntput#skipBytes(int)
-   */
-  @Override
-  public int skipBytes(int n) throws IOException {
-    return 0;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
    * @see com.easyinnova.tiff.io.TiffDataIntput#readByte()
    */
   @Override
@@ -286,17 +284,6 @@ public class TiffStreamIO extends FilterInputStream implements TiffDataIntput {
    */
   @Override
   public Ascii readAscii() throws IOException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see com.easyinnova.tiff.io.TiffDataIntput#readAscii(int)
-   */
-  @Override
-  public Ascii readAscii(int n) throws IOException {
     // TODO Auto-generated method stub
     return null;
   }

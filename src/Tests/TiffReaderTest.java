@@ -41,7 +41,6 @@ import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.Tile;
 import com.easyinnova.tiff.model.types.IFD;
-import com.easyinnova.tiff.model.types.IFD.ImageRepresentation;
 import com.easyinnova.tiff.reader.TiffReader;
 
 /**
@@ -105,7 +104,8 @@ public class TiffReaderTest {
     assertEquals(1, tv.getCardinality());
     assertEquals(1, tv.getFirstNumericValue());
 
-    assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
+    assertEquals(true, ifd.hasStrips());
+    assertEquals(false, ifd.hasTiles());
     ImageStrips ims = ifd.getImageStrips();
     long rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();
     int nrows = 0;
@@ -156,7 +156,8 @@ public class TiffReaderTest {
     assertEquals(1, tv.getCardinality());
     assertEquals(2, tv.getFirstNumericValue());
 
-    assertEquals(ImageRepresentation.TILES, ifd.getImageRepresentation());
+    assertEquals(false, ifd.hasStrips());
+    assertEquals(true, ifd.hasTiles());
     int tw = ifd.getImageTiles().getTileWidth();
     int th = ifd.getImageTiles().getTileHeight();
     assertEquals(256, tw);
@@ -186,7 +187,8 @@ public class TiffReaderTest {
 
     assertEquals(0, to.getSubIfdCount());
 
-    assertEquals(ImageRepresentation.STRIPS, ifd.getImageRepresentation());
+    assertEquals(true, ifd.hasStrips());
+    assertEquals(false, ifd.hasTiles());
     ImageStrips ims = ifd.getImageStrips();
     assertEquals(662, ims.getRowsPerStrip());
     long rowLength = ims.getStrips().get(0).getLength() / ims.getRowsPerStrip();

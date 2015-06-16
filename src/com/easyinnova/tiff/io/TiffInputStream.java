@@ -32,39 +32,32 @@
  */
 package com.easyinnova.tiff.io;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.easyinnova.tiff.model.types.*;
+import com.easyinnova.tiff.model.types.Ascii;
 import com.easyinnova.tiff.model.types.Byte;
 import com.easyinnova.tiff.model.types.Double;
 import com.easyinnova.tiff.model.types.Float;
 import com.easyinnova.tiff.model.types.Long;
+import com.easyinnova.tiff.model.types.Rational;
+import com.easyinnova.tiff.model.types.SByte;
+import com.easyinnova.tiff.model.types.SLong;
+import com.easyinnova.tiff.model.types.SRational;
+import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.Short;
+import com.easyinnova.tiff.model.types.Undefined;
 
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.ByteOrder;
 
 /**
  * The Class DataByteOrderInputStream.
  */
 public class TiffInputStream extends RandomAccessFileInputStream implements TiffDataIntput {
 
-
-  /** The big endian constant. */
-  public static boolean BIG_ENDIAN = true;
-
-  /** The little endian constant. */
-  public static boolean LITTLE_ENDIAN = false;
-
   /** The Byte order. */
-  private boolean ByteOrder;
+  private ByteOrder byteOrder;
 
   /**
    * Instantiates a new data byte order input stream.
@@ -73,24 +66,40 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    */
   public TiffInputStream(File file) throws FileNotFoundException {
   super(file);
-    ByteOrder = BIG_ENDIAN;
+    byteOrder = ByteOrder.BIG_ENDIAN;
   }
   
   /**
+   * Gets the byte order.
+   *
    * @return the byteOrder
    */
-
-  public boolean getByteOrder() {
-    return ByteOrder;
+  public ByteOrder getByteOrder() {
+    return byteOrder;
   }
 
   /**
+   * Sets the byte order.
+   *
    * @param byteOrder the byteOrder to set
    */
-  public void setByteOrder(boolean byteOrder) {
-    ByteOrder = byteOrder;
+  public void setByteOrder(ByteOrder byteOrder) {
+    this.byteOrder = byteOrder;
   }
 
+  /**
+   * Read byte.
+   *
+   * @param position the position
+   * @return the byte
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Byte readByte(long position) throws IOException {
+    seek(position);
+    return readByte();
+  }
+
+  @Override
   public Byte readByte() throws IOException {
     int ch = read();
     if (ch < 0) {
@@ -99,6 +108,19 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new Byte(ch);
   }
   
+  /**
+   * Read ascii.
+   *
+   * @param position the position
+   * @return the ascii
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Ascii readAscii(long position) throws IOException {
+    seek(position);
+    return readAscii();
+  }
+
+  @Override
   public Ascii readAscii() throws IOException {
     int ch = read();
     if (ch < 0) {
@@ -107,6 +129,19 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new Ascii(ch);
   }
   
+  /**
+   * Read s byte.
+   *
+   * @param position the position
+   * @return the s byte
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public SByte readSByte(long position) throws IOException {
+    seek(position);
+    return readSByte();
+  }
+
+  @Override
   public SByte readSByte() throws IOException {
     
     int ch = read();
@@ -116,6 +151,19 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new SByte(ch);
   }
 
+  /**
+   * Read short.
+   *
+   * @param position the position
+   * @return the short
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Short readShort(long position) throws IOException {
+    seek(position);
+    return readShort();
+  }
+
+  @Override
   public Short readShort() throws IOException {
     int ch1 = read();
     int ch2 = read();
@@ -123,7 +171,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     short val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = (short)((ch1 << 8) + (ch2 << 0));
     }else{
       val = (short)((ch2 << 8) + (ch1 << 0));
@@ -131,6 +179,19 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new Short(val);
   }
   
+  /**
+   * Read s short.
+   *
+   * @param position the position
+   * @return the s short
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public SShort readSShort(long position) throws IOException {
+    seek(position);
+    return readSShort();
+  }
+
+  @Override
   public SShort readSShort() throws IOException {
     int ch1 = read();
     int ch2 = read();
@@ -138,7 +199,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
       throw new EOFException();
     }
     short val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = (short)((ch1 << 8) + (ch2 << 0));
     }else{
       val = (short)((ch2 << 8) + (ch1 << 0));
@@ -146,6 +207,19 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new SShort(val);
   }
   
+  /**
+   * Read long.
+   *
+   * @param position the position
+   * @return the long
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Long readLong(long position) throws IOException {
+    seek(position);
+    return readLong();
+  }
+
+  @Override
   public Long readLong() throws IOException {
     
     int ch1 = read();
@@ -156,7 +230,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = (int)((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
@@ -164,6 +238,19 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new Long(val);
   }
   
+  /**
+   * Read s long.
+   *
+   * @param position the position
+   * @return the s long
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public SLong readSLong(long position) throws IOException {
+    seek(position);
+    return readSLong();
+  }
+
+  @Override
   public SLong readSLong() throws IOException {
     int ch1 = read();
     int ch2 = read();
@@ -173,7 +260,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = (int)((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
@@ -181,13 +268,37 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     return new SLong(val);
   }
 
+  /**
+   * Read undefined.
+   *
+   * @param position the position
+   * @return the undefined
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Undefined readUndefined(long position) throws IOException {
+    seek(position);
+    return readUndefined();
+  }
   
+  @Override
   public Undefined readUndefined() throws IOException {
     int ch = read();
     if (ch < 0) {
     throw new EOFException();
     }
     return new Undefined(ch);
+  }
+
+  /**
+   * Read rational.
+   *
+   * @param position the position
+   * @return the rational
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Rational readRational(long position) throws IOException {
+    seek(position);
+    return readRational();
   }
 
   @Override
@@ -200,7 +311,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = (int)((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
@@ -214,14 +325,25 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val2;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val2 = (int)((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val2 = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }     
     
     return new Rational(val,val2);
-    
+  }
+
+  /**
+   * Read s rational.
+   *
+   * @param position the position
+   * @return the s rational
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public SRational readSRational(long position) throws IOException {
+    seek(position);
+    return readSRational();
   }
 
   @Override
@@ -234,7 +356,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = (int)((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
@@ -248,13 +370,25 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val2;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val2 = (int)((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val2 = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }     
     
     return new SRational(val,val2);
+  }
+
+  /**
+   * Read float.
+   *
+   * @param position the position
+   * @return the float
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Float readFloat(long position) throws IOException {
+    seek(position);
+    return readFloat();
   }
 
   @Override
@@ -267,12 +401,24 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
         throw new EOFException();
     }
     int val;
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       val = ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }else{
       val = ((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }         
     return new Float( java.lang.Float.intBitsToFloat(val));
+  }
+
+  /**
+   * Read double.
+   *
+   * @param position the position
+   * @return the double
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public Double readDouble(long position) throws IOException {
+    seek(position);
+    return readDouble();
   }
 
   @Override
@@ -293,7 +439,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     
     long val;
     
-    if(ByteOrder) {
+    if (byteOrder == ByteOrder.BIG_ENDIAN) {
       
      val= ((long)ch1 << 56) + ((long)(ch2 & 255) << 48) + ((long)(ch3 & 255) << 40) 
        + ((long)(ch4 & 255) << 32) + ((long)(ch5 & 255) << 24) + ((long)(ch6 & 255) << 16) 
@@ -307,6 +453,5 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     }
     
     return new Double(java.lang.Double.longBitsToDouble(val));
-    
   }
 }

@@ -31,27 +31,17 @@
  */
 package com.easyinnova.tiff.reader;
 
+import com.easyinnova.tiff.io.TiffInputStream;
 import com.easyinnova.tiff.io.TiffStreamIO;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.ValidationResult;
-import com.easyinnova.tiff.model.types.Ascii;
-import com.easyinnova.tiff.model.types.Byte;
-import com.easyinnova.tiff.model.types.Double;
-import com.easyinnova.tiff.model.types.Float;
 import com.easyinnova.tiff.model.types.IFD;
-import com.easyinnova.tiff.model.types.Long;
-import com.easyinnova.tiff.model.types.Rational;
-import com.easyinnova.tiff.model.types.SByte;
-import com.easyinnova.tiff.model.types.SLong;
-import com.easyinnova.tiff.model.types.SRational;
-import com.easyinnova.tiff.model.types.SShort;
-import com.easyinnova.tiff.model.types.Short;
-import com.easyinnova.tiff.model.types.Undefined;
 import com.easyinnova.tiff.model.types.abstractTiffType;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteOrder;
@@ -71,7 +61,7 @@ public class TiffReader {
   String filename;
 
   /** The stream to get data from the file. */
-  TiffStreamIO data;
+  TiffInputStream data;
 
   /** The size in bytes of the tags' values field (=4 for Tiff, =8 for BigTiff). */
   int tagValueSize = 4;
@@ -145,11 +135,10 @@ public class TiffReader {
 
     try {
       if (Files.exists(Paths.get(filename))) {
-        data = new TiffStreamIO(null);
+        data = new TiffInputStream(new File(filename));
 
         tiffModel = new TiffDocument();
         validation = new ValidationResult();
-        data.load(filename);
         readHeader();
         if (tiffModel.getMagicNumber() != 42) {
           validation.addError("Incorrect tiff magic number", tiffModel.getMagicNumber());
@@ -179,8 +168,8 @@ public class TiffReader {
     int c1 = 0;
     int c2 = 0;
     try {
-      c1 = data.get(0);
-      c2 = data.get(1);
+      c1 = data.readByte().toInt();
+      c2 = data.readByte().toInt();
     } catch (Exception ex) {
       validation.addError("Header format error");
     }
@@ -200,18 +189,18 @@ public class TiffReader {
       validation.addWarning("Non-sense Byte Order. Trying Little Endian.");
       byteOrder = ByteOrder.LITTLE_ENDIAN;
     } else {
-      validation.addError("Invalid Byte Order " + data.get(0) + data.get(1));
+      validation.addError("Invalid Byte Order " + c1 + c2);
     }
 
     if (correct) {
       // set byte ordering to the stream
-      data.order(byteOrder);
+      data.setByteOrder(byteOrder);
 
       try {
         // read magic number
-        int magic = data.getShort(2);
+        int magic = data.readShort().toInt();
         tiffModel.setMagicNumber(magic);
-      } catch (IndexOutOfBoundsException ex) {
+      } catch (Exception ex) {
         validation.addError("Magic number parsing error");
       }
     }
@@ -223,7 +212,7 @@ public class TiffReader {
   public void readIFDs() {
     try {
       // The pointer to the first IFD is located in bytes 4-7
-      int offset0 = (int) data.getInt(4);
+      int offset0 = data.readLong(4).toInt();
       if (offset0 == 0) {
         validation.addError("There is no first IFD");
       } else {
@@ -279,10 +268,12 @@ public class TiffReader {
    */
   IfdReader readIFD(int offset, boolean isImage) {
     IFD ifd = new IFD(isImage);
+    IfdReader ir = new IfdReader();
+    ir.setIfd(ifd);
     int nextIfdOffset = 0;
     try {
       int index = offset;
-      int directoryEntries = data.getShort(offset);
+      int directoryEntries = data.readShort(offset).toInt();
       if (directoryEntries < 1) {
         validation.addError("Incorrect number of IFD entries",
             directoryEntries);
@@ -293,9 +284,9 @@ public class TiffReader {
         for (int i = 0; i < directoryEntries; i++) {
           int tagid = 0;
           try {
-            tagid = data.getUshort(index);
-            int tagType = data.getShort(index + 2);
-            int tagN = data.getInt(index + 4);
+            tagid = data.readShort(index).toInt();
+            int tagType = data.readShort(index + 2).toInt();
+            int tagN = data.readLong(index + 4).toInt();
             TagValue tv = getValue(tagType, tagN, tagid, index + 8, ifd);
             if (ifd.containsTagId(tagid)) {
               if (duplicateTagTolerance > 0)
@@ -315,7 +306,7 @@ public class TiffReader {
         // Reads the position of the next IFD
         nextIfdOffset = 0;
         try {
-          nextIfdOffset = (int) data.getInt(index);
+          nextIfdOffset = data.readLong(index).toInt();
         } catch (Exception ex) {
           nextIfdOffset = 0;
           if (nextIFDTolerance > 0)
@@ -327,6 +318,9 @@ public class TiffReader {
           validation.addError("Invalid next IFD offset", nextIfdOffset);
           nextIfdOffset = 0;
         }
+        ir.setNextIfdOffset(nextIfdOffset);
+
+        ir.readImage();
 
         // Validate ifd entries
         if (isImage) {
@@ -337,12 +331,8 @@ public class TiffReader {
       }
     } catch (Exception ex) {
       validation.addError("IO Exception");
-      ifd = null;
+      ir.setIfd(null);
     }
-    IfdReader ir = new IfdReader();
-    ir.setIfd(ifd);
-    ir.setNextIfdOffset(nextIfdOffset);
-    ir.readImage();
     return ir;
   }
 
@@ -386,69 +376,73 @@ public class TiffReader {
         break;
     }
 
+    boolean ok = true;
+
     // Check if the tag value fits in the directory entry value field, and get offset if not
     if (typeSize * n > tagValueSize) {
-      offset = data.getInt(offset);
+      try {
+      offset = data.readLong(offset).toInt();
+      } catch (Exception ex) {
+        validation.addError("Parse error getting tag " + id + " value");
+        ok = false;
+      }
     }
 
-    boolean ok = true;
-    try {
-      for (int i = 0; i < n; i++) {
-        // Get N tag values
-        switch (type) {
-          case 1:
-            tv.add(new Byte((byte) data.get(offset)));
-            break;
-          case 2:
-            tv.add(new Ascii((byte) data.get(offset)));
-            break;
-          case 6:
-            tv.add(new SByte((byte) data.get(offset)));
-            break;
-          case 7:
-            tv.add(new Undefined((byte) data.get(offset)));
-            break;
-          case 3:
-            tv.add(new Short((char) data.getUshort(offset)));
-            break;
-          case 8:
-            tv.add(new SShort((short) data.getShort(offset)));
-            break;
-          case 4:
-            tv.add(new Long(data.getUInt(offset)));
-            break;
-          case 9:
-            tv.add(new SLong(data.getInt(offset)));
-            break;
-          case 5:
-            int num = new Long(data.getInt(offset)).toInt();
-            int den = new Long(data.getInt(offset + 4)).toInt();
-            tv.add(new Rational(num, den));
-            break;
-          case 10:
-            int snum = new SLong(data.getInt(offset)).toInt();
-            int sden = new SLong(data.getInt(offset + 4)).toInt();
-            tv.add(new SRational(snum, sden));
-            break;
-          case 11:
-            tv.add(new Float(data.getFloat(offset)));
-            break;
-          case 12:
-            tv.add(new Double(data.getDouble(offset)));
-            break;
-          case 13:
-            int ifdOffset = data.getInt(offset);
-            IfdReader ifd = readIFD(ifdOffset, true);
-            IFD subIfd = ifd.getIfd();
-            subIfd.setParent(parentIFD);
-            tv.add(subIfd);
-            break;
+    if (ok) {
+      try {
+        for (int i = 0; i < n; i++) {
+          // Get N tag values
+          switch (type) {
+            case 1:
+              tv.add(data.readByte(offset));
+              break;
+            case 2:
+              tv.add(data.readAscii(offset));
+              break;
+            case 6:
+              tv.add(data.readSByte(offset));
+              break;
+            case 7:
+              tv.add(data.readUndefined(offset));
+              break;
+            case 3:
+              tv.add(data.readShort(offset));
+              break;
+            case 8:
+              tv.add(data.readSShort(offset));
+              break;
+            case 4:
+              tv.add(data.readLong(offset));
+              break;
+            case 9:
+              tv.add(data.readSLong(offset));
+              break;
+            case 5:
+              tv.add(data.readRational(offset));
+              break;
+            case 10:
+              tv.add(data.readSRational(offset));
+              break;
+            case 11:
+              tv.add(data.readFloat(offset));
+              break;
+            case 12:
+              tv.add(data.readDouble(offset));
+              break;
+            case 13:
+              int ifdOffset = data.readLong(offset).toInt();
+              IfdReader ifd = readIFD(ifdOffset, true);
+              IFD subIfd = ifd.getIfd();
+              subIfd.setParent(parentIFD);
+              tv.add(subIfd);
+              break;
+          }
+          offset += typeSize;
         }
-        offset += typeSize;
+      } catch (Exception ex) {
+        validation.addError("Parse error getting tag " + id + " value");
+        ok = false;
       }
-    } catch (Exception ex) {
-      validation.addError("Parse error getting tag " + id + " value");
-      ok = false;
     }
 
     if (ok && TiffTags.hasTag(id)) {

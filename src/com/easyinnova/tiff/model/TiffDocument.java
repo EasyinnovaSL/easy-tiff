@@ -74,6 +74,8 @@ public class TiffDocument {
    * @return the ifd count
    */
   public int getIfdCount() {
+    if (metadata == null)
+      return 0;
     if (metadata.contains("IFD")) {
       return getMetadataList("IFD").size();
     } else
@@ -106,6 +108,8 @@ public class TiffDocument {
    * @return the Subifd count
    */
   public int getSubIfdCount() {
+    if (metadata == null)
+      return 0;
     if (metadata.contains("SubIFDs"))
       return getMetadataList("SubIFDs").size();
     else

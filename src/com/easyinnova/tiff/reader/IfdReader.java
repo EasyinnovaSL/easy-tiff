@@ -37,7 +37,6 @@ import com.easyinnova.tiff.model.Strip;
 import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.Tile;
 import com.easyinnova.tiff.model.types.IFD;
-import com.easyinnova.tiff.model.types.IFD.ImageRepresentation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,17 +92,14 @@ public class IfdReader {
    * Read image.
    */
   public void readImage() {
-    ImageRepresentation imageRepresentation = ImageRepresentation.UNDEFINED;
     if (ifd.containsTagId(TiffTags.getTagId("StripOffsets"))
         && ifd.containsTagId(TiffTags.getTagId("StripBYTECount"))) {
-      imageRepresentation = ImageRepresentation.STRIPS;
       readStrips();
-    } else if (ifd.containsTagId(TiffTags.getTagId("TileOffsets"))
+    }
+    if (ifd.containsTagId(TiffTags.getTagId("TileOffsets"))
         && ifd.containsTagId(TiffTags.getTagId("TileBYTECounts"))) {
-      imageRepresentation = ImageRepresentation.TILES;
       readTiles();
     }
-    ifd.setImageRepresentation(imageRepresentation);
   }
 
   /**

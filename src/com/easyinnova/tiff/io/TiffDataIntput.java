@@ -30,21 +30,20 @@
  */
 package com.easyinnova.tiff.io;
 
-import java.io.IOException;
-import java.util.List;
-
-import com.easyinnova.tiff.model.types.Byte;
 import com.easyinnova.tiff.model.types.Ascii;
-import com.easyinnova.tiff.model.types.Short;
+import com.easyinnova.tiff.model.types.Byte;
+import com.easyinnova.tiff.model.types.Double;
+import com.easyinnova.tiff.model.types.Float;
 import com.easyinnova.tiff.model.types.Long;
 import com.easyinnova.tiff.model.types.Rational;
 import com.easyinnova.tiff.model.types.SByte;
-import com.easyinnova.tiff.model.types.SShort;
 import com.easyinnova.tiff.model.types.SLong;
 import com.easyinnova.tiff.model.types.SRational;
-import com.easyinnova.tiff.model.types.Float;
-import com.easyinnova.tiff.model.types.Double;
+import com.easyinnova.tiff.model.types.SShort;
+import com.easyinnova.tiff.model.types.Short;
 import com.easyinnova.tiff.model.types.Undefined;
+
+import java.io.IOException;
 
 /**
  * The Interface TiffDataIntput.

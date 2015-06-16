@@ -40,6 +40,7 @@ import com.easyinnova.tiff.model.TiffTags;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class SubIFD.
  */
@@ -53,9 +54,6 @@ public class IFD extends abstractTiffType {
 
   /** Pointer to the parent ifd. */
   private IFD parentIFD;
-
-  /** The image representation. */
-  private ImageRepresentation imageRepresentation;
 
   /** The image strips. */
   private ImageStrips imageStrips;
@@ -87,7 +85,6 @@ public class IFD extends abstractTiffType {
     super();
     tags = new IfdTags();
     nextIFD = null;
-    imageRepresentation = ImageRepresentation.UNDEFINED;
     this.isImage = isImage;
   }
 
@@ -218,6 +215,11 @@ public class IFD extends abstractTiffType {
     }
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
     if (this.hasParent())
@@ -237,15 +239,6 @@ public class IFD extends abstractTiffType {
   }
 
   /**
-   * Gets the image representation.
-   *
-   * @return the image representation
-   */
-  public ImageRepresentation getImageRepresentation() {
-    return imageRepresentation;
-  }
-
-  /**
    * Gets the image in strips.
    *
    * @return the image strips object
@@ -261,15 +254,6 @@ public class IFD extends abstractTiffType {
    */
   public ImageTiles getImageTiles() {
     return imageTiles;
-  }
-
-  /**
-   * Sets the image representation.
-   *
-   * @param imageRepresentation the new image representation
-   */
-  public void setImageRepresentation(ImageRepresentation imageRepresentation) {
-    this.imageRepresentation = imageRepresentation;
   }
 
   /**
@@ -315,6 +299,24 @@ public class IFD extends abstractTiffType {
    */
   public boolean isImage() {
     return isImage;
+  }
+
+  /**
+   * Checks for strips.
+   *
+   * @return true, if successful
+   */
+  public boolean hasStrips() {
+    return imageStrips != null;
+  }
+
+  /**
+   * Checks for tiles.
+   *
+   * @return true, if successful
+   */
+  public boolean hasTiles() {
+    return imageTiles != null;
   }
 }
 
