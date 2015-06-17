@@ -102,12 +102,25 @@ public class RandomAccessFileInputStream extends InputStream{
   }
 
   /**
-   * Limit.
+   * Set Limit.
    *
    * @param limit the limit
    */
   public void limit(long limit) {
       this.limit = limit;
+  }
+
+  /**
+   * Size.
+   *
+   * @return the int
+   */
+  public long size() {
+    try {
+    return randomAccessFile.length();
+    } catch (Exception ex) {
+      return 0;
+    }
   }
 
 }

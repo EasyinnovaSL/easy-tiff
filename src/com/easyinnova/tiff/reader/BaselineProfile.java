@@ -46,7 +46,7 @@ import com.easyinnova.tiff.model.types.abstractTiffType;
 public class BaselineProfile {
 
   /**
-   * Types of images.
+   * Known types of images.
    */
   public enum ImageType {
     /** Bilevel (black and white). */
@@ -72,65 +72,69 @@ public class BaselineProfile {
   /** The result of the check. */
   private ValidationResult validation;
 
-  /** The image yype. */
+  /** The image type. */
   private ImageType type;
 
   /** The photometric interpretation. */
   private int photometric;
 
-  /** Is image in strips. */
+  /** Is image stored in strips. */
   private boolean strips = false;
 
-  /** Is image in tiles. */
+  /** Is image stored in tiles. */
   private boolean tiles = false;
 
   /**
    * The tag order tolerance.<br>
-   * 0: No tolerance. 10: Full tolerance (no matter if tags are not in ascending order)
+   * 0: No tolerance. 1: Full tolerance (no matter if tags are not in ascending order)
    * */
-  private int tagOrderTolerance = 10;
+  private int tagOrderTolerance = 1;
 
-  /** The rows per strip tolerance. */
+  /**
+   * The rows per strip tolerance.<br>
+   * 0: No tolerance. 1: Full tolerance.
+   * */
   private int rowsPerStripTolerance = 1;
 
-  /** The ifd. */
+  /** The image file descriptor to validate. */
   private IFD ifd;
+
+  /** The metadata of the IFD. */
+  private IfdTags metadata;
 
   /**
    * Instantiates a new baseline profile.
+   *
+   * @param ifd the image to validate
    */
-  public BaselineProfile() {
+  public BaselineProfile(IFD ifd) {
     validation = new ValidationResult();
     type = ImageType.UNDEFINED;
+    this.ifd = ifd;
+    metadata = ifd.getMetadata();
   }
 
   /**
-   * Validates an IFD.
-   *
-   * @param ifd the image file descriptor
+   * Validates the IFD.
    */
-  public void validateIfd(IFD ifd) {
-    this.ifd = ifd;
-
-    // Validate tags
+  public void validate() {
     validateMetadata();
-
-    // Validate image
     checkImage();
   }
 
   /**
-   * Validates the ifd entries.
+   * Validates that the ifd entries have correct types and cardinalities, as they are defined in the
+   * JSONs tag configuration files.
    */
   public void validateMetadata() {
     int prevTagId = 0;
     TiffTags.getTiffTags();
-    for (TagValue ie : ifd.getMetadata().getTags()) {
+    for (TagValue ie : metadata.getTags()) {
       if (!TiffTags.tagMap.containsKey(ie.getId())) {
         validation.addWarning("Undefined tag id " + ie.getId());
-      }
-      else if (!TiffTags.tagTypes.containsKey(ie.getType()))
+      } else if (!TiffTags.tagTypes.containsKey(ie.getType())) {
         validation.addWarning("Unknown tag type " + ie.getType());
+      }
       else {
         Tag t = TiffTags.getTag(ie.getId());
         String stype = TiffTags.tagTypes.get(ie.getType());
@@ -166,12 +170,10 @@ public class BaselineProfile {
   }
 
   /**
-   * Check image.
+   * Check if the tags that define the image are correct and consistent.
    */
   public void checkImage() {
-    IfdTags metadata = ifd.getMetadata();
-
-    CheckCommonFields(metadata);
+    CheckCommonFields();
 
     if (!metadata.containsTagId(TiffTags.getTagId("PhotometricInterpretation"))) {
       validation.addError("Missing Photometric Interpretation");
@@ -414,13 +416,11 @@ public class BaselineProfile {
 
   /**
    * Check common fields.
-   *
-   * @param metadata the metadata
    */
-  private void CheckCommonFields(IfdTags metadata) {
+  private void CheckCommonFields() {
     int id;
 
-    // Width
+    // Width tag is mandatory
     id = TiffTags.getTagId("ImageWidth");
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).getName());
@@ -430,7 +430,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // Height
+    // Height tag is mandatory
     id = TiffTags.getTagId("ImageLength");
     if (!metadata.containsTagId(id))
       validation.addError("Missing required field", TiffTags.getTag(id).getName());
@@ -440,7 +440,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // Resolution Unit
+    // Check Resolution Unit
     id = TiffTags.getTagId("ResolutionUnit");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
@@ -450,7 +450,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // XResolution
+    // Check XResolution
     id = TiffTags.getTagId("XResolution");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
@@ -460,7 +460,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // YResolution
+    // Check YResolution
     id = TiffTags.getTagId("YResolution");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
@@ -470,7 +470,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // Planar Configuration
+    // Check Planar Configuration
     id = TiffTags.getTagId("PlanarConfiguration");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
@@ -480,7 +480,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // Orientation
+    // Check Orientation
     id = TiffTags.getTagId("Orientation");
     if (!metadata.containsTagId(id)) {
       // validation.addError("Missing required field", TiffTags.getTag(id).name);
@@ -490,7 +490,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), val);
     }
 
-    // Check whether tiles or strips
+    // Check whether the image is stored in tiles or strips
     strips = ifd.hasStrips();
     tiles = ifd.hasTiles();
     if (!strips && !tiles)
@@ -543,12 +543,11 @@ public class BaselineProfile {
   }
 
   /**
-   * Check strips.
+   * Check that the strips containing the image are well-formed.
    */
   private void CheckStrips() {
     long offset;
     int id;
-    IfdTags metadata = ifd.getMetadata();
 
     // Strip offsets
     id = TiffTags.getTagId("StripOffsets");
@@ -583,21 +582,20 @@ public class BaselineProfile {
   }
 
   /**
-   * Check tiles.
+   * Check that the tiles containing the image are well-formed.
    */
   private void CheckTiles() {
     long offset;
     int id;
-    IfdTags metadata = ifd.getMetadata();
 
-    // Tile Offsets
+    // Check Tile Offsets
     id = TiffTags.getTagId("TileOffsets");
     offset = metadata.get(id).getFirstNumericValue();
     int no = metadata.get(id).getCardinality();
     if (offset <= 0)
       validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), offset);
 
-    // Tile Byte Counts
+    // Check Tile Byte Counts
     id = TiffTags.getTagId("TileBYTECounts");
     offset = metadata.get(id).getFirstNumericValue();
     int nc = metadata.get(id).getCardinality();
@@ -608,7 +606,7 @@ public class BaselineProfile {
       validation.addError("Inconsistent tile lengths");
     }
 
-    // Tile Width
+    // Check Tile Width
     long tileWidth = 0;
     id = TiffTags.getTagId("TileWidth");
     if (!metadata.containsTagId(id))
@@ -619,7 +617,7 @@ public class BaselineProfile {
         validation.addError("Invalid value for field " + TiffTags.getTag(id).getName(), tileWidth);
     }
 
-    // Tile Length
+    // Check Tile Length
     id = TiffTags.getTagId("TileLength");
     long tileLength = 0;
     if (!metadata.containsTagId(id))
@@ -650,7 +648,7 @@ public class BaselineProfile {
   }
 
   /**
-   * Gets the validation.
+   * Gets the validation result.
    *
    * @return the validation
    */
@@ -659,7 +657,7 @@ public class BaselineProfile {
   }
 
   /**
-   * Gets the type.
+   * Gets the image type.
    *
    * @return the type
    */

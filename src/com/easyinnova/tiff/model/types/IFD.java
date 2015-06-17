@@ -40,9 +40,8 @@ import com.easyinnova.tiff.model.TiffTags;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class SubIFD.
+ * The Class IFD.
  */
 public class IFD extends abstractTiffType {
 

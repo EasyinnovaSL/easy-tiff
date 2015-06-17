@@ -145,8 +145,8 @@ public class TiffReaderWriter {
             for (TiffObject o : to.getIfds()) {
               IFD ifd = (IFD) o;
               if (ifd != null) {
-                BaselineProfile bp = new BaselineProfile();
-                bp.validateIfd(ifd);
+                BaselineProfile bp = new BaselineProfile(ifd);
+                bp.validate();
                 // String t = bp.getType().toString();
                 // System.out.println("IFD " + index++ + " (" + t + ")");
                 // ifd.printTags();
@@ -163,8 +163,8 @@ public class TiffReaderWriter {
               to.printMetadata();
               for (TiffObject o : to.getIfds()) {
                 IFD ifd = (IFD) o;
-                BaselineProfile bp = new BaselineProfile();
-                bp.validateIfd(ifd);
+                BaselineProfile bp = new BaselineProfile(ifd);
+                bp.validate();
                 // System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
                 // ifd.printTags();
               }

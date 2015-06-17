@@ -195,4 +195,13 @@ public class ValidationResult {
       ve.printWarning();
     }
   }
+
+  /**
+   * Checks if is correct.
+   *
+   * @return true, if is correct
+   */
+  public boolean isCorrect() {
+    return correct;
+  }
 }

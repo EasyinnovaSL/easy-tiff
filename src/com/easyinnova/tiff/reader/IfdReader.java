@@ -89,7 +89,7 @@ public class IfdReader {
   }
 
   /**
-   * Read image.
+   * Reads the image, which can be stored in strips and/or in tiles.
    */
   public void readImage() {
     if (ifd.containsTagId(TiffTags.getTagId("StripOffsets"))
@@ -103,7 +103,7 @@ public class IfdReader {
   }
 
   /**
-   * Read tiles.
+   * Read the tiles and store them (its offsets) in the imagetiles object.
    */
   private void readTiles() {
     ImageTiles imageTiles = new ImageTiles();
@@ -146,7 +146,7 @@ public class IfdReader {
   }
 
   /**
-   * Read strips.
+   * Read the strips and store them (its offsets) in the imagestrips object.
    */
   private void readStrips() {
     ImageStrips imageStrips = new ImageStrips();

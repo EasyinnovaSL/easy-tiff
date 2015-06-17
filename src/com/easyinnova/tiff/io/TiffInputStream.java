@@ -454,4 +454,13 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
     
     return new Double(java.lang.Double.longBitsToDouble(val));
   }
+
+  /**
+   * File size in bytes.
+   *
+   * @return the file size.
+   */
+  public long size() {
+    return super.size();
+  }
 }

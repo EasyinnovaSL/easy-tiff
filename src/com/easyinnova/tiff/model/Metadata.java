@@ -35,9 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Metadata.
+ * A dictinary of all the metadata contained in the tiff file.
  */
 public class Metadata {
 
@@ -52,7 +51,7 @@ public class Metadata {
   }
 
   /**
-   * Adds the.
+   * Adds a metadata value to the dictionary.
    *
    * @param name the name
    * @param value the value
@@ -64,7 +63,7 @@ public class Metadata {
   }
 
   /**
-   * Contains.
+   * Check if the dictionary contains the given metadata.
    *
    * @param name the name
    * @return true, if successful
@@ -74,7 +73,7 @@ public class Metadata {
   }
 
   /**
-   * Gets the first.
+   * Gets the first metadata object of the fiven metadata name.
    *
    * @param name the name
    * @return the first
@@ -84,7 +83,7 @@ public class Metadata {
   }
 
   /**
-   * Gets the list.
+   * Gets the list of objects of the given metadata name.
    *
    * @param name the name
    * @return the list
@@ -94,7 +93,7 @@ public class Metadata {
   }
 
   /**
-   * Key set.
+   * Get the set of metadata names.
    *
    * @return the sets the
    */
@@ -103,9 +102,9 @@ public class Metadata {
   }
 
   /**
-   * Adds the metadata.
+   * Adds a complete dictionary to the current one.
    *
-   * @param meta the meta
+   * @param meta the metadata dictionary to add
    */
   public void addMetadata(Metadata meta) {
     for (String k : meta.keySet()) {
