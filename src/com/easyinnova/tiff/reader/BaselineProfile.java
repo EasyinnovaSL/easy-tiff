@@ -35,7 +35,6 @@ import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffTags;
-import com.easyinnova.tiff.model.ValidationResult;
 import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.Rational;
 import com.easyinnova.tiff.model.types.abstractTiffType;
@@ -43,7 +42,7 @@ import com.easyinnova.tiff.model.types.abstractTiffType;
 /**
  * Checks if the Tiff file complies with the Baseline 6.0.
  */
-public class BaselineProfile {
+public class BaselineProfile extends GenericProfile {
 
   /**
    * Known types of images.
@@ -69,9 +68,6 @@ public class BaselineProfile {
     UNDEFINED
   };
 
-  /** The result of the check. */
-  private ValidationResult validation;
-
   /** The image type. */
   private ImageType type;
 
@@ -96,22 +92,14 @@ public class BaselineProfile {
    * */
   private int rowsPerStripTolerance = 1;
 
-  /** The image file descriptor to validate. */
-  private IFD ifd;
-
-  /** The metadata of the IFD. */
-  private IfdTags metadata;
-
   /**
    * Instantiates a new baseline profile.
    *
    * @param ifd the image to validate
    */
   public BaselineProfile(IFD ifd) {
-    validation = new ValidationResult();
+    super(ifd);
     type = ImageType.UNDEFINED;
-    this.ifd = ifd;
-    metadata = ifd.getMetadata();
   }
 
   /**
@@ -645,15 +633,6 @@ public class BaselineProfile {
         }
       }
     }
-  }
-
-  /**
-   * Gets the validation result.
-   *
-   * @return the validation
-   */
-  public ValidationResult getValidation() {
-    return validation;
   }
 
   /**
