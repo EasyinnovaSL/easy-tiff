@@ -119,9 +119,9 @@ public class BaselineProfile extends GenericProfile {
     TiffTags.getTiffTags();
     for (TagValue ie : metadata.getTags()) {
       if (!TiffTags.tagMap.containsKey(ie.getId())) {
-        validation.addWarning("Undefined tag id " + ie.getId());
+        validation.addWarning("Ignoring undefined tag id " + ie.getId());
       } else if (!TiffTags.tagTypes.containsKey(ie.getType())) {
-        validation.addWarning("Unknown tag type " + ie.getType());
+        validation.addWarning("Ignoring unknown tag type " + ie.getType());
       }
       else {
         Tag t = TiffTags.getTag(ie.getId());
@@ -431,7 +431,7 @@ public class BaselineProfile extends GenericProfile {
     // Check Resolution Unit
     id = TiffTags.getTagId("ResolutionUnit");
     if (!metadata.containsTagId(id)) {
-      // validation.addError("Missing required field", TiffTags.getTag(id).name);
+      validation.addError("Missing required field", TiffTags.getTag(id).getName());
     } else {
       long val = metadata.get(id).getFirstNumericValue();
       if (val != 1 && val != 2 && val != 3)

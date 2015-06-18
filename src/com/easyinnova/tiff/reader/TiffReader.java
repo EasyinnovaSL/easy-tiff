@@ -141,7 +141,7 @@ public class TiffReader {
         tiffModel = new TiffDocument();
         validation = new ValidationResult();
         readHeader();
-        if (tiffModel.getMagicNumber() != 42 && tiffModel.getMagicNumber() != 43) {
+        if (tiffModel.getMagicNumber() < 42) {
           validation.addError("Incorrect tiff magic number", tiffModel.getMagicNumber());
         } else if (tiffModel.getMagicNumber() == 43) {
           validation.addError("Big tiff file not yet supported");

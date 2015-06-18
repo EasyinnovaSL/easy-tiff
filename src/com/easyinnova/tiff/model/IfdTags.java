@@ -93,6 +93,16 @@ public class IfdTags {
   }
 
   /**
+   * Gets the Tag identified by its id.
+   *
+   * @param tagName the tag name
+   * @return the tag object
+   */
+  public TagValue get(String tagName) {
+    return hashTagsId.get(TiffTags.getTagId(tagName));
+  }
+
+  /**
    * Returns the tag list.
    *
    * @return list of tags
