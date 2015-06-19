@@ -99,9 +99,7 @@ public class Rational extends abstractTiffType {
    * @return the float value
    */
   public float getFloatValue() {
-
     return (float) numerator.getValue() / denominator.getValue();
-
   }
 
   @Override

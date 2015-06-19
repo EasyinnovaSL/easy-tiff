@@ -58,17 +58,17 @@ public class TiffReaderWriter {
   public static void main(final String[] args) throws IOException {
     ArrayList<String> files = new ArrayList<String>();
     String output_file = null;
-    boolean args_error = false;
 
     // Reads the parameters
-    for (int i = 0; i < args.length; i++) {
+    int i = 0;
+    boolean args_error = false;
+    while (i < args.length && !args_error) {
       String arg = args[i];
       if (arg == "-o") {
         if (i + 1 < args.length)
           output_file = args[++i];
         else {
           args_error = true;
-          break;
         }
       } else if (arg == "-help") {
         displayHelp();
@@ -76,7 +76,6 @@ public class TiffReaderWriter {
       } else if (arg.startsWith("-")) {
         // unknown option
         args_error = true;
-        break;
       } else {
         // File or directory to process
         File f = new File(arg);
@@ -91,6 +90,7 @@ public class TiffReaderWriter {
           }
         }
       }
+      i++;
     }
     if (args_error) {
       // Shows the program usage

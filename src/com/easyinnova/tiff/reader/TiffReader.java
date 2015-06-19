@@ -224,51 +224,51 @@ public class TiffReader {
       validation.addError("IO exception");
     }
       
-    if (!validation.isCorrect())
-      return;
+    if (validation.isCorrect()) {
+      try {
+        IfdReader ifd0 = readIFD(offset0, true);
+        HashSet<Integer> usedOffsets = new HashSet<Integer>();
+        usedOffsets.add(offset0);
+        if (ifd0.getIfd() == null) {
+          validation.addError("Parsing error in first IFD");
+        } else {
+          tiffModel.addIfd0(ifd0.getIfd());
 
-    try {
-      IfdReader ifd0 = readIFD(offset0, true);
-      HashSet<Integer> usedOffsets = new HashSet<Integer>();
-      usedOffsets.add(offset0);
-      if (ifd0.getIfd() == null) {
-        validation.addError("Parsing error in first IFD");
-      } else {
-        tiffModel.addIfd0(ifd0.getIfd());
+          IfdReader current_ifd = ifd0;
 
-        IfdReader current_ifd = ifd0;
-
-        // Read next IFDs
-        int nifd = 1;
-        while (current_ifd.getNextIfdOffset() > 0) {
-          if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
-            // Circular reference
-            validation.addError("IFD offset already used");
-            break;
-          } else if (current_ifd.getNextIfdOffset() > data.size()) {
-            validation.addError("Incorrect offset");
-            break;
-          } else {
-            usedOffsets.add(current_ifd.getNextIfdOffset());
-            IfdReader next_ifd = readIFD(current_ifd.getNextIfdOffset(), true);
-            if (next_ifd == null) {
-              validation.addError("Parsing error in IFD " + nifd);
-              break;
+          // Read next IFDs
+          int nifd = 1;
+          boolean stop = false;
+          while (current_ifd.getNextIfdOffset() > 0 && !stop) {
+            if (usedOffsets.contains(current_ifd.getNextIfdOffset())) {
+              // Circular reference
+              validation.addError("IFD offset already used");
+              stop = true;
+            } else if (current_ifd.getNextIfdOffset() > data.size()) {
+              validation.addError("Incorrect offset");
+              stop = true;
             } else {
-              current_ifd.getIfd().setNextIFD(next_ifd.getIfd());
-              current_ifd = next_ifd;
+              usedOffsets.add(current_ifd.getNextIfdOffset());
+              IfdReader next_ifd = readIFD(current_ifd.getNextIfdOffset(), true);
+              if (next_ifd == null) {
+                validation.addError("Parsing error in IFD " + nifd);
+                stop = true;
+              } else {
+                current_ifd.getIfd().setNextIFD(next_ifd.getIfd());
+                current_ifd = next_ifd;
+              }
+              nifd++;
             }
-            nifd++;
           }
         }
+      } catch (Exception ex) {
+        validation.addError("IFD parsing error");
       }
-    } catch (Exception ex) {
-      validation.addError("IFD parsing error");
-    }
 
-    try {
-      tiffModel.createMetadataDictionary();
-    } catch (Exception ex) {
+      try {
+        tiffModel.createMetadataDictionary();
+      } catch (Exception ex) {
+      }
     }
   }
 

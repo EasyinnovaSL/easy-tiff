@@ -114,12 +114,12 @@ public class TiffTags {
    * @return the tag or null if the identifier does not exist
    */
   public static Tag getTag(int identifier) {
+    Tag t = null;
     if (instance == null)
       getTiffTags();
     if (tagMap.containsKey(identifier))
-      return tagMap.get(identifier);
-    else
-      return null;
+      t = tagMap.get(identifier);
+    return t;
   }
 
   /**
@@ -129,11 +129,12 @@ public class TiffTags {
    * @return the tag id
    */
   public static int getTagId(String name) {
+    int id = -1;
     if (instance == null)
       getTiffTags();
-    if (!tagNames.containsKey(name))
-      return -1;
-    return tagNames.get(name).getId();
+    if (tagNames.containsKey(name))
+      id = tagNames.get(name).getId();
+    return id;
   }
 
   /**

@@ -184,11 +184,11 @@ public class IFD extends abstractTiffType {
    * @return the metadata
    */
   public TagValue getTag(String name) {
+    TagValue tv = null;
     int id = TiffTags.getTagId(name);
     if (tags.containsTagId(id))
-      return tags.get(id);
-    else
-      return null;
+      tv = tags.get(id);
+    return tv;
   }
 
   /**
@@ -244,11 +244,14 @@ public class IFD extends abstractTiffType {
    */
   @Override
   public String toString() {
+    String s = "";
     if (this.hasParent())
-      return "SubIFD";
-    if (isImage)
-      return "IFD";
-    return tags.toString();
+      s = "SubIFD";
+    else if (isImage)
+      s = "IFD";
+    else
+      s = tags.toString();
+    return s;
   }
 
   /**

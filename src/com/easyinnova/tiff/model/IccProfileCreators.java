@@ -89,12 +89,12 @@ public class IccProfileCreators {
    * @return the tag or null if the identifier does not exist
    */
   public static IccProfileCreator getIccProfile(int identifier) {
+    IccProfileCreator icc = null;
     if (instance == null)
       getIccProfileCreators();
     if (creatorsMap.containsKey(identifier))
-      return creatorsMap.get(identifier);
-    else
-      return null;
+      icc = creatorsMap.get(identifier);
+    return icc;
   }
 
   /**

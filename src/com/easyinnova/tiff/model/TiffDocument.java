@@ -74,12 +74,10 @@ public class TiffDocument {
    * @return the ifd count
    */
   public int getIfdCount() {
-    if (metadata == null)
-      return 0;
-    if (metadata.contains("IFD")) {
-      return getMetadataList("IFD").size();
-    } else
-      return 0;
+    int c = 0;
+    if (metadata != null && metadata.contains("IFD"))
+      c = getMetadataList("IFD").size();
+    return c;
   }
 
   /**
@@ -88,6 +86,7 @@ public class TiffDocument {
    * @return the ifd count
    */
   public int getIfdImagesCount() {
+    int c = 0;
     if (metadata.contains("IFD")) {
       List<TiffObject> l = getMetadataList("IFD");
       int n = 0;
@@ -96,10 +95,9 @@ public class TiffDocument {
         if (ifd.isImage())
           n++;
       }
-      return n;
+      c = n;
     }
-    else
-      return 0;
+    return c;
   }
 
   /**
@@ -108,12 +106,10 @@ public class TiffDocument {
    * @return the Subifd count
    */
   public int getSubIfdCount() {
-    if (metadata == null)
-      return 0;
-    if (metadata.contains("SubIFDs"))
-      return getMetadataList("SubIFDs").size();
-    else
-      return 0;
+    int c = 0;
+    if (metadata != null && metadata.contains("SubIFDs"))
+      c = getMetadataList("SubIFDs").size();
+    return c;
   }
 
   /**
@@ -131,10 +127,10 @@ public class TiffDocument {
    * @return the ifds list
    */
   public List<TiffObject> getIfds() {
+    List<TiffObject> l = new ArrayList<TiffObject>();
     if (metadata.contains("IFD"))
-      return getMetadataList("IFD");
-    else
-      return new ArrayList<TiffObject>();
+      l = getMetadataList("IFD");
+    return l;
   }
 
   /**
@@ -143,16 +139,14 @@ public class TiffDocument {
    * @return the ifds list
    */
   public List<TiffObject> getImageIfds() {
+    List<TiffObject> l = new ArrayList<TiffObject>();
     if (metadata.contains("IFD")) {
-      List<TiffObject> l = new ArrayList<TiffObject>();
       for (TiffObject ifd : getMetadataList("IFD")) {
         if (((IFD) ifd).isImage())
           l.add(ifd);
       }
-      return l;
     }
-    else
-      return new ArrayList<TiffObject>();
+    return l;
   }
 
   /**
@@ -161,10 +155,10 @@ public class TiffDocument {
    * @return the subifds list
    */
   public List<TiffObject> getSubIfds() {
+    List<TiffObject> l = new ArrayList<TiffObject>();
     if (metadata.contains("SubIFDs"))
-      return getMetadataList("SubIFDs");
-    else
-      return new ArrayList<TiffObject>();
+      l = getMetadataList("SubIFDs");
+    return l;
   }
 
   /**
@@ -186,10 +180,10 @@ public class TiffDocument {
    */
   public IFD getFirstIFD() {
     List<TiffObject> l = getImageIfds();
+    IFD ifd = null;
     if (l.size() > 0)
-      return (IFD) l.get(0);
-    else
-      return null;
+      ifd = (IFD) l.get(0);
+    return ifd;
   }
 
   /**
@@ -217,12 +211,12 @@ public class TiffDocument {
    * @return the metadata single string
    */
   public String getMetadataSingleString(String name) {
+    String s = "";
     if (metadata == null)
       createMetadataDictionary();
     if (metadata.contains(name))
-      return metadata.getFirst(name).toString();
-    else
-      return "";
+      s = metadata.getFirst(name).toString();
+    return s;
   }
 
   /**
@@ -232,12 +226,12 @@ public class TiffDocument {
    * @return the list of metadata that matches with the class name
    */
   public List<TiffObject> getMetadataList(String name) {
+    List<TiffObject> l = new ArrayList<TiffObject>();
     if (metadata == null)
       createMetadataDictionary();
     if (metadata.contains(name))
-      return metadata.getList(name);
-    else
-      return new ArrayList<TiffObject>();
+      l = metadata.getList(name);
+    return l;
   }
 
   /**

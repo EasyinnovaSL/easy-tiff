@@ -106,9 +106,10 @@ public class abstractTiffType extends TiffObject {
    * @return the char
    */
   public int toUint() {
-    if (toInt() < 0)
-      return toInt() + 256;
-    return toInt();
+    int res = toInt();
+    if (res < 0)
+      res += 256;
+    return res;
   }
 
   /**

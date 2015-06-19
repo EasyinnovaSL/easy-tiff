@@ -147,10 +147,10 @@ public class TagValue extends TiffObject {
    * @return the name
    */
   public String getName() {
+    String name = "" + id;
     if (TiffTags.hasTag(id))
-      return TiffTags.getTag(id).getName();
-    else
-      return "" + id;
+      name = TiffTags.getTag(id).getName();
+    return name;
   }
 
   /**

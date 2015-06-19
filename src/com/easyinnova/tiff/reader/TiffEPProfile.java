@@ -192,11 +192,10 @@ public class TiffEPProfile extends GenericProfile implements Profile {
     } else if (cardinality == 1 && possibleValues != null) {
       long val = metadata.get(tagid).getFirstNumericValue();
       boolean contained = false;
-      for (int i = 0; i < possibleValues.length; i++) {
-        if (possibleValues[i] == val) {
-          contained = true;
-          break;
-        }
+      int i = 0;
+      while (i < possibleValues.length && !contained) {
+        contained = possibleValues[i] == val;
+        i++;
       }
       if (!contained)
         validation.addError("Invalid value for TiffEP tag " + tagName, val);
