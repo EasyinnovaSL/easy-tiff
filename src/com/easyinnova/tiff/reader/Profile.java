@@ -1,5 +1,5 @@
 /**
- * <h1>GenericProfile.java</h1> 
+ * <h1>Profile.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -25,41 +25,18 @@
  *
  * @author Víctor Muñoz Solà
  * @version 1.0
- * @since 17/6/2015
+ * @since 18/6/2015
  *
  */
 package com.easyinnova.tiff.reader;
-
-import com.easyinnova.tiff.model.TiffDocument;
-import com.easyinnova.tiff.model.ValidationResult;
-
 /**
- * The Generic class for Profile validation.
+ * The Interface Class Profile.
  */
-public class GenericProfile {
-  /** The image file descriptor to validate. */
-  protected TiffDocument model;
-
-  /** The result of the check. */
-  protected ValidationResult validation;
-
+public interface Profile {
+  
   /**
-   * Instantiates a new baseline profile.
-   *
-   * @param doc the tiff file model
+   * Validate that the tiff document follows a given Standard.
    */
-  public GenericProfile(TiffDocument doc) {
-    validation = new ValidationResult();
-    this.model = doc;
-  }
-
-  /**
-   * Gets the validation result.
-   *
-   * @return the validation
-   */
-  public ValidationResult getValidation() {
-    return validation;
-  }
+  public void validate();
 }
 

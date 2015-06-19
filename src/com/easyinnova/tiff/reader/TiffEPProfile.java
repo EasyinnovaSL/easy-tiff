@@ -30,57 +30,81 @@
  */
 package com.easyinnova.tiff.reader;
 
+import com.easyinnova.tiff.model.IfdTags;
+import com.easyinnova.tiff.model.TiffDocument;
+import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.types.IFD;
 
 /**
  * The Class TiffEPProfile.
  */
-public class TiffEPProfile extends GenericProfile {
+public class TiffEPProfile extends GenericProfile implements Profile {
 
   /**
    * Instantiates a new tiff/ep profile validation.
    *
-   * @param ifd the image to check
+   * @param doc the image to check
    */
-  public TiffEPProfile(IFD ifd) {
-    super(ifd);
+  public TiffEPProfile(TiffDocument doc) {
+    super(doc);
   }
 
   /**
    * Validates that the IFD conforms the Tiff/EP standard.
    */
+  @Override
   public void validate() {
-    checkRequiredTag("ImageLength", 1);
-    checkRequiredTag("ImageWidth", 1);
-    int spp = -1;
-    if (checkRequiredTag("SamplesPerPixel", 1)) {
-      spp = (int) metadata.get("SamplesPerPixel").getFirstNumericValue();
-      checkRequiredTag("BitsPerSample", spp);
+    for (TiffObject o : model.getImageIfds()) {
+      IFD ifd = (IFD) o;
+      validateIfd(ifd);
     }
-    checkRequiredTag("ImageDescription", -1);
-    if (checkRequiredTag("Compression", 1)) {
+  }
+
+  /**
+   * Validate ifd.
+   *
+   * @param ifd the ifd
+   */
+  private void validateIfd(IFD ifd) {
+    IfdTags metadata = ifd.getMetadata();
+
+    checkRequiredTag(metadata, "ImageLength", 1);
+    checkRequiredTag(metadata, "ImageWidth", 1);
+    int spp = -1;
+    if (checkRequiredTag(metadata, "SamplesPerPixel", 1)) {
+      spp = (int) metadata.get("SamplesPerPixel").getFirstNumericValue();
+      checkRequiredTag(metadata, "BitsPerSample", spp);
+    }
+    checkRequiredTag(metadata, "ImageDescription", -1);
+    if (checkRequiredTag(metadata, "Compression", 1)) {
       int comp = (int) metadata.get("Compression").getFirstNumericValue();
       if (comp == 1)
-        checkForbiddenTag("CompressedBitsPerPixel");
+        checkForbiddenTag(metadata, "CompressedBitsPerPixel");
     }
-    checkRequiredTag("XResolution", 1);
-    checkRequiredTag("YResolution", 1);
-    checkRequiredTag("Make", -1);
-    checkRequiredTag("Model", -1);
-    checkRequiredTag("Software", -1);
-    checkRequiredTag("Copyright", -1);
-    checkRequiredTag("DateTimeOriginal", 20);
-    checkRequiredTag("DateTime", 20);
-    checkRequiredTag("TIFF/EP Standard ID", 4);
-    checkRequiredTag("NewSubFileType", 1, new long[] {0, 1});
-    if (checkRequiredTag("PhotometricInterpretation", 1, new long[] {1, 2, 6, 32803, 32767})) {
+    checkRequiredTag(metadata, "XResolution", 1);
+    checkRequiredTag(metadata, "YResolution", 1);
+    checkRequiredTag(metadata, "Make", -1);
+    checkRequiredTag(metadata, "Model", -1);
+    checkRequiredTag(metadata, "Software", -1);
+    checkRequiredTag(metadata, "Copyright", -1);
+    checkRequiredTag(metadata, "DateTimeOriginal", 20);
+    checkRequiredTag(metadata, "DateTime", 20);
+    checkRequiredTag(metadata, "TIFFEPStandardID", 4);
+    if (checkRequiredTag(metadata, "NewSubfileType", 1, new long[] {0, 1})) {
+      int nst = (int) metadata.get("NewSubfileType").getFirstNumericValue();
+      if (nst != 0) {
+        checkRequiredTag(metadata, "SubIFDs", -1);
+      }
+    }
+    if (checkRequiredTag(metadata, "PhotometricInterpretation", 1, new long[] {1, 2, 6, 32803,
+        32767})) {
       int photo = (int) metadata.get("PhotometricInterpretation").getFirstNumericValue();
       if (photo == 6) {
-        checkForbiddenTag("YCbCrCoefficients");
-        checkForbiddenTag("YCbCrSubSampling");
-        checkForbiddenTag("YCbCrPositioning");
-        checkForbiddenTag("ReferenceBlackWhite");
+        checkForbiddenTag(metadata, "YCbCrCoefficients");
+        checkForbiddenTag(metadata, "YCbCrSubSampling");
+        checkForbiddenTag(metadata, "YCbCrPositioning");
+        checkForbiddenTag(metadata, "ReferenceBlackWhite");
       } else if (photo == 2 || photo == 3) {
         if (spp != 3) {
           validation.addError("Invalid SampesPerPixel value fo TiffEP", spp);
@@ -90,27 +114,27 @@ public class TiffEPProfile extends GenericProfile {
           validation.addError("Invalid SampesPerPixel value fo TiffEP", spp);
         }
         if (photo == 32803) {
-          checkRequiredTag("CFARepeatPatternDim", 2);
-          checkRequiredTag("CFAPattern", -1);
+          checkRequiredTag(metadata, "CFARepeatPatternDim", 2);
+          checkRequiredTag(metadata, "CFAPattern", -1);
         }
       }
     }
-    checkRequiredTag("PlanarConfiguration", 1, new long[] {1, 2});
-    checkRequiredTag("ResolutionUnit", 1, new long[] {1, 2, 3});
+    checkRequiredTag(metadata, "PlanarConfiguration", 1, new long[] {1, 2});
+    checkRequiredTag(metadata, "ResolutionUnit", 1, new long[] {1, 2, 3});
     if (metadata.containsTagId(TiffTags.getTagId("Orientation")))
-      checkRequiredTag("Orientation", 1, new long[] {1, 3, 6, 8, 9});
+      checkRequiredTag(metadata, "Orientation", 1, new long[] {1, 3, 6, 8, 9});
 
     if (ifd.hasStrips()) {
-      checkRequiredTag("StripBYTECount", -1);
-      checkRequiredTag("StripOffsets", -1);
-      checkRequiredTag("RowsPerStrip", 1);
+      checkRequiredTag(metadata, "StripBYTECount", -1);
+      checkRequiredTag(metadata, "StripOffsets", -1);
+      checkRequiredTag(metadata, "RowsPerStrip", 1);
       if (ifd.hasTiles()) {
         validation.addError("Image in both strips and tiles");
       }
     } else if (ifd.hasTiles()) {
-      checkRequiredTag("TileLength", 1);
-      checkRequiredTag("TileOffsets", 1);
-      checkRequiredTag("TileWidth", -1);
+      checkRequiredTag(metadata, "TileLength", 1);
+      checkRequiredTag(metadata, "TileOffsets", 1);
+      checkRequiredTag(metadata, "TileWidth", -1);
     }
 
     int nycbcr = 0;
@@ -123,15 +147,15 @@ public class TiffEPProfile extends GenericProfile {
     if (metadata.containsTagId(TiffTags.getTagId("ReferenceBlackWhite")))
       nycbcr++;
     if (nycbcr > 0 && nycbcr != 4) {
-      checkRequiredTag("YCbCrCoefficients", 3);
-      checkRequiredTag("YCbCrSubSampling", 2);
-      checkRequiredTag("YCbCrPositioning", 1);
-      checkRequiredTag("ReferenceBlackWhite", 6);
+      checkRequiredTag(metadata, "YCbCrCoefficients", 3);
+      checkRequiredTag(metadata, "YCbCrSubSampling", 2);
+      checkRequiredTag(metadata, "YCbCrPositioning", 1);
+      checkRequiredTag(metadata, "ReferenceBlackWhite", 6);
     }
 
-    checkForbiddenTag("PrimaryChromaticities");
-    checkForbiddenTag("WhitePoint");
-    checkForbiddenTag("TransferFunction");
+    checkForbiddenTag(metadata, "PrimaryChromaticities");
+    checkForbiddenTag(metadata, "WhitePoint");
+    checkForbiddenTag(metadata, "TransferFunction");
 
     if (metadata.containsTagId(TiffTags.getTagId("FocalPlaneResolutionUnit"))) {
       int focal = (int) metadata.get("FocalPlaneResolutionUnit").getFirstNumericValue();
@@ -147,14 +171,16 @@ public class TiffEPProfile extends GenericProfile {
   }
 
   /**
-   * Check required tag is present.
+   * Check required tag is present, and its cardinality and value is correct.
    *
+   * @param metadata the metadata
    * @param tagName the name of the mandatory tag
    * @param cardinality the mandatory cardinality
    * @param possibleValues the possible tag values
    * @return true, if tag is found
    */
-  private boolean checkRequiredTag(String tagName, int cardinality, long[] possibleValues) {
+  private boolean checkRequiredTag(IfdTags metadata, String tagName, int cardinality,
+      long[] possibleValues) {
     boolean ok = true;
     int tagid = TiffTags.getTagId(tagName);
     if (!metadata.containsTagId(tagid)) {
@@ -171,9 +197,9 @@ public class TiffEPProfile extends GenericProfile {
           contained = true;
           break;
         }
-        if (!contained)
-          validation.addError("Invalid value for TiffEP tag " + tagName, val);
       }
+      if (!contained)
+        validation.addError("Invalid value for TiffEP tag " + tagName, val);
     }
     return ok;
   }
@@ -181,20 +207,22 @@ public class TiffEPProfile extends GenericProfile {
   /**
    * Check a required tag is present.
    *
+   * @param metadata the metadata
    * @param tagName the name of the mandatory tag
    * @param cardinality the mandatory cardinality
    * @return true, if tag is present
    */
-  private boolean checkRequiredTag(String tagName, int cardinality) {
-    return checkRequiredTag(tagName, cardinality, null);
+  private boolean checkRequiredTag(IfdTags metadata, String tagName, int cardinality) {
+    return checkRequiredTag(metadata, tagName, cardinality, null);
   }
 
   /**
    * Check a forbidden tag is not present.
    *
+   * @param metadata the metadata
    * @param tagName the tag name
    */
-  private void checkForbiddenTag(String tagName) {
+  private void checkForbiddenTag(IfdTags metadata, String tagName) {
     int tagid = TiffTags.getTagId(tagName);
     if (metadata.containsTagId(tagid)) {
       validation.addError("Forbidden tag for TiffEP found " + tagName);

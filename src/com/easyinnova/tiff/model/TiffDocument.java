@@ -126,13 +126,31 @@ public class TiffDocument {
   }
 
   /**
-   * Returns a list of ifds.
+   * Returns a list of ifds including exifds.
    *
    * @return the ifds list
    */
   public List<TiffObject> getIfds() {
     if (metadata.contains("IFD"))
       return getMetadataList("IFD");
+    else
+      return new ArrayList<TiffObject>();
+  }
+
+  /**
+   * Returns a list of ifds representing Images.
+   *
+   * @return the ifds list
+   */
+  public List<TiffObject> getImageIfds() {
+    if (metadata.contains("IFD")) {
+      List<TiffObject> l = new ArrayList<TiffObject>();
+      for (TiffObject ifd : getMetadataList("IFD")) {
+        if (((IFD) ifd).isImage())
+          l.add(ifd);
+      }
+      return l;
+    }
     else
       return new ArrayList<TiffObject>();
   }
@@ -167,7 +185,7 @@ public class TiffDocument {
    * @return image file d
    */
   public IFD getFirstIFD() {
-    List<TiffObject> l = getIfds();
+    List<TiffObject> l = getImageIfds();
     if (l.size() > 0)
       return (IFD) l.get(0);
     else
@@ -274,5 +292,14 @@ public class TiffDocument {
       System.out.println(name + mult + ": "
           + getMetadataSingleString(name));
     }
+  }
+
+  /**
+   * Gets the metadata.
+   *
+   * @return the metadata
+   */
+  public Metadata getMetadata() {
+    return metadata;
   }
 }

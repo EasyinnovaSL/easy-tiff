@@ -80,9 +80,8 @@ public class TiffEPTest {
     assertEquals(0, result);
     assertEquals(true, tr.getValidation().correct);
     to = tr.getModel();
-    ifd = (IFD) to.getFirstIFD();
 
-    TiffEPProfile bp = new TiffEPProfile(ifd);
+    TiffEPProfile bp = new TiffEPProfile(to);
     bp.validate();
     assertEquals(false, bp.getValidation().correct);
     assertEquals(12, bp.getValidation().errors.size());

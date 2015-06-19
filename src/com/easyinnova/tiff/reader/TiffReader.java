@@ -32,7 +32,6 @@
 package com.easyinnova.tiff.reader;
 
 import com.easyinnova.tiff.io.TiffInputStream;
-import com.easyinnova.tiff.io.TiffStreamIO;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
@@ -346,14 +345,18 @@ public class TiffReader {
   /**
    * Gets the value of the given tag field.
    *
-   * @param type the tag type
+   * @param tagtype the tag type
    * @param n the cardinality
    * @param id the tag id
    * @param beginOffset the offset position of the tag value
    * @param parentIFD the parent ifd
    * @return the tag value object
    */
-  public TagValue getValue(int type, int n, int id, int beginOffset, IFD parentIFD) {
+  public TagValue getValue(int tagtype, int n, int id, int beginOffset, IFD parentIFD) {
+    int type = tagtype;
+    if (id == 330 && type != 13)
+      type = 13;
+
     // Create TagValue object
     TagValue tv = new TagValue(id, type);
 
@@ -441,6 +444,7 @@ public class TiffReader {
               IfdReader ifd = readIFD(ifdOffset, true);
               IFD subIfd = ifd.getIfd();
               subIfd.setParent(parentIFD);
+              parentIFD.setsubIFD(subIfd);
               tv.add(subIfd);
               break;
           }
@@ -452,14 +456,18 @@ public class TiffReader {
       }
     }
 
+    if (id == 33723) {
+      System.out.print("");
+    }
+
     if (ok && TiffTags.hasTag(id)) {
       Tag t = TiffTags.getTag(id);
       if (t.hasTypedef()) {
-        String tagtype = t.getTypedef();
+        String tagclass = t.getTypedef();
 
         try {
           abstractTiffType instanceOfMyClass =
-              (abstractTiffType) Class.forName("com.easyinnova.tiff.model.types." + tagtype)
+              (abstractTiffType) Class.forName("com.easyinnova.tiff.model.types." + tagclass)
                   .getConstructor().newInstance();
           if (instanceOfMyClass.isIFD()) {
             long ifdOffset = tv.getFirstNumericValue();
@@ -500,7 +508,8 @@ public class TiffReader {
    * @deprecated use {data.getShort} instead.
    */
   @Deprecated
-  int readShort(int index, ByteOrder order, TiffStreamIO data) throws IOException {
+  int readShort(int index, ByteOrder order, com.easyinnova.tiff.io.TiffStreamIO data)
+      throws IOException {
     int result = 0;
 
     try {
@@ -530,7 +539,8 @@ public class TiffReader {
    * @deprecated use {data.getInt} instead.
    */
   @Deprecated
-  long readLong(int index, ByteOrder order, TiffStreamIO data) throws IOException {
+  long readLong(int index, ByteOrder order, com.easyinnova.tiff.io.TiffStreamIO data)
+      throws IOException {
     long result = 0;
 
     try {

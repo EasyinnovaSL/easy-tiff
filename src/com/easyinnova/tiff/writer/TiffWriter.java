@@ -88,8 +88,8 @@ public class TiffWriter {
    * Write.
    */
   public void writeTiff() {
-    for (int i = model.getIfds().size() - 1; i >= 0; i--) {
-      IFD ifd = (IFD) model.getIfds().get(i);
+    for (int i = model.getImageIfds().size() - 1; i >= 0; i--) {
+      IFD ifd = (IFD) model.getImageIfds().get(i);
       writeIFD(ifd);
     }
   }

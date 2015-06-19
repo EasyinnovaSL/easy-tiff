@@ -35,6 +35,7 @@ import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.reader.BaselineProfile;
+import com.easyinnova.tiff.reader.TiffEPProfile;
 import com.easyinnova.tiff.reader.TiffReader;
 import com.easyinnova.tiff.writer.TiffWriter;
 
@@ -140,16 +141,28 @@ public class TiffReaderWriter {
             System.out.println("IFDs: " + to.getIfdCount());
             System.out.println("SubIFDs: " + to.getSubIfdCount());
             
-            // int index = 0;
             to.printMetadata();
-            for (TiffObject o : to.getIfds()) {
+            BaselineProfile bp = new BaselineProfile(to);
+            bp.validate();
+            bp.getValidation().printErrors();
+            TiffEPProfile bpep = new TiffEPProfile(to);
+            bpep.validate();
+            bpep.getValidation().printErrors();
+
+            int nifd = 1;
+            for (TiffObject o : to.getImageIfds()) {
               IFD ifd = (IFD) o;
               if (ifd != null) {
-                BaselineProfile bp = new BaselineProfile(ifd);
-                bp.validate();
-                // String t = bp.getType().toString();
-                // System.out.println("IFD " + index++ + " (" + t + ")");
-                // ifd.printTags();
+                System.out.println("IFD " + nifd++ + " TAGS:");
+                ifd.printTags();
+              }
+            }
+            nifd = 1;
+            for (TiffObject o : to.getSubIfds()) {
+              IFD ifd = (IFD) o;
+              if (ifd != null) {
+                System.out.println("SubIFD " + nifd++ + " TAGS:");
+                ifd.printTags();
               }
             }
           } else {
@@ -161,13 +174,8 @@ public class TiffReaderWriter {
               
               // int index = 0;
               to.printMetadata();
-              for (TiffObject o : to.getIfds()) {
-                IFD ifd = (IFD) o;
-                BaselineProfile bp = new BaselineProfile(ifd);
-                bp.validate();
-                // System.out.println("IFD " + index++ + " (" + bp.getType().toString() + ")");
-                // ifd.printTags();
-              }
+              BaselineProfile bp = new BaselineProfile(to);
+              bp.validate();
             }
             tiffReader.getValidation().printErrors();
           }

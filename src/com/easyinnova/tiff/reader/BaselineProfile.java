@@ -34,6 +34,8 @@ package com.easyinnova.tiff.reader;
 import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
+import com.easyinnova.tiff.model.TiffDocument;
+import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.TiffTags;
 import com.easyinnova.tiff.model.types.IFD;
 import com.easyinnova.tiff.model.types.Rational;
@@ -42,7 +44,7 @@ import com.easyinnova.tiff.model.types.abstractTiffType;
 /**
  * Checks if the Tiff file complies with the Baseline 6.0.
  */
-public class BaselineProfile extends GenericProfile {
+public class BaselineProfile extends GenericProfile implements Profile {
 
   /**
    * Known types of images.
@@ -95,26 +97,33 @@ public class BaselineProfile extends GenericProfile {
   /**
    * Instantiates a new baseline profile.
    *
-   * @param ifd the image to validate
+   * @param doc the tiff file
    */
-  public BaselineProfile(IFD ifd) {
-    super(ifd);
+  public BaselineProfile(TiffDocument doc) {
+    super(doc);
     type = ImageType.UNDEFINED;
   }
 
   /**
    * Validates the IFD.
    */
+  @Override
   public void validate() {
-    validateMetadata();
-    checkImage();
+    for (TiffObject o : model.getImageIfds()) {
+      IFD ifd = (IFD) o;
+      IfdTags metadata = ifd.getMetadata();
+      validateMetadata(metadata);
+      checkImage(ifd, metadata);
+    }
   }
 
   /**
    * Validates that the ifd entries have correct types and cardinalities, as they are defined in the
    * JSONs tag configuration files.
+   *
+   * @param metadata the ifd metadata
    */
-  public void validateMetadata() {
+  public void validateMetadata(IfdTags metadata) {
     int prevTagId = 0;
     TiffTags.getTiffTags();
     for (TagValue ie : metadata.getTags()) {
@@ -159,9 +168,12 @@ public class BaselineProfile extends GenericProfile {
 
   /**
    * Check if the tags that define the image are correct and consistent.
+   *
+   * @param ifd the ifd
+   * @param metadata the ifd metadata
    */
-  public void checkImage() {
-    CheckCommonFields();
+  public void checkImage(IFD ifd, IfdTags metadata) {
+    CheckCommonFields(ifd, metadata);
 
     if (!metadata.containsTagId(TiffTags.getTagId("PhotometricInterpretation"))) {
       validation.addError("Missing Photometric Interpretation");
@@ -404,8 +416,11 @@ public class BaselineProfile extends GenericProfile {
 
   /**
    * Check common fields.
+   *
+   * @param ifd the ifd
+   * @param metadata the ifd metadata
    */
-  private void CheckCommonFields() {
+  private void CheckCommonFields(IFD ifd, IfdTags metadata) {
     int id;
 
     // Width tag is mandatory
@@ -486,9 +501,9 @@ public class BaselineProfile extends GenericProfile {
     else if (strips && tiles)
       validation.addError("Image in both strips and tiles");
     else if (strips) {
-      CheckStrips();
+      CheckStrips(metadata);
     } else if (tiles) {
-      CheckTiles();
+      CheckTiles(ifd, metadata);
     }
 
     // Check pixel samples bits
@@ -532,8 +547,10 @@ public class BaselineProfile extends GenericProfile {
 
   /**
    * Check that the strips containing the image are well-formed.
+   *
+   * @param metadata the metadata
    */
-  private void CheckStrips() {
+  private void CheckStrips(IfdTags metadata) {
     long offset;
     int id;
 
@@ -571,8 +588,11 @@ public class BaselineProfile extends GenericProfile {
 
   /**
    * Check that the tiles containing the image are well-formed.
+   *
+   * @param metadata the metadata
+   * @param ifd the ifd
    */
-  private void CheckTiles() {
+  private void CheckTiles(IFD ifd, IfdTags metadata) {
     long offset;
     int id;
 

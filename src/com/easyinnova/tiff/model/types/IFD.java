@@ -54,6 +54,9 @@ public class IFD extends abstractTiffType {
   /** Pointer to the parent ifd. */
   private IFD parentIFD;
 
+  /** Pointer to the child ifd. */
+  private IFD subIFD;
+
   /** The image strips. */
   private ImageStrips imageStrips;
 
@@ -103,6 +106,24 @@ public class IFD extends abstractTiffType {
    */
   public IFD getParent() {
     return parentIFD;
+  }
+
+  /**
+   * Sets the subIFD.
+   *
+   * @param subIFD the new subIFD
+   */
+  public void setsubIFD(IFD subIFD) {
+    this.subIFD = subIFD;
+  }
+
+  /**
+   * Gets the subIFD.
+   *
+   * @return the subIFD
+   */
+  public IFD getsubIFD() {
+    return subIFD;
   }
 
   /**
@@ -204,7 +225,9 @@ public class IFD extends abstractTiffType {
   public void printTags() {
     for (TagValue ie : tags.getTags()) {
       try {
-        String name = TiffTags.getTag(ie.getId()).getName();
+        String name = "" + ie.getId();
+        if (TiffTags.hasTag(ie.getId()))
+          name = TiffTags.getTag(ie.getId()).getName();
         String val = ie.toString();
         String type = TiffTags.tagTypes.get(ie.getType());
         System.out.println(name + "(" + ie.getType() + "->" + type + "): " + val);
