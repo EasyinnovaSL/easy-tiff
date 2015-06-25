@@ -183,7 +183,7 @@ public class ValidationResult {
    */
   public void printErrors() {
     for (ValidationEvent ve : errors) {
-      ve.print();
+      ve.printError();
     }
   }
 
@@ -203,5 +203,23 @@ public class ValidationResult {
    */
   public boolean isCorrect() {
     return correct;
+  }
+
+  /**
+   * Gets the errors.
+   *
+   * @return the errors
+   */
+  public ArrayList<ValidationEvent> getErrors() {
+    return errors;
+  }
+
+  /**
+   * Gets the warnings.
+   *
+   * @return the warnings
+   */
+  public ArrayList<ValidationEvent> getWarnings() {
+    return warnings;
   }
 }

@@ -37,10 +37,13 @@ package com.easyinnova.tiff.model;
 public class ValidationEvent {
 
   /** The error description. */
-  public String description;
+  private String description;
 
   /** The value that has thrown the error. */
-  public String value;
+  private String value;
+
+  /** The level. */
+  private int level;
 
   /**
    * Default constructor.
@@ -48,6 +51,7 @@ public class ValidationEvent {
   public ValidationEvent() {
     description = "";
     value = null;
+    level = 1;
   }
 
   /**
@@ -64,7 +68,7 @@ public class ValidationEvent {
   /**
    * Prints the error in the console.
    */
-  public void print() {
+  public void printError() {
     System.out.print(description);
     if (value != null)
       System.out.print(" (" + value + ")");
@@ -80,6 +84,33 @@ public class ValidationEvent {
     if (value != null)
       System.out.print(" (" + value + ")");
     System.out.println();
+  }
+
+  /**
+   * Gets the level.
+   *
+   * @return the level
+   */
+  public int getLevel() {
+    return level;
+  }
+
+  /**
+   * Gets the description.
+   *
+   * @return the description
+   */
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * Gets the erroneous value.
+   *
+   * @return the erroneous value
+   */
+  public String getInvalidValue() {
+    return value;
   }
 }
 

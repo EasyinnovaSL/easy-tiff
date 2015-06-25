@@ -128,7 +128,7 @@ public class TiffDocument {
    */
   public List<TiffObject> getIfds() {
     List<TiffObject> l = new ArrayList<TiffObject>();
-    if (metadata.contains("IFD"))
+    if (metadata != null && metadata.contains("IFD"))
       l = getMetadataList("IFD");
     return l;
   }
@@ -140,7 +140,7 @@ public class TiffDocument {
    */
   public List<TiffObject> getImageIfds() {
     List<TiffObject> l = new ArrayList<TiffObject>();
-    if (metadata.contains("IFD")) {
+    if (metadata != null && metadata.contains("IFD")) {
       for (TiffObject ifd : getMetadataList("IFD")) {
         if (((IFD) ifd).isImage())
           l.add(ifd);
@@ -156,7 +156,7 @@ public class TiffDocument {
    */
   public List<TiffObject> getSubIfds() {
     List<TiffObject> l = new ArrayList<TiffObject>();
-    if (metadata.contains("SubIFDs"))
+    if (metadata != null && metadata.contains("SubIFDs"))
       l = getMetadataList("SubIFDs");
     return l;
   }
