@@ -59,20 +59,11 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
   /** The Byte order. */
   private ByteOrder byteOrder;
 
-  /** The internal buffer. */
-  private int[] buffer;
-
-  /** The maximum internal buffer size. */
-  private int maxBufferSize = 100;
-
-  /** The current buffer size. */
-  private int currentBufferSize;
-
-  /** The buffer offset (file position of the 0th element). */
-  private long bufferOffset;
-
   /** The global file offset. */
   private long fileOffset;
+
+  /** The buffer. */
+  private InputBuffer buffer;
 
   /**
    * Instantiates a new data byte order input stream.
@@ -83,10 +74,7 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
   super(file);
     byteOrder = ByteOrder.BIG_ENDIAN;
     fileOffset = 0;
-    bufferOffset = 0;
-    currentBufferSize = 0;
-    if (maxBufferSize >= 0)
-      buffer = new int[maxBufferSize];
+    buffer = new InputBuffer(this);
   }
   
   /**
@@ -114,39 +102,8 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public void seekOffset(long offset) throws IOException {
-    if (maxBufferSize < 0) {
-      // old-school (no buffer optimization)
-      seek(offset);
-    } else {
-      checkBuffer(offset);
-      fileOffset = offset;
-    }
-  }
-
-  /**
-   * Checks if the given offset is already contained in the internal buffer.<br>
-   * If not, fills the buffer starting at the given offset position.
-   *
-   * @param offset the offset to check
-   * @throws IOException Signals that an I/O exception has occurred.
-   */
-  private void checkBuffer(long offset) throws IOException {
-    if (offset - bufferOffset < 0 || offset - bufferOffset >= currentBufferSize) {
-      // the given offset is not contained in the buffer
-      bufferOffset = offset;
-      int index = 0;
-      seek(offset);
-      try {
-        for (long pos = offset; pos < offset + maxBufferSize; pos++) {
-          int ch = read();
-          buffer[index] = ch;
-          index++;
-        }
-      } catch (IOException ex) {
-        // end of file reached -> do nothing
-      }
-      currentBufferSize = index;
-    }
+    buffer.seek(offset);
+    fileOffset = offset;
   }
 
   /**
@@ -156,16 +113,8 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   private int readCurrentByte() throws IOException {
-    int b;
-    if (maxBufferSize < 0) {
-      // old-school (no buffer optimization)
-      b = read();
-    } else {
-      checkBuffer(fileOffset);
-      b = buffer[(int) (fileOffset - bufferOffset)];
-      fileOffset++;
-    }
-
+    int b = buffer.read(fileOffset);
+    fileOffset++;
     return b;
   }
 
