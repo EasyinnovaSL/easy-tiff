@@ -29,7 +29,7 @@
  * @since 4/6/2015
  *
  */
-package com.easyinnova.tiff.reader;
+package com.easyinnova.tiff.profiles;
 
 import com.easyinnova.tiff.model.IfdTags;
 import com.easyinnova.tiff.model.Tag;

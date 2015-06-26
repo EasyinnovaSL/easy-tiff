@@ -39,7 +39,7 @@ import org.junit.Test;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.types.IFD;
-import com.easyinnova.tiff.reader.TiffEPProfile;
+import com.easyinnova.tiff.profiles.TiffEPProfile;
 import com.easyinnova.tiff.reader.TiffReader;
 
 /**

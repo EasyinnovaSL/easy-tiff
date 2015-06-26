@@ -28,7 +28,7 @@
  * @since 18/6/2015
  *
  */
-package com.easyinnova.tiff.reader;
+package com.easyinnova.tiff.profiles;
 /**
  * The Interface Class Profile.
  */

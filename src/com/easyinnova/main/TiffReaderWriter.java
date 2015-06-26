@@ -34,8 +34,8 @@ package com.easyinnova.main;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.types.IFD;
-import com.easyinnova.tiff.reader.BaselineProfile;
-import com.easyinnova.tiff.reader.TiffEPProfile;
+import com.easyinnova.tiff.profiles.BaselineProfile;
+import com.easyinnova.tiff.profiles.TiffEPProfile;
 import com.easyinnova.tiff.reader.TiffReader;
 import com.easyinnova.tiff.writer.TiffWriter;
 
