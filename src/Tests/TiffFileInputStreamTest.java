@@ -138,7 +138,7 @@ public class TiffFileInputStreamTest {
     assertEquals("0",stream.readShort().toString());
     assertEquals("65535",stream.readShort().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-    stream.seek(0);
+    stream.seekOffset(0);
     assertEquals("65407",stream.readShort().toString());
     assertEquals("128",stream.readShort().toString());
     assertEquals("0",stream.readShort().toString());
@@ -161,7 +161,7 @@ public class TiffFileInputStreamTest {
     assertEquals("0",stream.readSShort().toString());
     assertEquals("-1",stream.readSShort().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-    stream.seek(0);
+    stream.seekOffset(0);
     assertEquals("-129",stream.readSShort().toString());
     assertEquals("128",stream.readSShort().toString());
     assertEquals("0",stream.readSShort().toString());
@@ -184,7 +184,7 @@ public class TiffFileInputStreamTest {
     assertEquals("0",stream.readLong().toString());
     assertEquals("4294967295",stream.readLong().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-    stream.seek(0);
+    stream.seekOffset(0);
     assertEquals("4294967167",stream.readLong().toString());
     assertEquals("128",stream.readLong().toString());
     assertEquals("0",stream.readLong().toString());
@@ -208,7 +208,7 @@ public class TiffFileInputStreamTest {
     assertEquals("0",stream.readSLong().toString());
     assertEquals("-1",stream.readSLong().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-    stream.seek(0);
+    stream.seekOffset(0);
     assertEquals("-129",stream.readSLong().toString());
     assertEquals("128",stream.readSLong().toString());
     assertEquals("0",stream.readSLong().toString());
@@ -238,7 +238,7 @@ public class TiffFileInputStreamTest {
      assertEquals("-1.1754942E-38",stream.readFloat().toString());
      assertEquals("1.1754942E-38",stream.readFloat().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-     stream.seek(0);
+    stream.seekOffset(0);
      assertEquals("0.0",stream.readFloat().toString());
      assertEquals("1.794E-43",stream.readFloat().toString());
      assertEquals("4.6096E-41",stream.readFloat().toString());
@@ -275,7 +275,7 @@ public class TiffFileInputStreamTest {
       assertEquals("-2.225073858507201E-308",stream.readDouble().toString());
       assertEquals("2.225073858507201E-308",stream.readDouble().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-      stream.seek(0);
+    stream.seekOffset(0);
       assertEquals("0.0",stream.readDouble().toString());
       assertEquals("6.32E-322",stream.readDouble().toString());
       assertEquals("3.0418E-319",stream.readDouble().toString());
@@ -311,7 +311,7 @@ public class TiffFileInputStreamTest {
       assertEquals("-2.225073858507201E-308",stream.readDouble().toString());
       assertEquals("2.225073858507201E-308",stream.readDouble().toString());
     stream.setByteOrder(ByteOrder.LITTLE_ENDIAN);
-      stream.seek(0);
+    stream.seekOffset(0);
       assertEquals("0.0",stream.readDouble().toString());
       assertEquals("6.32E-322",stream.readDouble().toString());
       assertEquals("3.0418E-319",stream.readDouble().toString());

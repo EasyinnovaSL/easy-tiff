@@ -35,7 +35,6 @@ import com.easyinnova.tiff.model.Metadata;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffObject;
 
-// TODO: Auto-generated Javadoc
 /**
  * The generic class abstractTiffType.
  */

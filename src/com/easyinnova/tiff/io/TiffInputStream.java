@@ -59,6 +59,21 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
   /** The Byte order. */
   private ByteOrder byteOrder;
 
+  /** The internal buffer. */
+  private int[] buffer;
+
+  /** The maximum internal buffer size. */
+  private int maxBufferSize = 100;
+
+  /** The current buffer size. */
+  private int currentBufferSize;
+
+  /** The buffer offset (file position of the 0th element). */
+  private long bufferOffset;
+
+  /** The global file offset. */
+  private long fileOffset;
+
   /**
    * Instantiates a new data byte order input stream.
    * @param file file
@@ -67,6 +82,11 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
   public TiffInputStream(File file) throws FileNotFoundException {
   super(file);
     byteOrder = ByteOrder.BIG_ENDIAN;
+    fileOffset = 0;
+    bufferOffset = 0;
+    currentBufferSize = 0;
+    if (maxBufferSize >= 0)
+      buffer = new int[maxBufferSize];
   }
   
   /**
@@ -88,6 +108,68 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
   }
 
   /**
+   * Seek offset.
+   *
+   * @param offset the offset
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  public void seekOffset(long offset) throws IOException {
+    if (maxBufferSize < 0) {
+      // old-school (no buffer optimization)
+      seek(offset);
+    } else {
+      checkBuffer(offset);
+      fileOffset = offset;
+    }
+  }
+
+  /**
+   * Checks if the given offset is already contained in the internal buffer.<br>
+   * If not, fills the buffer starting at the given offset position.
+   *
+   * @param offset the offset to check
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private void checkBuffer(long offset) throws IOException {
+    if (offset - bufferOffset < 0 || offset - bufferOffset >= currentBufferSize) {
+      // the given offset is not contained in the buffer
+      bufferOffset = offset;
+      int index = 0;
+      seek(offset);
+      try {
+        for (long pos = offset; pos < offset + maxBufferSize; pos++) {
+          int ch = read();
+          buffer[index] = ch;
+          index++;
+        }
+      } catch (IOException ex) {
+        // end of file reached -> do nothing
+      }
+      currentBufferSize = index;
+    }
+  }
+
+  /**
+   * Reads the current byte (in fileOffset).
+   *
+   * @return the read byte
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private int readCurrentByte() throws IOException {
+    int b;
+    if (maxBufferSize < 0) {
+      // old-school (no buffer optimization)
+      b = read();
+    } else {
+      checkBuffer(fileOffset);
+      b = buffer[(int) (fileOffset - bufferOffset)];
+      fileOffset++;
+    }
+
+    return b;
+  }
+
+  /**
    * Read byte.
    *
    * @param position the position
@@ -95,13 +177,13 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Byte readByte(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readByte();
   }
 
   @Override
   public Byte readByte() throws IOException {
-    int ch = read();
+    int ch = readCurrentByte();
     if (ch < 0) {
     throw new EOFException();
     }
@@ -116,13 +198,13 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Ascii readAscii(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readAscii();
   }
 
   @Override
   public Ascii readAscii() throws IOException {
-    int ch = read();
+    int ch = readCurrentByte();
     if (ch < 0) {
     throw new EOFException();
     }
@@ -137,14 +219,14 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public SByte readSByte(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readSByte();
   }
 
   @Override
   public SByte readSByte() throws IOException {
     
-    int ch = read();
+    int ch = readCurrentByte();
     if (ch < 0) {
     throw new EOFException();
     }
@@ -159,14 +241,14 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Short readShort(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readShort();
   }
 
   @Override
   public Short readShort() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
     if ((ch1 | ch2) < 0) {
         throw new EOFException();
     }
@@ -187,14 +269,14 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public SShort readSShort(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readSShort();
   }
 
   @Override
   public SShort readSShort() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
     if ((ch1 | ch2) < 0) {
       throw new EOFException();
     }
@@ -215,17 +297,17 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Long readLong(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readLong();
   }
 
   @Override
   public Long readLong() throws IOException {
     
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
+    int ch3 = readCurrentByte();
+    int ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -246,16 +328,16 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public SLong readSLong(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readSLong();
   }
 
   @Override
   public SLong readSLong() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
+    int ch3 = readCurrentByte();
+    int ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -276,13 +358,13 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Undefined readUndefined(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readUndefined();
   }
   
   @Override
   public Undefined readUndefined() throws IOException {
-    int ch = read();
+    int ch = readCurrentByte();
     if (ch < 0) {
     throw new EOFException();
     }
@@ -297,16 +379,16 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Rational readRational(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readRational();
   }
 
   @Override
   public Rational readRational() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
+    int ch3 = readCurrentByte();
+    int ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -317,10 +399,10 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
       val = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }     
     
-    ch1 = read();
-    ch2 = read();
-    ch3 = read();
-    ch4 = read();
+    ch1 = readCurrentByte();
+    ch2 = readCurrentByte();
+    ch3 = readCurrentByte();
+    ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -342,16 +424,16 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public SRational readSRational(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readSRational();
   }
 
   @Override
   public SRational readSRational() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
+    int ch3 = readCurrentByte();
+    int ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -362,10 +444,10 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
       val = (int)((ch4 << 24) + (ch3 << 16) + (ch2 << 8) + (ch1 << 0));
     }     
     
-    ch1 = read();
-    ch2 = read();
-    ch3 = read();
-    ch4 = read();
+    ch1 = readCurrentByte();
+    ch2 = readCurrentByte();
+    ch3 = readCurrentByte();
+    ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -387,16 +469,16 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Float readFloat(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readFloat();
   }
 
   @Override
   public Float readFloat() throws IOException {
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
+    int ch3 = readCurrentByte();
+    int ch4 = readCurrentByte();
     if ((ch1 | ch2 | ch3 | ch4) < 0) {
         throw new EOFException();
     }
@@ -417,21 +499,21 @@ public class TiffInputStream extends RandomAccessFileInputStream implements Tiff
    * @throws IOException Signals that an I/O exception has occurred.
    */
   public Double readDouble(long position) throws IOException {
-    seek(position);
+    seekOffset(position);
     return readDouble();
   }
 
   @Override
   public Double readDouble() throws IOException {
     
-    int ch1 = read();
-    int ch2 = read();
-    int ch3 = read();
-    int ch4 = read();
-    int ch5 = read();
-    int ch6 = read();
-    int ch7 = read();
-    int ch8 = read();
+    int ch1 = readCurrentByte();
+    int ch2 = readCurrentByte();
+    int ch3 = readCurrentByte();
+    int ch4 = readCurrentByte();
+    int ch5 = readCurrentByte();
+    int ch6 = readCurrentByte();
+    int ch7 = readCurrentByte();
+    int ch8 = readCurrentByte();
     
     if ((ch1 | ch2 | ch3 | ch4 | ch5 | ch6 | ch7 | ch8 ) < 0) {
         throw new EOFException();
