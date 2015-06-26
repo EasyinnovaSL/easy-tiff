@@ -1,1 +1,7 @@
+Tests
 com.easyinnova.main
+com.easyinnova.tiff.io
+com.easyinnova.tiff.model
+com.easyinnova.tiff.model.types
+com.easyinnova.tiff.reader
+com.easyinnova.tiff.writer
