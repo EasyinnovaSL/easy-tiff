@@ -72,6 +72,7 @@ public class TiffDocument {
    * Gets the ifd count.
    *
    * @return the ifd count
+   * @the tiff tags io exception
    */
   public int getIfdCount() {
     int c = 0;
@@ -84,6 +85,7 @@ public class TiffDocument {
    * Gets the images count.
    *
    * @return the ifd count
+   * @the tiff tags io exception
    */
   public int getIfdImagesCount() {
     int c = 0;
@@ -104,6 +106,7 @@ public class TiffDocument {
    * Gets the Subifd count.
    *
    * @return the Subifd count
+   * @the tiff tags io exception
    */
   public int getSubIfdCount() {
     int c = 0;
@@ -116,6 +119,7 @@ public class TiffDocument {
    * Gets the count of IFDs and SubIFDs.
    *
    * @return the ifd count
+   * @the tiff tags io exception
    */
   public int getIfdAndSubIfdCount() {
     return getMetadataList("IFD").size() + getMetadataList("SubIFDs").size();
@@ -125,6 +129,7 @@ public class TiffDocument {
    * Returns a list of ifds including exifds.
    *
    * @return the ifds list
+   * @the tiff tags io exception
    */
   public List<TiffObject> getIfds() {
     List<TiffObject> l = new ArrayList<TiffObject>();
@@ -137,6 +142,7 @@ public class TiffDocument {
    * Returns a list of ifds representing Images.
    *
    * @return the ifds list
+   * @the tiff tags io exception
    */
   public List<TiffObject> getImageIfds() {
     List<TiffObject> l = new ArrayList<TiffObject>();
@@ -153,6 +159,7 @@ public class TiffDocument {
    * Returns a list of subifds.
    *
    * @return the subifds list
+   * @the tiff tags io exception
    */
   public List<TiffObject> getSubIfds() {
     List<TiffObject> l = new ArrayList<TiffObject>();
@@ -165,6 +172,7 @@ public class TiffDocument {
    * Returns a list of subifds.
    *
    * @return the subifds list
+   * @the tiff tags io exception
    */
   public List<TiffObject> getIfdsAndSubIfds() {
     List<TiffObject> all = new ArrayList<TiffObject>();
@@ -177,6 +185,7 @@ public class TiffDocument {
    * Returns the first image of the file.
    *
    * @return image file d
+   * @the tiff tags io exception
    */
   public IFD getFirstIFD() {
     List<TiffObject> l = getImageIfds();
@@ -209,6 +218,7 @@ public class TiffDocument {
    *
    * @param name the tag name
    * @return the metadata single string
+   * @the tiff tags io exception
    */
   public String getMetadataSingleString(String name) {
     String s = "";
@@ -224,6 +234,7 @@ public class TiffDocument {
    *
    * @param name the class name
    * @return the list of metadata that matches with the class name
+   * @the tiff tags io exception
    */
   public List<TiffObject> getMetadataList(String name) {
     List<TiffObject> l = new ArrayList<TiffObject>();
@@ -236,6 +247,8 @@ public class TiffDocument {
 
   /**
    * Creates the metadata dictionary.
+   *
+   * @the tiff tags io exception
    */
   public void createMetadataDictionary() {
     metadata = new Metadata();
@@ -249,6 +262,7 @@ public class TiffDocument {
    *
    * @param ifd the ifd
    * @param key the key
+   * @the tiff tags io exception
    */
   private void addMetadataFromIFD(IFD ifd, String key) {
     metadata.add(key, ifd);
@@ -274,6 +288,8 @@ public class TiffDocument {
 
   /**
    * Prints the metadata.
+   *
+   * @the tiff tags io exception
    */
   public void printMetadata() {
     if (metadata == null)

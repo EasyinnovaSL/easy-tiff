@@ -32,6 +32,7 @@
 package com.easyinnova.tiff.profiles;
 
 import com.easyinnova.tiff.model.IfdTags;
+import com.easyinnova.tiff.model.ReadTagsIOException;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
@@ -125,7 +126,10 @@ public class BaselineProfile extends GenericProfile implements Profile {
    */
   public void validateMetadata(IfdTags metadata) {
     int prevTagId = 0;
+    try {
     TiffTags.getTiffTags();
+    } catch (ReadTagsIOException e) {
+    }
     for (TagValue ie : metadata.getTags()) {
       if (!TiffTags.tagMap.containsKey(ie.getId())) {
         validation.addWarning("Ignoring undefined tag id " + ie.getId());

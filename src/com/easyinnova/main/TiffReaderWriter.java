@@ -31,6 +31,8 @@
  */
 package com.easyinnova.main;
 
+import com.easyinnova.tiff.model.ReadIccConfigIOException;
+import com.easyinnova.tiff.model.ReadTagsIOException;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.TiffObject;
 import com.easyinnova.tiff.model.types.IFD;
@@ -98,16 +100,18 @@ public class TiffReaderWriter {
     } else {
       // Process files
       for (final String filename : files) {
-        TiffReader tr = new TiffReader();
-        int result = tr.readFile(filename);
-        reportResults(tr, result, output_file);
-
-        TiffWriter tw = new TiffWriter();
-        tw.SetModel(tr.getModel());
         try {
+          TiffReader tr = new TiffReader();
+          int result = tr.readFile(filename);
+          reportResults(tr, result, output_file);
+  
+          TiffWriter tw = new TiffWriter();
+          tw.SetModel(tr.getModel());
           // tw.write("out.tif");
-        } catch (Exception ex) {
-          System.out.println("Error writing TIFF");
+        } catch (ReadTagsIOException e) {
+          System.out.println("Error loading TIFF dependencies");
+        } catch (ReadIccConfigIOException e) {
+          System.out.println("Error loading ICC Profile dependencies");
         }
       }
     }

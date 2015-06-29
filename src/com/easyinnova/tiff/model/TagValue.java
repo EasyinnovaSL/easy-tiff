@@ -123,7 +123,11 @@ public class TagValue extends TiffObject {
    */
   public String toString() {
     String s = "";
-    boolean defined = TiffTags.hasTag(id) && TiffTags.getTag(id).hasTypedef();
+    boolean defined = false;
+    try {
+      defined = TiffTags.hasTag(id) && TiffTags.getTag(id).hasTypedef();
+    } catch (Exception ex) {
+    }
     if (defined) {
       s = value.get(0).toString();
     } else if (type != 1) {

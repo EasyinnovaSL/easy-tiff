@@ -67,7 +67,13 @@ public class TiffEPTest {
    */
   @Before
   public void PreTest() {
-    tr = new TiffReader();
+    boolean ok = true;
+    try {
+      tr = new TiffReader();
+    } catch (Exception e) {
+      ok = false;
+    }
+    assertEquals(ok, true);
   }
 
   /**

@@ -32,7 +32,15 @@ package com.easyinnova.tiff.model;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.CodeSource;
 import java.util.HashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * The Class IccProfileCreators.
@@ -48,25 +56,61 @@ public class IccProfileCreators {
 
   /**
    * Instantiates a new tiff tags.
+   *
+   * @throws ReadIccConfigIOException the read icc config io exception
    */
-  protected IccProfileCreators() {
+  protected IccProfileCreators() throws ReadIccConfigIOException {
     try {
-      FileReader fr = new FileReader("./config/iccprofile/creators.txt");
-      BufferedReader br = new BufferedReader(fr);
-      String line = br.readLine();
-      while (line != null) {
-        String[] fields = line.split("\t");
-        if (fields.length == 3) {
-          int signature = Integer.parseInt(fields[1], 16);
-          IccProfileCreator icp = new IccProfileCreator(signature, fields[0], fields[2]);
-          creatorsMap.put(icp.getSignature(), icp);
+      Path path = Paths.get("./config");
+      if (Files.exists(path)) {
+        // Look in current dir
+        FileReader fr = new FileReader("./config/iccprofile/creators.txt");
+        BufferedReader br = new BufferedReader(fr);
+        String line = br.readLine();
+        while (line != null) {
+          String[] fields = line.split("\t");
+          if (fields.length == 3) {
+            int signature = Integer.parseInt(fields[1], 16);
+            IccProfileCreator icp = new IccProfileCreator(signature, fields[0], fields[2]);
+            creatorsMap.put(icp.getSignature(), icp);
+          }
+          line = br.readLine();
         }
-        line = br.readLine();
+        br.close();
+        fr.close();
+      } else {
+        // Look in JAR
+        CodeSource src = TiffTags.class.getProtectionDomain().getCodeSource();
+        if (src != null) {
+          URL jar = src.getLocation();
+          ZipInputStream zip = new ZipInputStream(jar.openStream());
+          ZipEntry zipFile;
+          while ((zipFile = zip.getNextEntry()) != null) {
+            String name = zipFile.getName();
+            if (name.equals("iccprofile/creators.txt")) {
+              try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(zip));
+                String line = br.readLine();
+                while (line != null) {
+                  String[] fields = line.split("\t");
+                  if (fields.length == 3) {
+                    int signature = Integer.parseInt(fields[1], 16);
+                    IccProfileCreator icp = new IccProfileCreator(signature, fields[0], fields[2]);
+                    creatorsMap.put(icp.getSignature(), icp);
+                  }
+                  line = br.readLine();
+                }
+              } catch (Exception ex) {
+                throw new ReadIccConfigIOException();
+              }
+            }
+          }
+        } else {
+          throw new ReadIccConfigIOException();
+        }
       }
-      br.close();
-      fr.close();
     } catch (Exception ex) {
-
+      throw new ReadIccConfigIOException();
     }
   }
 
@@ -74,8 +118,10 @@ public class IccProfileCreators {
    * Gets the tiff tags.
    *
    * @return the singleton instance
+   * @throws ReadIccConfigIOException the read icc config io exception
    */
-  public static synchronized IccProfileCreators getIccProfileCreators() {
+  public static synchronized IccProfileCreators getIccProfileCreators()
+      throws ReadIccConfigIOException {
     if (instance == null) {
       instance = new IccProfileCreators();
     }
@@ -90,10 +136,14 @@ public class IccProfileCreators {
    */
   public static IccProfileCreator getIccProfile(int identifier) {
     IccProfileCreator icc = null;
-    if (instance == null)
-      getIccProfileCreators();
-    if (creatorsMap.containsKey(identifier))
-      icc = creatorsMap.get(identifier);
+    try {
+      if (instance == null)
+        getIccProfileCreators();
+      if (creatorsMap.containsKey(identifier))
+        icc = creatorsMap.get(identifier);
+    } catch (ReadIccConfigIOException e) {
+
+    }
     return icc;
   }
 

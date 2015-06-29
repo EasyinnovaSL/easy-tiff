@@ -39,7 +39,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.CodeSource;
 import java.util.HashMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * The Class TiffTags.
@@ -60,47 +68,80 @@ public class TiffTags {
 
   /**
    * Instantiates a new tiff tags.
+   *
+   * @throws ReadTagsIOException the read tags io exception
    */
-  protected TiffTags() {
-    File folder = new File("./config/tifftags/");
-    Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
+  protected TiffTags() throws ReadTagsIOException {
+    try {
+      Gson gson = new GsonBuilder().setDateFormat("dd/MM/yyyy").create();
 
-    for (final File fileEntry : folder.listFiles()) {
-      try {
-        BufferedReader br = new BufferedReader(  
-            new FileReader(fileEntry.toPath().toString()));
-        
-        Tag tag = gson.fromJson(br, Tag.class); 
-        
-        tagMap.put(tag.getId(), tag);
-        tagNames.put(tag.getName(), tag);
-      } catch (FileNotFoundException e) {
-        
-        e.printStackTrace();
-      }  
+      Path path = Paths.get("./config");
+      if (Files.exists(path)) {
+        // Look in current dir
+        File folder = new File("./config/tifftags/");
+        for (final File fileEntry : folder.listFiles()) {
+          try {
+            BufferedReader br = new BufferedReader(new FileReader(fileEntry.toPath().toString()));
+
+            Tag tag = gson.fromJson(br, Tag.class);
+
+            tagMap.put(tag.getId(), tag);
+            tagNames.put(tag.getName(), tag);
+          } catch (FileNotFoundException e) {
+            throw new ReadTagsIOException();
+          }
+        }
+      } else {
+        // Look in JAR
+        CodeSource src = TiffTags.class.getProtectionDomain().getCodeSource();
+        if (src != null) {
+          URL jar = src.getLocation();
+          ZipInputStream zip = new ZipInputStream(jar.openStream());
+          ZipEntry zipFile;
+          while ((zipFile = zip.getNextEntry()) != null) {
+            String name = zipFile.getName();
+            if (name.startsWith("tifftags/") && !name.equals("tifftags/")) {
+              try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(zip));
+
+                Tag tag = gson.fromJson(in, Tag.class);
+                tagMap.put(tag.getId(), tag);
+                tagNames.put(tag.getName(), tag);
+              } catch (Exception ex) {
+                throw new ReadTagsIOException();
+              }
+            }
+          }
+        } else {
+          throw new ReadTagsIOException();
+        }
+      }
+
+      tagTypes.put(1, "BYTE");
+      tagTypes.put(2, "ASCII");
+      tagTypes.put(3, "SHORT");
+      tagTypes.put(4, "LONG");
+      tagTypes.put(5, "RATIONAL");
+      tagTypes.put(6, "SBYTE");
+      tagTypes.put(7, "UNDEFINED");
+      tagTypes.put(8, "SSHORT");
+      tagTypes.put(9, "SSHORT");
+      tagTypes.put(10, "SRATIONAL");
+      tagTypes.put(11, "FLOAT");
+      tagTypes.put(12, "DOUBLE");
+      tagTypes.put(13, "SUBIFD");
+    } catch (Exception ex) {
+      throw new ReadTagsIOException();
     }
-    
-    tagTypes.put(1, "BYTE");
-    tagTypes.put(2, "ASCII");
-    tagTypes.put(3, "SHORT");
-    tagTypes.put(4, "LONG");
-    tagTypes.put(5, "RATIONAL");
-    tagTypes.put(6, "SBYTE");
-    tagTypes.put(7, "UNDEFINED");
-    tagTypes.put(8, "SSHORT");
-    tagTypes.put(9, "SSHORT");
-    tagTypes.put(10, "SRATIONAL");
-    tagTypes.put(11, "FLOAT");
-    tagTypes.put(12, "DOUBLE");
-    tagTypes.put(13, "SUBIFD");
   }
   
   /**
    * Gets the tiff tags.
    *
    * @return the singleton instance
+   * @throws ReadTagsIOException the read tags io exception
    */
-  public static synchronized TiffTags getTiffTags() {
+  public static synchronized TiffTags getTiffTags() throws ReadTagsIOException {
     if (instance == null) {
       instance = new TiffTags();
     }
@@ -115,8 +156,11 @@ public class TiffTags {
    */
   public static Tag getTag(int identifier) {
     Tag t = null;
+    try {
     if (instance == null)
       getTiffTags();
+    } catch (ReadTagsIOException e) {
+    }
     if (tagMap.containsKey(identifier))
       t = tagMap.get(identifier);
     return t;
@@ -130,8 +174,11 @@ public class TiffTags {
    */
   public static int getTagId(String name) {
     int id = -1;
+    try {
     if (instance == null)
       getTiffTags();
+    } catch (ReadTagsIOException e) {
+    }
     if (tagNames.containsKey(name))
       id = tagNames.get(name).getId();
     return id;

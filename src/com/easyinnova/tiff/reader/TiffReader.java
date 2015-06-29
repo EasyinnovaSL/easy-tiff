@@ -32,6 +32,9 @@
 package com.easyinnova.tiff.reader;
 
 import com.easyinnova.tiff.io.TiffInputStream;
+import com.easyinnova.tiff.model.IccProfileCreators;
+import com.easyinnova.tiff.model.ReadIccConfigIOException;
+import com.easyinnova.tiff.model.ReadTagsIOException;
 import com.easyinnova.tiff.model.Tag;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
@@ -90,10 +93,15 @@ public class TiffReader {
   /**
    * Default constructor.<br>
    * Instantiates a new empty tiff reader.
+   *
+   * @throws ReadTagsIOException the read tags io exception
+   * @throws ReadIccConfigIOException the read icc config io exception
    */
-  public TiffReader() {
+  public TiffReader() throws ReadTagsIOException, ReadIccConfigIOException {
     tiffModel = null;
     filename = null;
+    TiffTags.getTiffTags();
+    IccProfileCreators.getIccProfileCreators();
   }
 
   /**

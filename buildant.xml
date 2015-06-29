@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<project name="FatJar easytiff_fat.jar (experimental)" default="main" basedir=".">
+    <!-- this file was created by Fat-Jar Eclipse Plug-in -->
+    <!-- the ANT-Export is in a very early stage, so this -->
+    <!-- is only experimental, ANT 1.6 or above is        -->
+    <!-- required, feedback is always welcome:            -->
+    <!--       http://sourceforge.net/projects/fjep       -->
+    <!-- uncomment the following lines if using ANT outside Eclipse -->
+    <!--
+        <property name="fjepPath" value="reference:file:plugins/net.sf.fjep.fatjar_0.0.31.jarfatjar.jar"/>
+        <taskdef name="fatjar.build" classname="net.sf.fjep.anttask.FJBuildTask" classpath="${fjepPath}"/>
+        <typedef name="fatjar.manifest" classname="net.sf.fjep.anttask.FJManifestType" classpath="${fjepPath}"/>
+        <typedef name="fatjar.exclude" classname="net.sf.fjep.anttask.FJExcludeType" classpath="${fjepPath}"/>
+        <typedef name="fatjar.jarsource" classname="net.sf.fjep.anttask.FJJarSourceType" classpath="${fjepPath}"/>
+        <typedef name="fatjar.filesource" classname="net.sf.fjep.anttask.FJFileSourceType" classpath="${fjepPath}"/>
+    -->
+    <!-- uncomment the above lines to use ANT outside of Eclipse -->
+    <target name="main">
+        <fatjar.build output="easytiff_fat.jar">
+            <fatjar.manifest/>
+            <fatjar.filesource path="D:\workspace\easytiff\bin" relpath="">
+                <fatjar.exclude relpath="test/"/>
+                <fatjar.exclude relpath="Tests/"/>
+            </fatjar.filesource>
+            <fatjar.jarsource file="D:\workspace\easytiff\lib\gson-2.3.1.jar" relpath=""/>
+            <fatjar.jarsource file="C:\Program Files\eclipse\plugins\org.junit_4.11.0.v201303080030\junit.jar" relpath=""/>
+            <fatjar.jarsource file="C:\Program Files\eclipse\plugins\org.hamcrest.core_1.3.0.v201303031735.jar" relpath=""/>
+            <fatjar.filesource path="D:\workspace\easytiff\config\" relpath=""/>
+        </fatjar.build>
+    </target>
+</project>

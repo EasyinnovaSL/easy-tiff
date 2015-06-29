@@ -30,6 +30,8 @@
  */
 package Tests;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,7 +65,13 @@ public class SpeedTest {
    */
   @Before
   public void PreTest() {
-    tr = new TiffReader();
+    boolean ok = true;
+    try {
+      tr = new TiffReader();
+    } catch (Exception e) {
+      ok = false;
+    }
+    assertEquals(ok, true);
   }
 
   /**
