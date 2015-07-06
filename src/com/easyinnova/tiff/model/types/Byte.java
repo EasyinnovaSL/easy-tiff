@@ -71,4 +71,13 @@ public class Byte extends abstractTiffType {
   public String toString() {
     return "" + (int) (value & 0xFF);
   }
+  
+  /**
+   * To byte.
+   *
+   * @return the char
+   */
+  public byte toByte() {
+	return value;
+  }
 }

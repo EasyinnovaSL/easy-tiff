@@ -37,10 +37,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.easyinnova.tiff.model.ImageStrips;
+import com.easyinnova.tiff.model.Metadata;
 import com.easyinnova.tiff.model.TagValue;
 import com.easyinnova.tiff.model.TiffDocument;
 import com.easyinnova.tiff.model.Tile;
 import com.easyinnova.tiff.model.types.IFD;
+import com.easyinnova.tiff.model.types.IPTC;
 import com.easyinnova.tiff.reader.TiffReader;
 
 /**
@@ -225,6 +227,27 @@ public class TiffReaderTest {
     assertEquals("8", to.getMetadataSingleString("BitsPerSample"));
     assertEquals(999, Integer.parseInt(to.getMetadataSingleString("ImageWidth")));
     assertEquals("NIKON D7000", to.getMetadataSingleString("Model"));
+  }
+  
+  /**
+   * Test5.
+   */
+  @SuppressWarnings("unused")
+  @Test
+  public void Test5() {
+    // Image 5
+    result = tr.readFile("src\\test\\resources\\Small\\iptc.tif");
+    assertEquals(0, result);
+    assertEquals(true, tr.getValidation().correct);
+    to = tr.getModel();
+    
+    ifd = (IFD) to.getFirstIFD();
+    IPTC iptc = (IPTC)ifd.getTag("IPTC").getValue().get(0);
+    Metadata mtIPTC = (iptc).createMetadata();
+    iptc.toString();
+    assertEquals(33723,ifd.getTag("IPTC").getId());
+    assertEquals(true, ifd.getTag("IPTC").getValue().size()>0);
+    
   }
 }
 

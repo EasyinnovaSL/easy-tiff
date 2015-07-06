@@ -1,5 +1,5 @@
 /**
- * <h1>Undefined.java</h1> 
+ * <h1>Short.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -28,55 +28,63 @@
  * @since 27/5/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.iptc;
+
+import java.util.List;
+
+import com.easyinnova.tiff.model.types.Byte;
 
 /**
- * The Class Undefined.
+ * The Class Short.
  */
-public class Undefined extends abstractTiffType{
-  /** The value. */
-  private byte value;
+public class Short extends abstractIptcType{
 
-  /**
-   * Instantiates a new s byte.
-   *
-   * @param ch the value
-   */
-  public Undefined(int ch) {
-    super();
-    this.value=(byte) ch;
-    setTypeSize(1);
-  }
+	/** The value. */
+	private int value;
 
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public byte getValue() {
-    return value;
-  }
+	
+	/**
+	 * Instantiates a new Short.
+	 *
+	 */
+	public Short() {
+		super();		
+		this.value = 0; 
+		setType(1);
+	}
+	
+	/**
+	 * Instantiates a new Short.
+	 *
+	 * @param value the value represented in List<Byte>
+	 */
+	public void read(List<Byte> value) {
+		if(value.size()==2){
+			this.value = ((value.get(0).toInt() << 8) & 0x0000ff00) | (value.get(1).toInt() & 0x000000ff);
+		}		 
+	}
 
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(byte value) {
-    this.value = value;
-  }
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
+	public int getValue() {
+		return (int) (value & 0xffff);
+	}
 
-  @Override
-  public String toString() {
-    return "" + value;
-  }
-  
-  /**
-   * To byte.
-   *
-   * @return the char
-   */
-  public byte toByte() {
-	return value;
-  }
+	/**
+	 * Sets the value.
+	 *
+	 * @param value the new value
+	 */
+	public void setValue(short value) {
+		this.value = value;
+	}
+
+	@Override
+	public java.lang.String toString() {
+		return "" + (int) (value & 0xffff);
+	}
+
 }

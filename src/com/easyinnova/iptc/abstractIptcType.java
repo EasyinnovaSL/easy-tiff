@@ -29,29 +29,32 @@
  * @since 26/5/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.iptc;
 
-import com.easyinnova.tiff.model.Metadata;
-import com.easyinnova.tiff.model.TagValue;
-import com.easyinnova.tiff.model.TiffObject;
+import java.util.List;
+
+import com.easyinnova.tiff.model.types.Byte;
 
 /**
  * The generic class abstractTiffType.
  */
-public class abstractTiffType extends TiffObject {
+public class abstractIptcType {
 
   /** The tag size in bytes. */
-  private int typeSize;
-
-  /** The is ifd. */
-  private boolean isIFD;
+  private int type;
 
   /**
    * Instantiates a new abstract tiff type.
    */
-  public abstractTiffType() {
-    typeSize = 0; // Undefined
-    isIFD = false;
+  public abstractIptcType() {
+    type = 0; // Undefined
+  }
+  
+  /**
+   * Instantiates a new abstract tiff type.
+   */
+  public abstractIptcType(List<Byte> tv) {
+    type = 0; // Undefined
   }
 
   /**
@@ -59,8 +62,8 @@ public class abstractTiffType extends TiffObject {
    *
    * @param size the new type size
    */
-  public void setTypeSize(int size) {
-    typeSize = size;
+  public void setType(int size) {
+    type = size;
   }
 
   /**
@@ -69,83 +72,15 @@ public class abstractTiffType extends TiffObject {
    * @return the type size
    */
   public int getTypeSize() {
-    return typeSize;
+    return type;
   }
-
-  /**
-   * Convert the value to an integer.
-   *
-   * @return the int
-   * @throws NumberFormatException Number format exception
-   */
-  public int toInt() throws NumberFormatException {
-    return Integer.parseInt(this.toString());
-  }
-
+  
   /**
    * Read.
    *
    * @param tv the tv
    */
-  public void read(TagValue tv) {
-  }
-
-  /**
-   * Checks if is ifd.
-   *
-   * @return true, if is ifd
-   */
-  public boolean isIFD() {
-    return isIFD;
-  }
-
-  /**
-   * To uint.
-   *
-   * @return the char
-   */
-  public int toUint() {
-    int res = toInt();
-    if (res < 0)
-      res += 256;
-    return res;
+  public void read(List<Byte> tv) {
   }
   
-  /**
-   * To byte.
-   *
-   * @return the byte
-   */
-  public byte toByte() {
-	byte b = new java.lang.Byte(this.toString());
-    return b;
-  }
-  
-
-  /**
-   * Sets the checks if is ifd.
-   *
-   * @param b the new checks if is ifd
-   */
-  protected void setIsIFD(boolean b) {
-    isIFD = b;
-  }
-
-  /**
-   * Contains metadata.
-   *
-   * @return true, if successful
-   */
-  public boolean containsMetadata() {
-    return false;
-  }
-
-  /**
-   * Creates the metadata.
-   *
-   * @return the hash map
-   */
-  public Metadata createMetadata() {
-    return new Metadata();
-  }
 }

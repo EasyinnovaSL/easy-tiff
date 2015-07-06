@@ -28,55 +28,69 @@
  * @since 27/5/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.iptc;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import com.easyinnova.tiff.model.types.Byte;
 
 /**
  * The Class Undefined.
  */
-public class Undefined extends abstractTiffType{
-  /** The value. */
-  private byte value;
+public class Undefined extends abstractIptcType{
+	/** The value. */
+	private byte[] value;
 
-  /**
-   * Instantiates a new s byte.
-   *
-   * @param ch the value
-   */
-  public Undefined(int ch) {
-    super();
-    this.value=(byte) ch;
-    setTypeSize(1);
-  }
+	/**
+	 * Instantiates a new Undefined.
+	 *
+	 */
+	public Undefined() {
+		super();
+		this.value= new byte[0];
+		setType(5);
+	}
 
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public byte getValue() {
-    return value;
-  }
+	/**
+	 * Instantiates a new Undefined.
+	 *
+	 * @param value the value represented in List<Byte>
+	 */
+	public void read(List<Byte> value) {
+		this.value = new byte[value.size()];
+		for(int j=0;j<value.size();j++){
+			this.value[j]=value.get(j).toByte();
+		}
+	}
 
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(byte value) {
-    this.value = value;
-  }
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
+	public byte[] getValue() {
+		return value;
+	}
 
-  @Override
-  public String toString() {
-    return "" + value;
-  }
-  
-  /**
-   * To byte.
-   *
-   * @return the char
-   */
-  public byte toByte() {
-	return value;
-  }
+	/**
+	 * Sets the value.
+	 *
+	 * @param value the new value
+	 */
+	public void setValue(byte[] value) {
+		this.value = value;
+	}
+
+	@Override
+	public java.lang.String toString() {
+		java.lang.String result = "";
+		try {
+			result= new java.lang.String(value,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+
 }

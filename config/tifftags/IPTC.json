@@ -2,9 +2,10 @@
   "id": 33723,
   "name": "IPTC",
   "type": [
-    "UNDEFINED",
-    "BYTE"
+    "BYTE",
+    "UNDEFINED"
   ],
+  "typedef": IPTC,
   "cardinality": "N",
   "defaultValue": "",
   "ifd": "",

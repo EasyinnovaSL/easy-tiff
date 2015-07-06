@@ -1,5 +1,5 @@
 /**
- * <h1>Undefined.java</h1> 
+ * <h1>Short.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -28,55 +28,69 @@
  * @since 27/5/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.iptc;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import com.easyinnova.tiff.model.types.Byte;
 
 /**
- * The Class Undefined.
+ * The Class String.
  */
-public class Undefined extends abstractTiffType{
-  /** The value. */
-  private byte value;
+public class String extends abstractIptcType{
 
-  /**
-   * Instantiates a new s byte.
-   *
-   * @param ch the value
-   */
-  public Undefined(int ch) {
-    super();
-    this.value=(byte) ch;
-    setTypeSize(1);
-  }
+	/** The value. */
+	private java.lang.String value;
 
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public byte getValue() {
-    return value;
-  }
+	/**
+	 * Instantiates a new String.
+	 *
+	 */
+	public String() {
+		super();
+		this.value= "";
+		setType(2);
+	}
+	
+	/**
+	 * Instantiates a new String.
+	 *
+	 * @param value the value represented in List<Byte>
+	 */
+	public void read(List<Byte> value) {
+		try {
+			byte[] arrayContent = new byte[value.size()];
+			for(int j=0;j<value.size();j++){
+				arrayContent[j]=value.get(j).toByte();
+			}
+			
+			this.value = new java.lang.String(arrayContent,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+	}
 
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(byte value) {
-    this.value = value;
-  }
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
+	public java.lang.String getValue() {
+		return value;
+	}
 
-  @Override
-  public String toString() {
-    return "" + value;
-  }
-  
-  /**
-   * To byte.
-   *
-   * @return the char
-   */
-  public byte toByte() {
-	return value;
-  }
+	/**
+	 * Sets the value.
+	 *
+	 * @param value the new value
+	 */
+	public void setValue(java.lang.String value) {
+		this.value = value;
+	}
+
+	@Override
+	public java.lang.String toString() {
+		return value;
+	}
+
 }

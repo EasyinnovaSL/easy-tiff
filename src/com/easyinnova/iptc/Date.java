@@ -1,5 +1,5 @@
 /**
- * <h1>Undefined.java</h1> 
+ * <h1>Short.java</h1> 
  * <p>
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -28,55 +28,64 @@
  * @since 27/5/2015
  *
  */
-package com.easyinnova.tiff.model.types;
+package com.easyinnova.iptc;
+
+import java.util.List;
+
+import com.easyinnova.tiff.model.types.Byte;
 
 /**
- * The Class Undefined.
+ * The Class Short.
  */
-public class Undefined extends abstractTiffType{
-  /** The value. */
-  private byte value;
+public class Date extends abstractIptcType{
 
-  /**
-   * Instantiates a new s byte.
-   *
-   * @param ch the value
-   */
-  public Undefined(int ch) {
-    super();
-    this.value=(byte) ch;
-    setTypeSize(1);
-  }
+	/** The value. */
+	private java.lang.String value;
 
-  /**
-   * Gets the value.
-   *
-   * @return the value
-   */
-  public byte getValue() {
-    return value;
-  }
 
-  /**
-   * Sets the value.
-   *
-   * @param value the new value
-   */
-  public void setValue(byte value) {
-    this.value = value;
-  }
+	/**
+	 * Instantiates a new Date.
+	 *
+	 */
+	public Date() {
+		super();
+		this.value= "";
+		setType(3);
+	}
 
-  @Override
-  public String toString() {
-    return "" + value;
-  }
-  
-  /**
-   * To byte.
-   *
-   * @return the char
-   */
-  public byte toByte() {
-	return value;
-  }
+	/**
+	 * Instantiates a new Date.
+	 *
+	 * @param value the value represented in List<Byte>
+	 */
+	public void read(List<Byte> value) {
+		this.value = "";
+		for(int j=0;j<value.size();j++){
+			this.value+=(char)value.get(j).toByte();
+		}
+	}
+
+	/**
+	 * Gets the value.
+	 *
+	 * @return the value
+	 */
+	public java.lang.String getValue() {
+		return value;
+	}
+
+	/**
+	 * Sets the value.
+	 *
+	 * @param value the new value
+	 */
+	public void setValue(java.lang.String value) {
+		this.value = value;
+	}
+
+	@Override
+	public java.lang.String toString() {
+		return value;
+	}
+
 }
